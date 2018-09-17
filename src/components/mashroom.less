@@ -1,0 +1,16 @@
+.mashroom-item {
+  border-radius: 5px;
+  margin: 0.5px;
+  float: left;
+  width: 40px;
+  height: 40px;
+  background-color: fade(#fdd10e, 60);
+  animation: rotateplane 10s infinite ease-in-out;
+  &.deep {
+    background-color: fade(#fdd10e, 70);
+  }
+  &.blank {
+    animation: none;
+    background: none;
+  }
+}
