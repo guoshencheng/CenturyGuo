@@ -13,6 +13,7 @@ deploy:
   provider: pages
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
+  repo: https://github.com/guoshencheng/guoshencheng.github.io.git
   keep-history: true
   local_dir: public
   name: $GIT_NAME
