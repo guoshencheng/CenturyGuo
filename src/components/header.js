@@ -12,7 +12,7 @@ const Header = ({ siteTitle }) => (
         <Link to="/">{siteTitle}</Link>
       </div>
     </div>
-    <div class="header-line-item game-text header-link">
+    <div className="header-line-item game-text header-link">
       <Link to="/">Posts</Link>
     </div>
   </div>

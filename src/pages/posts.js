@@ -10,7 +10,9 @@ const Posts = ({ data }) => (
       data.allMarkdownRemark.edges.map(i => i.node).map(node => (
         <div className="post-item" key={node.id}>
           <div className="post-item-title">
-            {node.frontmatter.title}
+            <Link to={`/posts/${node.fields.slug}`}>
+              {node.frontmatter.title}
+            </Link>
           </div>
           <div className="post-item-base-info">
             {node.frontmatter.date}
@@ -35,6 +37,9 @@ query AllMarkdownRemakSchema {
         frontmatter {
           title
           date(formatString: "DD MMMM, YYYY")
+        }
+        fields {
+          slug
         }
         excerpt
       }

@@ -14,6 +14,7 @@ module.exports = {
         name: 'src',
         path: path.resolve(__dirname, './docs'),
       }
-    }
+    },
+    'gatsby-plugin-remove-trailing-slashes',
   ],
 }

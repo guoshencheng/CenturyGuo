@@ -9,6 +9,7 @@
     "gatsby-link": "^1.6.46",
     "gatsby-plugin-less": "^1.1.8",
     "gatsby-plugin-react-helmet": "^2.0.11",
+    "gatsby-plugin-remove-trailing-slashes": "^1.0.9",
     "gatsby-source-filesystem": "^1.5.39",
     "gatsby-transformer-remark": "^1.7.44",
     "react": "^16.5.0",
