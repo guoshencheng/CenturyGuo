@@ -3,7 +3,7 @@ import Link from 'gatsby-link';
 import MashRoom from '../components/mashroom';
 import './index.less';
 
-const IndexPage = () => (
+const IndexPage = ({ siteTitle }) => (
   <table className="home-page-container">
     <tbody>
       <tr>

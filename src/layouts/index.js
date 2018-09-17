@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
+import classnames from 'classnames';
 
 import Header from '../components/header'
 import './index.less'
 
-const Layout = ({ children, data }) => (
+const Layout = ({ children, data, location }) => (
   <div>
     <Helmet
       title={data.site.siteMetadata.title}
@@ -14,8 +15,11 @@ const Layout = ({ children, data }) => (
         { name: 'keywords', content: 'sample, something' },
       ]}
     />
-    <Header siteTitle={data.site.siteMetadata.title} />
-    <div className="container">
+    {
+      location.pathname !== '/' 
+      && <Header siteTitle={data.site.siteMetadata.title} />
+    }
+    <div className={classnames('container', { 'with-header': location.pathname !== '/' })}>
       {children()}
     </div>
   </div>

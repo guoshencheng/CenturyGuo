@@ -7,5 +7,5 @@ exports.onCreateNode = ({ node }) => {
 }
 
 exports.createPages = (...args) => {
-  console.log(...args);
+  // console.log(...args);
 }
