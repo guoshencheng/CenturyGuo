@@ -4,6 +4,8 @@ import Helmet from 'react-helmet'
 import classnames from 'classnames';
 
 import Header from '../components/header'
+import '../atom-one-dark.css'
+import '../github-markdown.css'
 import './index.less'
 
 const Layout = ({ children, data, location }) => (

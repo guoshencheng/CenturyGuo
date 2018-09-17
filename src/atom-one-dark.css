@@ -1,0 +1,98 @@
+/*
+
+Atom One Dark by Daniel Gamage
+Original One Dark Syntax theme from https://github.com/atom/one-dark-syntax
+
+base:    #282c34
+mono-1:  #abb2bf
+mono-2:  #818896
+mono-3:  #5c6370
+hue-1:   #56b6c2
+hue-2:   #61aeee
+hue-3:   #c678dd
+hue-4:   #98c379
+hue-5:   #e06c75
+hue-5-2: #be5046
+hue-6:   #d19a66
+hue-6-2: #e6c07b
+
+*/
+
+pre[class*=language-] {
+  font-family: source-code-pro,Menlo,Monaco,Consolas,Courier New,monospace;
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #ffffff;
+  background: #282c34;
+  border-radius: 5px;
+}
+
+.token.comment,
+.token.quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.token.doctag,
+.token.keyword,
+.token.formula {
+  color: #c678dd;
+}
+
+.token.section,
+.token.name,
+.token.selector-tag,
+.token.deletion,
+.token.subst {
+  color: #e06c75;
+}
+
+.token.literal {
+  color: #56b6c2;
+}
+
+.token.string,
+.token.regexp,
+.token.addition,
+.token.attribute,
+.token.meta-string {
+  color: #98c379;
+}
+
+.token.built_in,
+.token.class .token.title {
+  color: #e6c07b;
+}
+
+.token.attr,
+.token.variable,
+.token.template-variable,
+.token.type,
+.token.selector-class,
+.token.selector-attr,
+.token.selector-pseudo,
+.token.number {
+  color: #d19a66;
+}
+
+.token.symbol,
+.token.bullet,
+.token.link,
+.token.meta,
+.token.selector-id,
+.token.title {
+  color: #61aeee;
+}
+
+.token.emphasis {
+  font-style: italic;
+}
+
+.token.strong {
+  font-weight: bold;
+}
+
+.token.link {
+  text-decoration: underline;
+}

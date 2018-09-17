@@ -1,14 +1,26 @@
 import React from 'react';
+import highlight from 'highlight.js';
+import './post.less';
 
-export default ({ data }) => {
-  const post = data.markdownRemark;
-  return (
-    <div>
-      <h1>{post.frontmatter.title}</h1>
-      <div dangerouslySetInnerHTML={{ __html: post.html }} />
-    </div>
-  );
-};
+export default class Post extends React.Component {
+  render() {
+    const { data } = this.props;
+    const post = data.markdownRemark;
+    return (
+      <div className="post-container">
+        <div className="post-title">
+          {post.frontmatter.title}
+        </div>
+        <div className="post-date">
+          {post.frontmatter.date}
+        </div>
+        <div className="markdown-body">
+          <div dangerouslySetInnerHTML={{ __html: post.html }} />
+        </div>
+      </div>
+    );
+  }
+}
 
 export const query = graphql`
   query BlogPostQuery($slug: String!) {
@@ -16,6 +28,7 @@ export const query = graphql`
       html
       frontmatter {
         title
+        date(formatString: "DD MMMM, YYYY")
       }
     }
   }
