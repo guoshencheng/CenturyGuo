@@ -14,5 +14,8 @@ deploy:
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
   keep-history: true
+  local_dir: public
+  name: $GIT_NAME
+  email: $GIT_EMAIL
   on:
     branch: master
