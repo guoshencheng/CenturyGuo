@@ -1,8 +1,9 @@
 import React from 'react'
 import Link from 'gatsby-link'
 import graphql from 'graphql'
+import './posts.less';
 
-const SecondPage = ({ data }) => (
+const Posts = ({ data }) => (
   <div>
     <div className="posts-list">
     {
@@ -42,4 +43,4 @@ query AllMarkdownRemakSchema {
 }
 `
 
-export default SecondPage;
+export default Posts;
