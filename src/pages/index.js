@@ -22,9 +22,9 @@ const IndexPage = () => (
               <Link to="">
                 Tips
               </Link>
-              <Link to="">
-                Github
-              </Link>
+              <a target="_blank" href="https://github.com/guoshencheng">
+                github
+              </a>
             </div>
           </div>
         </td>
