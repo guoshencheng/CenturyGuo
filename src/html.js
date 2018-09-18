@@ -19,6 +19,9 @@ const fontString = `
   src: local('Press Start 2P Regular'), local('PressStart2P-Regular'), url('${font}') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+html {
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+}
 `
 
 module.exports = class HTML extends React.Component {
