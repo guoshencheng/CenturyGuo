@@ -29,7 +29,12 @@ const Posts = ({ data }) => (
 
 export const query = graphql`
 query AllMarkdownRemakSchema {
-  allMarkdownRemark {
+  allMarkdownRemark(
+    sort: {
+    	fields: [frontmatter___date]
+      order: DESC
+  	}
+  ) {
     totalCount
     edges {
       node {
