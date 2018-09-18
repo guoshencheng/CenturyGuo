@@ -1,6 +1,7 @@
 ---
 title: 'React-redux解读'
 date: '2017-09-11'
+tag: react,redux
 ---
 
 写react项目快一年了，最近写项目用到了[redux-saga](https://redux-saga.js.org/)这个框架，大家总是拿，`redux-saga`和[redux-thunk](https://github.com/gaearon/redux-thunk)相提并论，大概都是因为大家先用了`redux-thunk`，然后才用了`redux-saga`的缘由吧，因为我觉得确实`redux-saga`做的比`redux-thunk`做的多，而且用法相差甚远。很多人没有仔细阅读过文档或者用了更上层的框架来使用`redux-saga`，本文意在讲解作者理解的`redux-saga`，引导大家走向我觉得正确的使用路线上。

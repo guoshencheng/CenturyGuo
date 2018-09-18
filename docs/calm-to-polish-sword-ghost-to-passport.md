@@ -1,6 +1,7 @@
 ---
 title: '静心打磨手中利刃之从Ghost到Passport'
 date: '2017-10-22'
+tag: 静心打磨手中利刃,node
 ---
 > 其实一直有接触[Ghost](https://github.com/TryGhost/Ghost)这个博客系统，自从学习node开始，就有使用过这个系统，乃至现在公司的博客系统，都是使用这个搭建的，曾经没有好好的去看看源码。最近想要修改这个系统的后台系统，但是[Ghost-Admin](https://github.com/TryGhost/Ghost-Admin)的代码编译恕在下无能，真的有点难编译，或者可能就算编译通过了，也会比较难适应，于是就心生一个念头，自己写个[ghost-admin-react](https://github.com/guoshencheng/ghost-admin-react)，当然随之而来的就是这个这个后台系统的登录问题，虽然我们从原始后台系统的登录就可以了解这个系统的登录了，但是我们不妨一窥Ghost的登录源码，或许能有些惊喜。
 

@@ -28,12 +28,19 @@ const Posts = ({ data }) => (
 )
 
 export const query = graphql`
-query AllMarkdownRemakSchema {
+query AllMarkdownRemakSchema($tag: String) {
   allMarkdownRemark(
     sort: {
     	fields: [frontmatter___date]
       order: DESC
-  	}
+  	},
+    filter: {
+      frontmatter: {
+        tag: {
+          regex: $tag
+        }
+      }
+    }
   ) {
     totalCount
     edges {

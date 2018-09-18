@@ -1,6 +1,7 @@
 ---
 title: "Setting up your React /ES6 Development environment with Webpack, Express and Babel"
 date: 2017-01-27
+tag: react,webpack
 ---
 
 转载自[Setting up your React /ES6 Development environment with Webpack, Express and Babel](https://blog.hellojs.org/setting-up-your-react-es6-development-environment-with-webpack-express-and-babel-e2a53994ade#.8miz3jdjt)
