@@ -8,6 +8,7 @@ install:
 
 script: 
   - npm run build
+  - cp ./src/CNAME public/
 
 deploy:
   provider: pages
