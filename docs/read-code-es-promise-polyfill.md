@@ -336,6 +336,22 @@ function publish(promise) {
 }
 ```
 
+publish获取了promise的subscribers，subscribers中的数据是循环的使用`[...<promise>, <resolved callback>, <rejected callback>...]` 如果 subscribers 中没有观察者，则什么都不做，否则循环。在每个循环中，取到观察者promise，通过当前的promise的状态来获取应该使用resolve还是reject
+
+```javascript
+callback = subscribers[i + settled];
+```
+
+由于`es-promise`对state的定义为:
+
+```javascript
+const PENDING   = void 0;
+const FULFILLED = 1;
+const REJECTED  = 2;
+```
+
+所以可以直接通过`subscribers[i + settled]`来获取到当前的callback, 获取到callback之后会校验观察者的promise是否存在，如果存在就调用`invokeCallback`，否则就调用`callback(detail)`，相当于直接调用注册的的resolve或者reject的回调，`callback(detail)`这个很好理解，那么我们再看看`invokeCallback`做了什么
+
 ```javascript
 function invokeCallback(settled, promise, callback, detail) {
   let hasCallback = isFunction(callback),
@@ -375,6 +391,8 @@ function invokeCallback(settled, promise, callback, detail) {
   }
 }
 ```
+
+这又是一个需要回顾入参的函数，settled为当前Promise的状态，promise为当前的观察的promise的实例，callback为当前观察者注册的父promise在resolve或者reject后的回调，detail是当前promise在fullfill后的返回值
 
 ```javascript
 function reject(promise, reason) {

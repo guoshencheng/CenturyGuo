@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'gatsby-link';
 import './post.less';
+require("prismjs/themes/prism-tomorrow.css")
 
 export default class Post extends React.Component {
   render() {
