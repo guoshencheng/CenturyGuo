@@ -14,6 +14,7 @@ tag: Promise,ES
 2. 如上的代码会输出什么?
 
 ```javascript
+
 new Promise((resolve) => {
   console.log(1);
   resolve();
@@ -184,3 +185,5 @@ function handleOwnThenable(promise, thenable) {
   }
 }
 ```
+
+这里的promise和thenable分别是当前的promise对象和resolve的value，而thenable其实经过判断也是一个合法的promise，这里校验了resolve的promise的`_state`。
