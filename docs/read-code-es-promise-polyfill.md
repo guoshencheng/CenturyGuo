@@ -187,3 +187,282 @@ function handleOwnThenable(promise, thenable) {
 ```
 
 这里的promise和thenable分别是当前的promise对象和resolve的value，而thenable其实经过判断也是一个合法的promise，这里校验了resolve的promise的`_state`。
+
+如果thenable是一个已经完成的`promise`的话，调用`fullfill()`
+
+```javascript
+function fulfill(promise, value) {
+  if (promise._state !== PENDING) { return; }
+
+  promise._result = value;
+  promise._state = FULFILLED;
+
+  if (promise._subscribers.length !== 0) {
+    asap(publish, promise);
+  }
+}
+```
+
+再次介绍一下这里的入参，promise是当前的promise实例，value是resolve的promise在fulfill之后的返回值，首先`fullfill`本身也会校验`promise`的状态，然后将当前的promise实例赋值状态和当前的值。后续去判断了一个`promise._subscribers`的长度，关于这个`promise._subscribers`应该只是这个`es-promise`自己实现的需要，原生的`promise`是没有这个属性的，我们没有去关注原生的promise的实现方式，暂且关系这个`es-promise`的实现吧，而这个`promise._subscribers`在后续会讲到，可以先理解为一系列已经注册的观察者。至于这些观察者是什么时候注册，后续会娓娓道来。那么我们现在可能比较关心的就是如何理解`asap(publish, promise)`这个调用
+
+```javascript
+export var asap = function asap(callback, arg) {
+  queue[len] = callback;
+  queue[len + 1] = arg;
+  len += 2;
+  if (len === 2) {
+    // If len is 2, that means that we need to schedule an async flush.
+    // If additional callbacks are queued before the queue is flushed, they
+    // will be processed by this flush that we are scheduling.
+    if (customSchedulerFn) {
+      customSchedulerFn(flush);
+    } else {
+      scheduleFlush();
+    }
+  }
+}
+```
+
+`queue`是一个全局的变量，每次执行asap都会将回调函数callback和该回调函数所需的参数arg放到队列`queue`中，而len记录了当前queue的长度，当长度为2，也就是说，本来队列中为空的情况下会去执行`scheduleFlush()`这里有个判断，会判断`customSchedulerFn`这个变量，这个变量会在开发人员调用了`setScheduler`设置成开发人员自定义的`scheduleFlush`，而系统已经更具浏览器的兼容情况为我们提供了`scheduleFlush`
+
+```javascript
+let scheduleFlush;
+// Decide what async method to use to triggering processing of queued callbacks:
+if (isNode) {
+  scheduleFlush = useNextTick();
+} else if (BrowserMutationObserver) {
+  scheduleFlush = useMutationObserver();
+} else if (isWorker) {
+  scheduleFlush = useMessageChannel();
+} else if (browserWindow === undefined && typeof require === 'function') {
+  scheduleFlush = attemptVertx();
+} else {
+  scheduleFlush = useSetTimeout();
+}
+```
+
+我们先看`isNode`的情况
+
+```javascript
+function useNextTick() {
+  return () => process.nextTick(flush);
+}
+```
+
+可以发现，其实scheduleFlush就是想在下一个事件循环中执行flush的操作。
+
+```javascript
+function flush() {
+  for (let i = 0; i < len; i+=2) {
+    let callback = queue[i];
+    let arg = queue[i+1];
+    callback(arg);
+    queue[i] = undefined;
+    queue[i+1] = undefined;
+  }
+  len = 0;
+}
+```
+
+而flush就是讲队列中的任务逐个执行，这里没有将队列中的数据排出，这就是为什么还需要个len来表示当前队列的实际长度
+
+接下来的各种判断就是根据浏览器来决定用什么方式来实现“下个事件循环”中执行
+
+```javascript
+function useMutationObserver() {
+  let iterations = 0;
+  const observer = new BrowserMutationObserver(flush);
+  const node = document.createTextNode('');
+  observer.observe(node, { characterData: true });
+
+  return () => {
+    node.data = (iterations = ++iterations % 2);
+  };
+}
+```
+
+`useMutationObserver`是通过MutationObserver的监听来实现事件循环，关于MutationObserver的浏览器兼容问题，可以查看[can i use ](https://caniuse.com/#search=MutationObserver)
+
+```javascript
+// web worker
+function useMessageChannel() {
+  const channel = new MessageChannel();
+  channel.port1.onmessage = flush;
+  return () => channel.port2.postMessage(0);
+}
+```
+
+`useMessageChannel`是通过web worker的`MessageChannel`来实现事件循环的，关于`MessageChannel`的浏览器兼容问题，可以查看[can i use](https://caniuse.com/#search=MessageChannel)
+
+最后，保底会使用setTimeout来实现事件循环
+
+```javascript
+function useSetTimeout() {
+  const globalSetTimeout = setTimeout;
+  return () => globalSetTimeout(flush, 1);
+}
+```
+
+当然这并不是很科学的下个事件循环的实现，只是模拟的一个简短的延迟执行。
+
+回过头来我们继续看调用这个`asap`的代码
+
+```javascript
+function fulfill(promise, value) {
+  // ...
+    asap(publish, promise);
+  // ...
+}
+```
+
+通过查看刚才对`asap`这个函数的立即，上述代码可以理解为下个事件循环执行`publish(promise)`函数，那么再看查看一下`publish(promise)`这个函数
+
+```javascript
+function publish(promise) {
+  let subscribers = promise._subscribers;
+  let settled = promise._state;
+  if (subscribers.length === 0) { return; }
+  let child, callback, detail = promise._result;
+  for (let i = 0; i < subscribers.length; i += 3) {
+    child = subscribers[i];
+    callback = subscribers[i + settled];
+    if (child) {
+      invokeCallback(settled, child, callback, detail);
+    } else {
+      callback(detail);
+    }
+  }
+  promise._subscribers.length = 0;
+}
+```
+
+```javascript
+function invokeCallback(settled, promise, callback, detail) {
+  let hasCallback = isFunction(callback),
+      value, error, succeeded, failed;
+
+  if (hasCallback) {
+    value = tryCatch(callback, detail);
+
+    if (value === TRY_CATCH_ERROR) {
+      failed = true;
+      error = value.error;
+      value.error = null;
+    } else {
+      succeeded = true;
+    }
+
+    if (promise === value) {
+      reject(promise, cannotReturnOwn());
+      return;
+    }
+
+  } else {
+    value = detail;
+    succeeded = true;
+  }
+
+  if (promise._state !== PENDING) {
+    // noop
+  } else if (hasCallback && succeeded) {
+    resolve(promise, value);
+  } else if (failed) {
+    reject(promise, error);
+  } else if (settled === FULFILLED) {
+    fulfill(promise, value);
+  } else if (settled === REJECTED) {
+    reject(promise, value);
+  }
+}
+```
+
+```javascript
+function reject(promise, reason) {
+  if (promise._state !== PENDING) { return; }
+  promise._state = REJECTED;
+  promise._result = reason;
+  asap(publishRejection, promise);
+}
+```
+
+```javascript
+function publishRejection(promise) {
+  if (promise._onerror) {
+    promise._onerror(promise._result);
+  }
+  publish(promise);
+}
+```
+
+```javascript
+function subscribe(parent, child, onFulfillment, onRejection) {
+  let { _subscribers } = parent;
+  let { length } = _subscribers;
+  parent._onerror = null;
+  _subscribers[length] = child;
+  _subscribers[length + FULFILLED] = onFulfillment;
+  _subscribers[length + REJECTED]  = onRejection;
+  if (length === 0 && parent._state) {
+    asap(publish, parent);
+  }
+}
+```
+
+```javascript
+function handleForeignThenable(promise, thenable, then) {
+   asap(promise => {
+    var sealed = false;
+    var error = tryThen(then, thenable, value => {
+      if (sealed) { return; }
+      sealed = true;
+      if (thenable !== value) {
+        resolve(promise, value);
+      } else {
+        fulfill(promise, value);
+      }
+    }, reason => {
+      if (sealed) { return; }
+      sealed = true;
+
+      reject(promise, reason);
+    }, 'Settle: ' + (promise._label || ' unknown promise'));
+
+    if (!sealed && error) {
+      sealed = true;
+      reject(promise, error);
+    }
+  }, promise);
+}
+
+```
+
+```javascript
+function tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+  try {
+    then.call(value, fulfillmentHandler, rejectionHandler);
+  } catch(e) {
+    return e;
+  }
+}
+```
+
+```javascript
+export default function then(onFulfillment, onRejection) {
+  const parent = this;
+
+  const child = new this.constructor(noop);
+
+  if (child[PROMISE_ID] === undefined) {
+    makePromise(child);
+  }
+  const { _state } = parent;
+
+  if (_state) {
+    const callback = arguments[_state - 1];
+    asap(() => invokeCallback(_state, child, callback, parent._result));
+  } else {
+    subscribe(parent, child, onFulfillment, onRejection);
+  }
+  return child;
+}
+```
