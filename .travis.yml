@@ -15,7 +15,7 @@ deploy:
   skip-cleanup: true
   github-token: $GITHUB_TOKEN
   repo: guoshencheng/guoshencheng.github.io
-  target-branch: master
+  target-branch: git-pages
   keep-history: true
   local_dir: public
   name: $GIT_NAME
