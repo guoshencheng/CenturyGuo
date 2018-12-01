@@ -392,25 +392,7 @@ function invokeCallback(settled, promise, callback, detail) {
 }
 ```
 
-这又是一个需要回顾入参的函数，settled为当前Promise的状态，promise为当前的观察的promise的实例，callback为当前观察者注册的父promise在resolve或者reject后的回调，detail是当前promise在fullfill后的返回值
-
-```javascript
-function reject(promise, reason) {
-  if (promise._state !== PENDING) { return; }
-  promise._state = REJECTED;
-  promise._result = reason;
-  asap(publishRejection, promise);
-}
-```
-
-```javascript
-function publishRejection(promise) {
-  if (promise._onerror) {
-    promise._onerror(promise._result);
-  }
-  publish(promise);
-}
-```
+这又是一个需要回顾入参的函数，settled为当前Promise的状态，promise为当前的观察的promise的实例，callback为当前观察者注册的父promise在resolve或者reject后的回调，detail是当前promise在fullfill后的返回值，首先会校验是否callback是否为一个函数，如果是一个函数，会尝试执行这个函数，那么可能我们就要关心一个这个函数到底是什么东西，也是时候讲述一下这写subscriber是什么时候注册的了，在之前的代码中我们已经看到过一次注册的地方了，在`handleOwnThenable`中如果当前的promise为pedding的状态的话会执行`subscribe(thenable, undefined, value  => resolve(promise, value), reason => reject(promise, reason))`，可以看一下`subscribe`的实现
 
 ```javascript
 function subscribe(parent, child, onFulfillment, onRejection) {
@@ -426,49 +408,13 @@ function subscribe(parent, child, onFulfillment, onRejection) {
 }
 ```
 
-```javascript
-function handleForeignThenable(promise, thenable, then) {
-   asap(promise => {
-    var sealed = false;
-    var error = tryThen(then, thenable, value => {
-      if (sealed) { return; }
-      sealed = true;
-      if (thenable !== value) {
-        resolve(promise, value);
-      } else {
-        fulfill(promise, value);
-      }
-    }, reason => {
-      if (sealed) { return; }
-      sealed = true;
-
-      reject(promise, reason);
-    }, 'Settle: ' + (promise._label || ' unknown promise'));
-
-    if (!sealed && error) {
-      sealed = true;
-      reject(promise, error);
-    }
-  }, promise);
-}
-
-```
-
-```javascript
-function tryThen(then, value, fulfillmentHandler, rejectionHandler) {
-  try {
-    then.call(value, fulfillmentHandler, rejectionHandler);
-  } catch(e) {
-    return e;
-  }
-}
-```
+subscribe在当前promise的_subscribers中插入观察者信息（promise、resolve、reject），判断当前的`promise`如果为非pedding状态且之前观察者队列为空的话，可以直接在下个事件循环中，通知所有的观察者当前的promise已经完成，并执行回调。回看`invokeCallback`的callback应该就是`subscribe`的`onFullfillment`或者`onRejection`，这个参数是在调用`subscribe`的时候传入的，`handleOwnThenable`中最后就是调用了`resolve(promise, value)`和`reject(promise, error)`来作为`onFullfillment`和`onRejection`。当然之前的`handleOwnThenable`中调用的`subscribe`显然不会走到`invokeCallback`的逻辑中，因为那个`subscribe`的child是空的，最后在publish的时候`child`为空会直接执行`callback(detail)`，那么什么时候执行`invokeCallback`呢，可以查看一下还有什么地方会调用`subscribe`。
 
 ```javascript
 export default function then(onFulfillment, onRejection) {
   const parent = this;
 
-  const child = new this.constructor(noop);
+  const child = new this.cnstructor(noop);
 
   if (child[PROMISE_ID] === undefined) {
     makePromise(child);
@@ -484,3 +430,39 @@ export default function then(onFulfillment, onRejection) {
   return child;
 }
 ```
+
+可以看到 Promise.prototype.then 是如上实现的，每个promise.then都会创建一个新的`promise`，并且在then执行结束的时候返回它，如果当前promise的状态还处于pendding会注册一个监听，这个监听在当前promise完成之后会执行传入onFulfillment或者onRejection，不然会直接在下个事件循环中执行onFulfillment和onRejection，这里的subscribe会传入一个child，所以会在最后执行publish的时候执行invokeCallback
+
+所以总的来说，invokeCallback执行的一般可能是then的时候onFulfillment或onRejection，或者可能是创建一个Promise的时候resolve一个新的promise的时候
+
+```javascript
+// example1
+Promise.resolve().then(() => 1) // 这里的then会注册一个subscribe然后会触发invokeCallback，callback参数为() => 1
+// example2
+Promise.resolve(new Promise(resolve => setTimeout(resolve, 1000))) // 因为resolve了一个promise，会subscribe这个resolve的promise，在这个promise结束的时候，改变自身的状态并且尝试publish自己的所有subscribers
+```
+
+回到开始的`initializePromise`，我们解释了一大圈resolve的逻辑，现在再看看reject的逻辑
+
+```javascript
+function reject(promise, reason) {
+  if (promise._state !== PENDING) { return; }
+  promise._state = REJECTED;
+  promise._result = reason;
+  asap(publishRejection, promise);
+}
+```
+
+其实reject的逻辑很简单，就是讲当前的promise的状态设置rejected并赋值相应的原因，在下个事件循环中调用`publishRejection`
+
+```javascript
+function publishRejection(promise) {
+  if (promise._onerror) {
+    promise._onerror(promise._result);
+  }
+  publish(promise);
+}
+```
+
+`publishRejection`的实现其实只是在正常的publish之前尝试调用了`promise._onerror`，我不知道这个是不是原生promise的标准，这个`es-promise`是存在这个逻辑的。
+
