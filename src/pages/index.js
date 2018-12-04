@@ -19,9 +19,6 @@ const IndexPage = ({ siteTitle }) => (
               <Link to="/posts">
                 Posts
               </Link>
-              <Link to="">
-                Tips
-              </Link>
               <a target="_blank" href="https://github.com/guoshencheng">
                 github
               </a>
