@@ -114,10 +114,10 @@ class PolitePerson extends Person {
 
 ---
 
-You might think that passing `props` down to `super` is necessary so that the base `React.Component` constructor can initialize `this.props`:
+你可能会觉得将props传递到父类的构造函数中，这样父类`React.Component`的构造函数就能够初始化`this.props`
 
 ```js
-// Inside React
+// React内部
 class Component {
   constructor(props) {
     this.props = props;
@@ -126,19 +126,19 @@ class Component {
 }
 ```
 
-And that’s not far from truth — indeed, that’s [what it does](https://github.com/facebook/react/blob/1d25aa5787d4e19704c049c3cfa985d3b5190e0d/packages/react/src/ReactBaseClasses.js#L22).
+其实这里真相已经不远了 - [React真正做的事情](https://github.com/facebook/react/blob/1d25aa5787d4e19704c049c3cfa985d3b5190e0d/packages/react/src/ReactBaseClasses.js#L22)其实是这样的
 
-But somehow, even if you call `super()` without the `props` argument, you’ll still be able to access `this.props` in the `render` and other methods. (If you don’t believe me, try it yourself!)
+接下来有个令人不解的问题就是，即使你在调用父类的构造函数的时候没有传递`props`参数，你也依然可以在`render`或者其他的成员函数中访问`this.props`(如果你不相信我，可以自己尝试一下)
 
-How does *that* work? It turns out that **React also assigns `props` on the instance right after calling *your* constructor:**
+*上述*的现象是如何产生的？显而易见,这个现象证明了**React还会在调用*你的*构造函数之后，为生成的实例的`props`赋值**
 
 ```js
-  // Inside React
+  // React内部
   const instance = new YourComponent(props);
   instance.props = props;
 ```
 
-So even if you forget to pass `props` to `super()`, React would still set them right afterwards. There is a reason for that.
+所以即使你忘记掉在调用`super()`的时候传入`props`，React依然会在构造函数结束之后将`props`赋值，这就是产生这个现象的原因
 
 When React added support for classes, it didn’t just add support for ES6 classes alone. The goal was to support as wide range of class abstractions as possible. It was [not clear](https://reactjs.org/blog/2015/01/27/react-v0.13.0-beta-1.html#other-languages) how relatively successful would ClojureScript, CoffeeScript, ES6, Fable, Scala.js, TypeScript, or other solutions be for defining components. So React was intentionally unopinionated about whether calling `super()` is required — even though ES6 classes are.
 
