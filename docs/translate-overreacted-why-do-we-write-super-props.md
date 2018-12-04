@@ -140,13 +140,13 @@ class Component {
 
 所以即使你忘记掉在调用`super()`的时候传入`props`，React依然会在构造函数结束之后将`props`赋值，这就是产生这个现象的原因
 
-When React added support for classes, it didn’t just add support for ES6 classes alone. The goal was to support as wide range of class abstractions as possible. It was [not clear](https://reactjs.org/blog/2015/01/27/react-v0.13.0-beta-1.html#other-languages) how relatively successful would ClojureScript, CoffeeScript, ES6, Fable, Scala.js, TypeScript, or other solutions be for defining components. So React was intentionally unopinionated about whether calling `super()` is required — even though ES6 classes are.
+当React要添加对class的支持的时候，这不只是代表着React单纯的只是支持ES6 class，React的目标是尽可能的支持最宽泛的class的概念。当时还[不能够确定](https://reactjs.org/blog/2015/01/27/react-v0.13.0-beta-1.html#other-languages)ClojureScript, CoffeeScript, ES6, Fable, Scala.js, TypeScript或者其他语言那种相对来说用于定义组件会比较好。所以React特意对是否必须调用`super()`不敢妄自约束 - 即使是ES6的类。
 
-So does this mean you can just write `super()` instead of `super(props)`?
+那么难道这就意味着你能够使用`super()`而不去调用`super(props)`？
 
-**Probably not because it’s still confusing.** Sure, React would later assign `this.props` *after* your constructor has run. But `this.props` would still be undefined *between* the `super` call and the end of your constructor:
+**可能还是不可以这么做，因为这还存在一些问题** 当然，React会在调用构造函数之后为`this.props`赋值。但是在调用了`super`和构造函数结束之间`this.props`还是`undefuned`:
 
-```js{14}
+```js
 // Inside React
 class Component {
   constructor(props) {
@@ -155,23 +155,22 @@ class Component {
   }
 }
 
-// Inside your code
+// 你的代码
 class Button extends React.Component {
   constructor(props) {
-    super(); // 😬 We forgot to pass props
+    super(); // 😬 我们忘记了将props传入
     console.log(props);      // ✅ {}
     console.log(this.props); // 😬 undefined 
   }
   // ...
 }
 ```
-
-It can be even more challenging to debug if this happens in some method that’s called *from* the constructor. **And that’s why I recommend always passing down `super(props)`, even though it isn’t strictly necessary:**
+你也可以做更多的尝试，比如在一些函数中调用`this.props`，然后在*构造函数中*调用这些函数，看看结果如何。**这也是为什么我推荐你最好能够总是将props传到父类的构造函数中，即使这并不是严格上必须的**
 
 ```js
 class Button extends React.Component {
   constructor(props) {
-    super(props); // ✅ We passed props
+    super(props); // ✅ 我们传入了props
     console.log(props);      // ✅ {}
     console.log(this.props); // ✅ {}
   }
@@ -179,16 +178,16 @@ class Button extends React.Component {
 }
 ```
 
-This ensures `this.props` is set even before the constructor exits.
+这确保了`this.props`在构造函数结束之前就被初始化
 
 -----
 
-There’s one last bit that longtime React users might be curious about.
+这里还有一点，很长的一段时间里，React的使用者都非常的好气。
 
-You might have noticed that when you use the Context API in classes (either with the legacy `contextTypes` or the modern `contextType` API added in React 16.6), `context` is passed as a second argument to the constructor.
+你可能注意到，当你在class中使用 context api(无论是老的`contextTypes`或者现在的React16.6的`contextType`API)，`context`会作为第二个参数传递到构造函数中。
 
-So why don’t we write `super(props, context)` instead? We could, but context is used less often so this pitfall just doesn’t come up as much.
+但是我们会像`super(props, context)`这么写么？我们可以这么做，但是context会用的比较低频，相同的context的问题并不会像props这么多。
 
-**With the class fields proposal this whole pitfall mostly disappears anyway.** Without an explicit constructor, all arguments are passed down automatically. This is what allows an expression like `state = {}` to include references to `this.props` or `this.context` if necessary.
+**通过类属性提案，这些问题大多数都能够解决**即使没有明确构造函数的定义，所有的参数都能够自动的传入父类，这让我们可以通过类似于`state = {}`的表达式来赋值`this.props`或者`this.contxt`
 
-With Hooks, we don’t even have `super` or `this`. But that’s a topic for another day.
+通过 Hooks，我们甚至可以不使用`super`或者`this`。但这是下次的话题了
