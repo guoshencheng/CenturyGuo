@@ -184,9 +184,9 @@ const instance = Counter(props);
 
 ---
 
-Before we see how React solves this, it’s important to remember most people using React use compilers like Babel to compile away modern features like classes for older browsers. So we need to consider compilers in our design.
+在我们了解React是如何处理这类问题之前，我们需要知道，大多数人在使用React的时候会用到类似于Babel这样的编译工具，从而能够在旧的浏览器上使用类似于class这样的语法。所以我们需要在我们的设计中考虑到编译工具的存在。
 
-In early versions of Babel, classes could be called without `new`. However, this was fixed — by generating some extra code:
+在一些老点的版本的Babel中，class不需要new也能够调用，但是这当时也是可以解决的 - 通过添加一些额外的代码:
 
 ```js
 function Person(name) {
@@ -202,37 +202,37 @@ new Person('Fred'); // ✅ Okay
 Person('George');   // 🔴 Can’t call class as a function
 ``` 
 
-You might have seen code like this in your bundle. That’s what all those `_classCallCheck` functions do. (You can reduce the bundle size by opting into the “loose mode” without no checks but this might complicate your eventual transition to real native classes.)
+你可能可以在你的打包后的文件中能够看到这些类似的代码。其实这就是那些`_classCallCheck`的函数做的事情。(你可以使用一个疏松模式(loose mode)来通过不检查来减少最终打包后的包大小，但是这可能会让你想用上真正的class的时候变得更加复杂)
 
 ---
 
-By now, you should roughly understand the difference between calling something with `new` or without `new`:
+现在，你应该能够明白在调用函数的时候使用`new`和不使用`new`的区别:
 
 |  | `new Person()` | `Person()` |
 |---|---|---|
-| `class` | ✅ `this` is a `Person` instance | 🔴 `TypeError`
-| `function` | ✅ `this` is a `Person` instance | 😳 `this` is `window` or `undefined` |
+| `class` | ✅ `this` 是 `Person` 的实例 | 🔴 `TypeError`
+| `function` | ✅ `this` 是 `Person` 实例 | 😳 `this` 是 `window` 或者 `undefined` |
 
-This is why it’s important for React to call your component correctly. **If your component is defined as a class, React needs to use `new` when calling it.**
+这就是为什么你需要正确的调用你的组件。 **如果你的组件是使用class来定义的，React需要使用`new`来调用**
 
-So can React just check if something is a class or not?
+那么React是怎么确定组件究竟是类还是其他的类型呢?
 
-Not so easy! Even if we could [tell a class from a function in JavaScript](https://stackoverflow.com/questions/29093396/how-do-you-check-the-difference-between-an-ecmascript-6-class-and-function), this still wouldn’t work for classes processed by tools like Babel. To the browser, they’re just plain functions. Tough luck for React.
+这没有那么简单！即使我们本就可以[在Javascript中区分class和函数](https://stackoverflow.com/questions/29093396/how-do-you-check-the-difference-between-an-ecmascript-6-class-and-function)，但是这对那些通过类似Babael这样的工具编译的class没用，编译之后这些class会变成一个纯函数。React觉得很难玩儿。
 
 ---
 
-Okay, so maybe React could just use `new` on every call? Unfortunately, that doesn’t always work either.
+OK! 那是不是React可以在每次调用的时候都使用`new`？非常不幸，这也不行。
 
-With regular functions, calling them with `new` would give them an object instance as `this`. It’s desirable for functions written as constructor (like our `Person` above), but it would be confusing for function components:
+在函数中，使用`new`来调用会在内部返回一个`this`的对象。这对构造函数(比如`Person`)会比较合理，但是对于纯函数定义的组件而言，看起来就就会比较奇怪了
 
 ```js
 function Greeting() {
-  // We wouldn’t expect `this` to be any kind of instance here
+  // 我们不希望`this`是任何对象
   return <p>Hello</p>;
 }
 ```
 
-That could be tolerable though. There are two *other* reasons that kill this idea.
+这么做或许可以勉强使用，但是这里还有*其他的*两个原因让我们不使用这种方式。
 
 ---
 
