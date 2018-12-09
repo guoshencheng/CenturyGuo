@@ -1,0 +1,459 @@
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><style>
+/* latin */
+@font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Press Start 2P Regular'), local('PressStart2P-Regular'), url('/static/PressStart2P-Regular.01515575.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+html {
+  font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+}
+</style><link rel="preload" href="/component---src-layouts-index-js-c09ba235cf06125cfc47.js" as="script"/><link rel="preload" href="/component---src-templates-post-js-151fda6e99914a23c475.js" as="script"/><link rel="preload" href="/path---posts-translate-overreacted-how-does-react-tell-a-class-from-a-function-26d3dfcb3e26d4234c6f.js" as="script"/><link rel="preload" href="/app-9de042cfaab38d4abdce.js" as="script"/><link rel="preload" href="/commons-cf32f37b11eea4693204.js" as="script"/><title data-react-helmet="true">Century&#x27;s world</title><meta data-react-helmet="true" name="description" content="Sample"/><meta data-react-helmet="true" name="keywords" content="sample, something"/><style id="gatsby-inlined-css">.header{font-size:15px;height:50px;overflow:hidden;line-height:50px;box-sizing:border-box;width:100%;padding:0 30px}.header a{color:inherit;text-decoration:none}.header .header-title-container{float:left}.header .header-line-item{font-size:13px;float:right}.markdown-body{color:#4c4c4c;overflow:hidden;font-family:Helvetica Neue,Helvetica,Segoe UI,Arial,freesans,sans-serif;font-size:15px;line-height:1.6;word-wrap:break-word}.markdown-body a{background:transparent}.markdown-body a:active,.markdown-body a:hover{outline:0}.markdown-body strong{font-weight:700}.markdown-body h1{font-size:2em;margin:.67em 0}.markdown-body img{border:0}.markdown-body hr{box-sizing:content-box}.markdown-body pre{overflow:auto}.markdown-body code,.markdown-body kbd,.markdown-body pre{font-family:monospace,monospace;font-size:1em}.markdown-body input{color:inherit;font:inherit;margin:0}.markdown-body html input[disabled]{cursor:default}.markdown-body input{line-height:normal}.markdown-body input[type=checkbox]{box-sizing:border-box;padding:0}.markdown-body table{border-collapse:collapse;border-spacing:0}.markdown-body td,.markdown-body th{padding:0}.markdown-body *{box-sizing:border-box}.markdown-body input{font:13px/1.4 Helvetica,arial,freesans,clean,sans-serif}.markdown-body a{color:#4183c4;text-decoration:none}.markdown-body a:active,.markdown-body a:focus,.markdown-body a:hover{text-decoration:underline}.markdown-body hr{height:0;margin:15px 0;overflow:hidden;background:transparent;border:0;border-bottom:1px solid #ddd}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body hr:after{clear:both}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{margin-top:15px;margin-bottom:15px;line-height:1.1}.markdown-body h1{font-size:30px}.markdown-body h2{font-size:21px}.markdown-body h3{font-size:16px}.markdown-body h4{font-size:14px}.markdown-body h5{font-size:12px}.markdown-body h6{font-size:11px}.markdown-body blockquote{margin:0}.markdown-body ol,.markdown-body ul{padding:0;margin-top:0;margin-bottom:0}.markdown-body ol ol,.markdown-body ul ol{list-style-type:lower-roman}.markdown-body ol ol ol,.markdown-body ol ul ol,.markdown-body ul ol ol,.markdown-body ul ul ol{list-style-type:lower-alpha}.markdown-body dd{margin-left:0}.markdown-body code{font-family:monospace,monospace,source-code-pro,Menlo,Monaco,Consolas,Courier New;font-size:13px;border-radius:8px}.markdown-body pre{margin-top:0;margin-bottom:0}.markdown-body kbd{background-color:#e7e7e7;background-image:linear-gradient(#fefefe,#e7e7e7);background-repeat:repeat-x;border-radius:2px;border:1px solid #cfcfcf;color:#000;padding:3px 5px;line-height:10px;font:11px Consolas,Liberation Mono,Menlo,Courier,monospace;display:inline-block}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body .anchor{position:absolute;top:0;bottom:0;left:0;display:block;padding-right:6px;padding-left:30px;margin-left:-30px}.markdown-body .anchor:focus{outline:none}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{position:relative;margin-top:1em;margin-bottom:16px;font-weight:700;line-height:1.4}.markdown-body h1 .octicon-link,.markdown-body h2 .octicon-link,.markdown-body h3 .octicon-link,.markdown-body h4 .octicon-link,.markdown-body h5 .octicon-link,.markdown-body h6 .octicon-link{display:none;color:#000;vertical-align:middle}.markdown-body h1:hover .anchor,.markdown-body h2:hover .anchor,.markdown-body h3:hover .anchor,.markdown-body h4:hover .anchor,.markdown-body h5:hover .anchor,.markdown-body h6:hover .anchor{height:1em;padding-left:8px;margin-left:-30px;line-height:1;text-decoration:none}.markdown-body h1:hover .anchor .octicon-link,.markdown-body h2:hover .anchor .octicon-link,.markdown-body h3:hover .anchor .octicon-link,.markdown-body h4:hover .anchor .octicon-link,.markdown-body h5:hover .anchor .octicon-link,.markdown-body h6:hover .anchor .octicon-link{display:inline-block}.markdown-body h1{font-size:2.25em;line-height:1.2}.markdown-body h1,.markdown-body h2{padding-bottom:.3em;border-bottom:1px solid #eee}.markdown-body h2{font-size:1.75em;line-height:1.225}.markdown-body h3{font-size:1.5em;line-height:1.43}.markdown-body h4{font-size:1.25em}.markdown-body h5{font-size:1em}.markdown-body h6{font-size:1em;color:#777}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin-top:0;margin-bottom:16px}.markdown-body hr{height:4px;padding:0;margin:16px 0;background-color:#e7e7e7;border:0 none}.markdown-body ol,.markdown-body ul{padding-left:2em}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-top:0;margin-bottom:0}.markdown-body li>p{margin-top:16px}.markdown-body dl{padding:0}.markdown-body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}.markdown-body dl dd{padding:0 16px;margin-bottom:16px}.markdown-body blockquote{padding:0 15px;color:#777;border-left:4px solid #ddd}.markdown-body blockquote>:first-child{margin-top:0}.markdown-body blockquote>:last-child{margin-bottom:0}.markdown-body table{display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{padding:6px 13px;border:1px solid #ddd}.markdown-body table tr{background-color:#fff;border-top:1px solid #ccc}.markdown-body table tr:nth-child(2n){background-color:#f8f8f8}.markdown-body img{max-width:100%;box-sizing:border-box}.markdown-body code:after,.markdown-body code:before{letter-spacing:-.2em;content:"\A0"}.markdown-body pre>code{font-size:14px;word-break:normal;white-space:pre;border:0;max-height:200px}.markdown-body .highlight{margin-bottom:16px}.markdown-body .highlight pre{margin-bottom:0;word-break:normal}.markdown-body pre{word-wrap:normal}.markdown-body pre code{word-wrap:normal;border:0}.markdown-body pre code:after,.markdown-body pre code:before{content:normal}.markdown-body .highlight .il,.markdown-body .highlight .m,.markdown-body .highlight .mf,.markdown-body .highlight .mh,.markdown-body .highlight .mi,.markdown-body .highlight .mo{color:#945277}.markdown-body .highlight .s,.markdown-body .highlight .s1,.markdown-body .highlight .s2,.markdown-body .highlight .sb,.markdown-body .highlight .sc,.markdown-body .highlight .sd,.markdown-body .highlight .se,.markdown-body .highlight .sh,.markdown-body .highlight .si,.markdown-body .highlight .sx{color:#df5000}.markdown-body .highlight .k,.markdown-body .highlight .kc,.markdown-body .highlight .kd,.markdown-body .highlight .kn,.markdown-body .highlight .kp,.markdown-body .highlight .kr,.markdown-body .highlight .kt,.markdown-body .highlight .o{font-weight:700}.markdown-body .highlight .kt{color:#458}.markdown-body .highlight .c,.markdown-body .highlight .c1,.markdown-body .highlight .cm{color:#998;font-style:italic}.markdown-body .highlight .cp,.markdown-body .highlight .cs{color:#999;font-weight:700}.markdown-body .highlight .cs{font-style:italic}.markdown-body .highlight .n{color:#4c4c4c}.markdown-body .highlight .na,.markdown-body .highlight .nv,.markdown-body .highlight .vc,.markdown-body .highlight .vg,.markdown-body .highlight .vi{color:teal}.markdown-body .highlight .nb{color:#0086b3}.markdown-body .highlight .nc{color:#458;font-weight:700}.markdown-body .highlight .no{color:#094e99}.markdown-body .highlight .ni{color:purple}.markdown-body .highlight .ne{color:#900;font-weight:700}.markdown-body .highlight .nf{color:#945277;font-weight:700}.markdown-body .highlight .nn{color:#555}.markdown-body .highlight .nt{color:navy}.markdown-body .highlight .err{color:#a61717;background-color:#e3d2d2}.markdown-body .highlight .gd{color:#000;background-color:#fdd}.markdown-body .highlight .gd .x{color:#000;background-color:#faa}.markdown-body .highlight .ge{font-style:italic}.markdown-body .highlight .gr{color:#a00}.markdown-body .highlight .gh{color:#999}.markdown-body .highlight .gi{color:#000;background-color:#dfd}.markdown-body .highlight .gi .x{color:#000;background-color:#afa}.markdown-body .highlight .go{color:#888}.markdown-body .highlight .gp{color:#555}.markdown-body .highlight .gs{font-weight:700}.markdown-body .highlight .gu{color:purple;font-weight:700}.markdown-body .highlight .gt{color:#a00}.markdown-body .highlight .ow{font-weight:700}.markdown-body .highlight .w{color:#bbb}.markdown-body .highlight .sr{color:#017936}.markdown-body .highlight .ss{color:#8b467f}.markdown-body .highlight .bp{color:#999}.markdown-body .highlight .gc{color:#999;background-color:#eaf2f5}.markdown-body .octicon{font:normal normal 16px octicons-anchor;line-height:1;display:inline-block;text-decoration:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-body .octicon-link:before{content:"\F05C"}.markdown-body .task-list-item{list-style-type:none}.markdown-body .task-list-item+.task-list-item{margin-top:3px}.markdown-body .task-list-item input{float:left;margin:.3em 0 .25em -1.6em;vertical-align:middle}html{top:0;position:fixed}body,html{width:100%;height:100%}body{position:absolute;margin:0;font-family:-apple-system,Helvetica Neue,Helvetica,Segoe UI,Arial,freesans,sans-serif;color:#373737}.indie-flow-text{font-family:Indie Flower,Helvetica Neue}.game-text{font-family:Press Start\ 2P,Helvetica Neue}.container{position:absolute;width:100%;bottom:0;left:0;top:0;overflow:auto;-webkit-overflow-scrolling:touch}.container.with-header{top:50px}.posts-list{margin:20px auto;max-width:1000px;padding:0 40px}.posts-list .post-item{margin-bottom:30px}.posts-list .post-item .post-item-title{line-height:40px;font-size:28px}.posts-list .post-item .post-item-title a{color:inherit;text-decoration:none}.posts-list .post-item .post-item-base-info{line-height:30px;color:#afbd20;font-size:13px}.posts-list .post-item .post-item-desc{font-size:15px}.post-container{max-width:1000px;margin:0 auto;padding:0 20px}.post-container .post-title{font-size:30px}.post-container .post-date{margin-left:10px;color:#afbd20}.post-container .post-tag{color:rgba(82,162,96,.6)}.post-container .post-tag a{margin-left:10px;color:inherit;text-decoration:none}.post-container .post-tag a:hover{color:#52a260}.post-container .markdown-body{margin-top:30px}code[class*=language-],pre[class*=language-]{color:#ccc;background:none;font-family:Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto}:not(pre)>code[class*=language-],pre[class*=language-]{background:#2d2d2d}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.block-comment,.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#999}.token.punctuation{color:#ccc}.token.attr-name,.token.deleted,.token.namespace,.token.tag{color:#e2777a}.token.function-name{color:#6196cc}.token.boolean,.token.function,.token.number{color:#f08d49}.token.class-name,.token.constant,.token.property,.token.symbol{color:#f8c555}.token.atrule,.token.builtin,.token.important,.token.keyword,.token.selector{color:#cc99cd}.token.attr-value,.token.char,.token.regex,.token.string,.token.variable{color:#7ec699}.token.entity,.token.operator,.token.url{color:#67cdcc}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}.token.inserted{color:green}.mashroom-item{border-radius:5px;margin:.5px;float:left;width:40px;height:40px;background-color:rgba(253,209,14,.6);animation:rotateplane 10s infinite ease-in-out}.mashroom-item.deep{background-color:rgba(253,209,14,.7)}.mashroom-item.blank{animation:none;background:none}@keyframes rotateplane{0%{transform:perspective(120px) rotateX(0deg) rotateY(0deg);-webkit-transform:perspective(120px) rotateX(0deg) rotateY(0deg)}10%{transform:perspective(120px) rotateX(-180.1deg) rotateY(0);-webkit-transform:perspective(120px) rotateX(-180.1deg) rotateY(0)}50%{transform:perspective(120px) rotateX(-180.1deg) rotateY(0);-webkit-transform:perspective(120px) rotateX(-180.1deg) rotateY(0)}60%{transform:perspective(120px) rotateX(-1turn) rotateY(0deg);-webkit-transform:perspective(120px) rotateX(-1turn) rotateY(0deg)}to{transform:perspective(120px) rotateX(-1turn) rotateY(0deg);-webkit-transform:perspective(120px) rotateX(-1turn) rotateY(0deg)}}.home-page-container{background:#52a260;position:absolute;left:0;top:0;width:100%;height:100%}.home-page{text-align:center;color:#fff;box-sizing:border-box;overflow:hidden}.home-page .home-title{font-size:35px;margin-bottom:50px}.home-page .mashroom-container{width:328px;margin:0 auto;position:relative;overflow:hidden}.home-page .operations{margin-top:30px}.home-page .operations a{color:#fff;text-decoration:none;margin:0 20px}</style></head><body><div id="___gatsby"><div data-reactroot=""><div class="header"><div class="header-title-container"><div class="header-logo"></div><div class="header-title game-text"><a href="/">Century&#x27;s world</a></div></div><div class="header-line-item game-text header-link"><a href="/">Posts</a></div></div><div class="container with-header"><div class="post-container"><div class="post-title">翻译：React是如何将Function转变成类的</div><div class="extra-info"><span class="post-date">02 December, 2018</span><span class="post-tag"><a href="/posts/translate">translate</a><a href="/posts/overreacted">overreacted</a></span></div><div class="markdown-body"><div><blockquote>
+<p>本文出自<a href="https://overreacted.io/">overreacted</a>，这是<a href="https://mobile.twitter.com/dan_abramov">Dan Abramov</a>写的博客，我觉得对很有用所以特意做了这个翻译<a href="/posts/overreacted">系列</a>，原文链接请查看<a href="https://overreacted.io/how-does-react-tell-a-class-from-a-function/">这里</a></p>
+</blockquote>
+<p>我们可以先来看一下这个用函数定义的<code class="language-text">Greeting</code>组件:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+      </div>
+<p>React也支持将这个组件定义成一个类:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">Greeting</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">{</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+      </div>
+<p>(我们只能使用类的定义的方式来使用一些类似于state这样的功能，知道最近的<a href="https://reactjs.org/docs/hooks-intro.html">hooks</a>)</p>
+<p>当你想要渲染<code class="language-text">&lt;Greeting /&gt;</code>时，你不用关系它究竟是如何定义的:</p>
+<div class="gatsby-highlight" data-language="jsx">
+      <pre class="language-jsx"><code class="language-jsx"><span class="token comment">// 无论是函数定义还是类定义</span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>Greeting</span> <span class="token punctuation">/></span></span></code></pre>
+      </div>
+<p>但是 <em>React 自己</em> 会关心这两种定义方式的区别</p>
+<p>如果<code class="language-text">Greeting</code>是一个函数，React会直接调用它:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token comment">// 你的代码</span>
+<span class="token keyword">function</span> <span class="token function">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// React内部的实现</span>
+<span class="token keyword">const</span> result <span class="token operator">=</span> <span class="token function">Greeting</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// &lt;p>Hello&lt;/p></span></code></pre>
+      </div>
+<p>但是如果<code class="language-text">Greeting</code>是一个类，React需要先试用<code class="language-text">new</code>来实例化它，然后在调用它的<code class="language-text">render</code>函数:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token comment">// 你的代码</span>
+<span class="token keyword">class</span> <span class="token class-name">Greeting</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">{</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// React内部实现</span>
+<span class="token keyword">const</span> instance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Greeting</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Greeting {}</span>
+<span class="token keyword">const</span> result <span class="token operator">=</span> instance<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// &lt;p>Hello&lt;/p></span></code></pre>
+      </div>
+<p>在上面的两个例子中，React的目标都是一致的，就是将你需要渲染的React节点获取到（在这个例子中，是<code class="language-text">&lt;p&gt;Hellp&lt;/p&gt;</code>）。但是这些额外的操作取决于<code class="language-text">Greeting</code>是如何定义的。</p>
+<p><strong>那么React是如何知道这个组件是使用函数定义的还是类定义的呢？</strong></p>
+<p>就想我<a href="/posts/translate-overreacted-why-do-we-write-super-props">之前的文章</a>讲的那样，<strong>对于使用React的时候，你并不<em>需要</em>了解这些</strong> 很多年里，我也不知道这些。所以请不要将这些作为你的面试题目。事实上，这篇文章更多的是讲解Javascript而不是React</p>
+<p>这篇文章是针对那些想知道React究竟如何工作的人的。你是这样的人么？那么让我们一起来探索吧。</p>
+<p><strong>这是一篇非常长的旅程。系好安全带吧！这篇文章并不会有太多的关于React本身，但是我们会探索到一些概念，比如<code class="language-text">new</code>,<code class="language-text">this</code>,<code class="language-text">class</code>,<code class="language-text">arrow</code>,<code class="language-text">functions</code>,<code class="language-text">prototypela</code>, <code class="language-text">_proto_</code>,<code class="language-text">instanceof</code>,以及这些东西在Javascript中是如何一起工作的。非常幸运的是，你在使用React的时候并不需要太考虑这些。不过假如你在实现React的话，那就不一样了...</strong></p>
+<p>(如果你真的只是想知道最终的答案的话，可以直接滚动到最底下)</p>
+<hr>
+<p>首先，我们需要理解为什么有必要去对函数的申明方式和类的申明方式区分。可以注意一下我们在使用类的申明组件的时候发生了什么。</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token comment">// 如果Greeting是一个函数</span>
+<span class="token keyword">const</span> result <span class="token operator">=</span> <span class="token function">Greeting</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// &lt;p>Hello&lt;/p></span>
+
+<span class="token comment">// 如果Greeting是一个类</span>
+<span class="gatsby-highlight-code-line"><span class="token keyword">const</span> instance <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Greeting</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Greeting {}</span>
+</span><span class="token keyword">const</span> result <span class="token operator">=</span> instance<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// &lt;p>Hello&lt;/p></span></code></pre>
+      </div>
+<p>让我们深度的来了解一下当使用<code class="language-text">new</code>的时候，Javascript做了什么</p>
+<hr>
+<p>在比较早的时候，Javascript还没有定义类的方式。但是你可以通过纯函数来模拟出一个类的效果。<strong>具体的来说就是，通过对函数使用<code class="language-text">new</code>调用，你可以使用<em>任何</em>函数来作为一个类的构造函数</strong>:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token comment">// 这只是一个函数</span>
+<span class="token keyword">function</span> <span class="token function">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> fred <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'Fred'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// ✅ Person {name: 'Fred'}</span>
+<span class="token keyword">var</span> george <span class="token operator">=</span> <span class="token function">Person</span><span class="token punctuation">(</span><span class="token string">'George'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 🔴 并不起作用</span></code></pre>
+      </div>
+<p>这些代码依然可以使用，你可以在开发工具中尝试。</p>
+<p>如果你在调用<code class="language-text">Person(&#39;Fred&#39;)</code>的时候<strong>不使用</strong><code class="language-text">new</code>操作符，函数内的<code class="language-text">this</code>指向就会指向一些全局或者没有什么用的对象(比如说，<code class="language-text">window</code>或者<code class="language-text">undefined</code>)。如果这么使用的话，我们的代码就会报错或者执行一些设置<code class="language-text">window.name</code>之类的傻兮兮的事情。</p>
+<p>通过在调用前添加<code class="language-text">new</code>的操作符。我们相当于在说: "Hey Javascript，我知道<code class="language-text">Person</code>是一个函数啦，但是可以不可以让我们假装它是一个构造函数"。<strong>创建一个空对象，然后让<code class="language-text">Person</code>函数中的<code class="language-text">this</code>指向这个对象，这样我们就能够为这个对象设置像<code class="language-text">this.name</code>这样的成员变量。然后将这个对象返回</strong></p>
+<p>这就是<code class="language-text">new</code>这个操作符做的事情</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">var</span> fred <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'Fred'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 返回构造函数中的this</span></code></pre>
+      </div>
+<p><code class="language-text">new</code>这个操作也将<code class="language-text">Person.prototype</code>中的成员变量代理到了<code class="language-text">fred</code>的对象上:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+Person<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function-variable function">sayHi</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'Hi, I am '</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> fred <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'Fred'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+fred<span class="token punctuation">.</span><span class="token function">sayHi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      </div>
+<p>这就是大家在Javascript推出类的写法之前模拟出来的类</p>
+<hr>
+<p>所以<code class="language-text">new</code>在Javascript中已经存在了很长时间了，但是，classes是最近几年才有的。使用它，我们可以重新编写我们的代码，让我们离今天要探究的事情更加贴切。</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">Person</span> <span class="token punctuation">{</span>
+  <span class="token function">constructor</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token function">sayHi</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'Hi, I am '</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">let</span> fred <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'Fred'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+fred<span class="token punctuation">.</span><span class="token function">sayHi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      </div>
+<p><em>抓住开发者想要的东西</em>在设计语言和API的时候是非常重要的。</p>
+<p>如果你写了一个函数，Javascript不能够完全明白究竟者意味着是像<code class="language-text">alert()</code>这样直接调用或者会像<code class="language-text">new Person()</code>这样当做一个构造函数来调用。如果忘记掉在像<code class="language-text">Person</code>这种函数前面加上<code class="language-text">new</code>操作符会让代码出现一些神奇的现象。</p>
+<p><strong>Class的预发让我们告诉Javascript的运行者: "这不是只是一个函数 - 这是一个类，他有一个构造函数"</strong>，当你在调用它的时候忘记使用<code class="language-text">new</code>操作符的时候，Javascript会抛出一个异常:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">let</span> fred <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'Fred'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// ✅ 如果Person是一个函数，没有问题</span>
+<span class="token comment">// ✅ 如果Person是一个类，没有问题</span>
+
+<span class="token keyword">let</span> george <span class="token operator">=</span> <span class="token function">Person</span><span class="token punctuation">(</span><span class="token string">'George'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 我们忘记添加`new`</span>
+<span class="token comment">// 😳 如果用户是一个类似构造函数的函数 这个函数执行会出现一些奇怪的情况</span>
+<span class="token comment">// 🔴 如果Person是一个类，会立马抛出异常</span></code></pre>
+      </div>
+<p>这让我们在出现一些类似于<code class="language-text">this.name</code>被赋值为<code class="language-text">window.name</code>而不是<code class="language-text">georage.name</code>的问题之前就能够及早的发现问题。</p>
+<p>所以，这就代表着React需要在创建类之前加上一个<code class="language-text">new</code>，我们不能够像普通的函数那样调用它，因为Javascript会抛出一个异常</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">Counter</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">{</span>
+  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// 🔴 React 不能这么做:</span>
+<span class="token keyword">const</span> instance <span class="token operator">=</span> <span class="token function">Counter</span><span class="token punctuation">(</span>props<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+      </div>
+<p>像这么写会有问题。</p>
+<hr>
+<p>在我们了解React是如何处理这类问题之前，我们需要知道，大多数人在使用React的时候会用到类似于Babel这样的编译工具，从而能够在旧的浏览器上使用类似于class这样的语法。所以我们需要在我们的设计中考虑到编译工具的存在。</p>
+<p>在一些老点的版本的Babel中，class不需要new也能够调用，但是这当时也是可以解决的 - 通过添加一些额外的代码:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// A bit simplified from Babel output:</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span><span class="token keyword">this</span> <span class="token keyword">instanceof</span> <span class="token class-name">Person</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">TypeError</span><span class="token punctuation">(</span><span class="token string">"Cannot call a class as a function"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token comment">// Our code:</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'Fred'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// ✅ Okay</span>
+<span class="token function">Person</span><span class="token punctuation">(</span><span class="token string">'George'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// 🔴 Can’t call class as a function</span></code></pre>
+      </div>
+<p>你可能可以在你的打包后的文件中能够看到这些类似的代码。其实这就是那些<code class="language-text">_classCallCheck</code>的函数做的事情。(你可以使用一个疏松模式(loose mode)来通过不检查来减少最终打包后的包大小，但是这可能会让你想用上真正的class的时候变得更加复杂)</p>
+<hr>
+<p>现在，你应该能够明白在调用函数的时候使用<code class="language-text">new</code>和不使用<code class="language-text">new</code>的区别:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code class="language-text">new Person()</code></th>
+<th><code class="language-text">Person()</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-text">class</code></td>
+<td>✅ 
+<code class="language-text">this</code>
+ 是 
+<code class="language-text">Person</code>
+ 的实例</td>
+<td>🔴 
+<code class="language-text">TypeError</code></td>
+</tr>
+<tr>
+<td><code class="language-text">function</code></td>
+<td>✅ 
+<code class="language-text">this</code>
+ 是 
+<code class="language-text">Person</code>
+ 实例</td>
+<td>😳 
+<code class="language-text">this</code>
+ 是 
+<code class="language-text">window</code>
+ 或者 
+<code class="language-text">undefined</code></td>
+</tr>
+</tbody>
+</table>
+<p>这就是为什么你需要正确的调用你的组件。 <strong>如果你的组件是使用class来定义的，React需要使用<code class="language-text">new</code>来调用</strong></p>
+<p>那么React是怎么确定组件究竟是类还是其他的类型呢?</p>
+<p>这没有那么简单！即使我们本就可以<a href="https://stackoverflow.com/questions/29093396/how-do-you-check-the-difference-between-an-ecmascript-6-class-and-function">在Javascript中区分class和函数</a>，但是这对那些通过类似Babael这样的工具编译的class没用，编译之后这些class会变成一个纯函数。React觉得很难玩儿。</p>
+<hr>
+<p>OK! 那是不是React可以在每次调用的时候都使用<code class="language-text">new</code>？非常不幸，这也不行。</p>
+<p>在函数中，使用<code class="language-text">new</code>来调用会在内部返回一个<code class="language-text">this</code>的对象。这对构造函数(比如<code class="language-text">Person</code>)会比较合理，但是对于纯函数定义的组件而言，看起来就就会比较奇怪了</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// 我们不希望`this`是任何对象</span>
+  <span class="token keyword">return</span> <span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+      </div>
+<p>这么做或许可以勉强使用，但是这里还有<em>其他的</em>两个原因让我们不使用这种方式。</p>
+<hr>
+<p>The first reason why always using <code class="language-text">new</code> wouldn’t work is that for native arrow functions (not the ones compiled by Babel), calling with <code class="language-text">new</code> throws an error:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token function-variable function">Greeting</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">;</span>
+<span class="token keyword">new</span> <span class="token class-name">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 🔴 Greeting is not a constructor</span></code></pre>
+      </div>
+<p>This behavior is intentional and follows from the design of arrow functions. One of the main perks of arrow functions is that they <em>don’t</em> have their own <code class="language-text">this</code> value — instead, <code class="language-text">this</code> is resolved from the closest regular function:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">Friends</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">{</span>
+<span class="gatsby-highlight-code-line">  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+</span>    <span class="token keyword">const</span> friends <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>friends<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> friends<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span>friend <span class="token operator">=></span>
+      <span class="token operator">&lt;</span>Friend
+<span class="gatsby-highlight-code-line">        <span class="token comment">// `this` is resolved from the `render` method</span>
+</span><span class="gatsby-highlight-code-line">        size<span class="token operator">=</span><span class="token punctuation">{</span><span class="token keyword">this</span><span class="token punctuation">.</span>props<span class="token punctuation">.</span>size<span class="token punctuation">}</span>
+</span>        name<span class="token operator">=</span><span class="token punctuation">{</span>friend<span class="token punctuation">.</span>name<span class="token punctuation">}</span>
+        key<span class="token operator">=</span><span class="token punctuation">{</span>friend<span class="token punctuation">.</span>id<span class="token punctuation">}</span>
+      <span class="token operator">/</span><span class="token operator">></span>
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+      </div>
+<p>Okay, so <strong>arrow functions don’t have their own <code class="language-text">this</code>.</strong> But that means they would be entirely useless as constructors!</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">const</span> <span class="token function-variable function">Person</span> <span class="token operator">=</span> <span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token comment">// 🔴 This wouldn’t make sense!</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+      </div>
+<p>Therefore, <strong>JavaScript disallows calling an arrow function with <code class="language-text">new</code>.</strong> If you do it, you probably made a mistake anyway, and it’s best to tell you early. This is similar to how JavaScript doesn’t let you call a class <em>without</em> <code class="language-text">new</code>.</p>
+<p>This is nice but it also foils our plan. React can’t just call <code class="language-text">new</code> on everything because it would break arrow functions! We could try detecting arrow functions specifically by their lack of <code class="language-text">prototype</code>, and not <code class="language-text">new</code> just them:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>prototype <span class="token comment">// undefined</span>
+<span class="token punctuation">(</span><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">.</span>prototype <span class="token comment">// {constructor: f}</span></code></pre>
+      </div>
+<p>But this <a href="https://github.com/facebook/react/issues/4599#issuecomment-136562930">wouldn’t work</a> for functions compiled with Babel. This might not be a big deal, but there is another reason that makes this approach a dead end.</p>
+<hr>
+<p>Another reason we can’t always use <code class="language-text">new</code> is that it would preclude React from supporting components that return strings or other primitive types.</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token string">'Hello'</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// ✅ 'Hello'</span>
+<span class="token keyword">new</span> <span class="token class-name">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 😳 Greeting {}</span></code></pre>
+      </div>
+<p>This, again, has to do with the quirks of the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new"><code class="language-text">new</code> operator</a> design. As we saw earlier, <code class="language-text">new</code> tells the JavaScript engine to create an object, make that object <code class="language-text">this</code> inside the function, and later give us that object as a result of <code class="language-text">new</code>.</p>
+<p>However, JavaScript also allows a function called with <code class="language-text">new</code> to <em>override</em> the return value of <code class="language-text">new</code> by returning some other object. Presumably, this was considered useful for patterns like pooling where we want to reuse instances:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="gatsby-highlight-code-line"><span class="token comment">// Created lazily</span>
+</span><span class="gatsby-highlight-code-line"><span class="token keyword">var</span> zeroVector <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+</span>
+<span class="token keyword">function</span> <span class="token function">Vector</span><span class="token punctuation">(</span>x<span class="token punctuation">,</span> y<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>x <span class="token operator">===</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> y <span class="token operator">===</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>zeroVector <span class="token operator">!==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="gatsby-highlight-code-line">      <span class="token comment">// Reuse the same instance</span>
+</span><span class="gatsby-highlight-code-line">      <span class="token keyword">return</span> zeroVector<span class="token punctuation">;</span>
+</span>    <span class="token punctuation">}</span>
+    zeroVector <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>x <span class="token operator">=</span> x<span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>y <span class="token operator">=</span> y<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">var</span> a <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Vector</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="gatsby-highlight-code-line"><span class="token keyword">var</span> b <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Vector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span><span class="gatsby-highlight-code-line"><span class="token keyword">var</span> c <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Vector</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 😲 b === c</span>
+</span></code></pre>
+      </div>
+<p>However, <code class="language-text">new</code> also <em>completely ignores</em> a function’s return value if it’s <em>not</em> an object. If you return a string or a number, it’s like there was no <code class="language-text">return</code> at all.</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Answer</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token number">42</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token function">Answer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// ✅ 42</span>
+<span class="token keyword">new</span> <span class="token class-name">Answer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 😳 Answer {}</span></code></pre>
+      </div>
+<p>There is just no way to read a primitive return value (like a number or a string) from a function when calling it with <code class="language-text">new</code>. So if React always used <code class="language-text">new</code>, it would be unable to add support components that return strings!</p>
+<p>That’s unacceptable so we need to compromise.</p>
+<hr>
+<p>What did we learn so far? React needs to call classes (including Babel output) <em>with</em> <code class="language-text">new</code> but it needs to call regular functions or arrow functions (including Babel output) <em>without</em> <code class="language-text">new</code>. And there is no reliable way to distinguish them.</p>
+<p><strong>If we can’t solve a general problem, can we solve a more specific one?</strong></p>
+<p>When you define a component as a class, you’ll likely want to extend <code class="language-text">React.Component</code> for built-in methods like <code class="language-text">this.setState()</code>. <strong>Rather than try to detect all classes, can we detect only <code class="language-text">React.Component</code> descendants?</strong></p>
+<p>Spoiler: this is exactly what React does.</p>
+<hr>
+<p>Perhaps, the idiomatic way to check if <code class="language-text">Greeting</code> is a React component class is by testing if <code class="language-text">Greeting.prototype instanceof React.Component</code>:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">class</span> <span class="token class-name">A</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token keyword">class</span> <span class="token class-name">B</span> <span class="token keyword">extends</span> <span class="token class-name">A</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token constant">B</span><span class="token punctuation">.</span>prototype <span class="token keyword">instanceof</span> <span class="token class-name">A</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// true</span></code></pre>
+      </div>
+<p>I know what you’re thinking. What just happened here?! To answer this, we need to understand JavaScript prototypes.</p>
+<p>You might be familiar with the “prototype chain”. Every object in JavaScript might have a “prototype”. When we write <code class="language-text">fred.sayHi()</code> but <code class="language-text">fred</code> object has no <code class="language-text">sayHi</code> property, we look for <code class="language-text">sayHi</code> property on <code class="language-text">fred</code>’s prototype. If we don’t find it there, we look at the next prototype in the chain — <code class="language-text">fred</code>’s prototype’s prototype. And so on.</p>
+<p><strong>Confusingly, the <code class="language-text">prototype</code> property of a class or a function <em>does not</em> point to the prototype of that value.</strong> I’m not kidding.</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Person</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>Person<span class="token punctuation">.</span>prototype<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 🤪 Not Person's prototype</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>Person<span class="token punctuation">.</span>__proto__<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 😳 Person's prototype</span></code></pre>
+      </div>
+<p>So the “prototype chain” is more like <code class="language-text">__proto__.__proto__.__proto__</code> than <code class="language-text">prototype.prototype.prototype</code>. This took me years to get.</p>
+<p>What’s the <code class="language-text">prototype</code> property on a function or a class, then? <strong>It’s the <code class="language-text">__proto__</code> given to all objects <code class="language-text">new</code>ed with that class or a function!</strong></p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">Person</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+Person<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span><span class="token function-variable function">sayHi</span> <span class="token operator">=</span> <span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token function">alert</span><span class="token punctuation">(</span><span class="token string">'Hi, I am '</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="gatsby-highlight-code-line"><span class="token keyword">var</span> fred <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Person</span><span class="token punctuation">(</span><span class="token string">'Fred'</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Sets `fred.__proto__` to `Person.prototype`</span>
+</span></code></pre>
+      </div>
+<p>And that <code class="language-text">__proto__</code> chain is how JavaScript looks up properties:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js">fred<span class="token punctuation">.</span><span class="token function">sayHi</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 1. Does fred have a sayHi property? No.</span>
+<span class="token comment">// 2. Does fred.__proto__ have a sayHi property? Yes. Call it!</span>
+
+fred<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// 1. Does fred have a toString property? No.</span>
+<span class="token comment">// 2. Does fred.__proto__ have a toString property? No.</span>
+<span class="token comment">// 3. Does fred.__proto__.__proto__ have a toString property? Yes. Call it!</span></code></pre>
+      </div>
+<p>In practice, you should almost never need to touch <code class="language-text">__proto__</code> from the code directly unless you’re debugging something related to the prototype chain. If you want to make stuff available on <code class="language-text">fred.__proto__</code>, you’re supposed to put it on <code class="language-text">Person.prototype</code>. At least that’s how it was originally designed.</p>
+<p>The <code class="language-text">__proto__</code> property wasn’t even supposed to be exposed by browsers at first because the prototype chain was considered an internal concept. But some browsers added <code class="language-text">__proto__</code> and eventually it was begrudgingly standardized (but deprecated in favor of <code class="language-text">Object.getPrototypeOf()</code>).</p>
+<p><strong>And yet I still find it very confusing that a property called <code class="language-text">prototype</code> does not give you a value’s prototype</strong> (for example, <code class="language-text">fred.prototype</code> is undefined because <code class="language-text">fred</code> is not a function). Personally, I think this is the biggest reason even experienced developers tend to misunderstand JavaScript prototypes.</p>
+<hr>
+<p>This is a long post, eh? I’d say we’re 80% there. Hang on.</p>
+<p>We know that when say <code class="language-text">obj.foo</code>, JavaScript actually looks for <code class="language-text">foo</code> in <code class="language-text">obj</code>, <code class="language-text">obj.__proto__</code>, <code class="language-text">obj.__proto__.__proto__</code>, and so on.</p>
+<p>With classes, you’re not exposed directly to this mechanism, but <code class="language-text">extends</code> also works on top of the good old prototype chain. That’s how our React class instance gets access to methods like <code class="language-text">setState</code>:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="gatsby-highlight-code-line"><span class="token keyword">class</span> <span class="token class-name">Greeting</span> <span class="token keyword">extends</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span> <span class="token punctuation">{</span>
+</span>  <span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token operator">&lt;</span>p<span class="token operator">></span>Hello<span class="token operator">&lt;</span><span class="token operator">/</span>p<span class="token operator">></span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">let</span> c <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>__proto__<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Greeting.prototype</span>
+<span class="gatsby-highlight-code-line">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>__proto__<span class="token punctuation">.</span>__proto__<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// React.Component.prototype</span>
+</span>console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>__proto__<span class="token punctuation">.</span>__proto__<span class="token punctuation">.</span>__proto__<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Object.prototype</span>
+
+c<span class="token punctuation">.</span><span class="token function">render</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>      <span class="token comment">// Found on c.__proto__ (Greeting.prototype)</span>
+<span class="gatsby-highlight-code-line">c<span class="token punctuation">.</span><span class="token function">setState</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// Found on c.__proto__.__proto__ (React.Component.prototype)</span>
+</span>c<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>    <span class="token comment">// Found on c.__proto__.__proto__.__proto__ (Object.prototype)</span></code></pre>
+      </div>
+<p>In other words, <strong>when you use classes, an instance’s <code class="language-text">__proto__</code> chain “mirrors” the class hierarchy:</strong></p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token comment">// `extends` chain</span>
+Greeting
+  → React<span class="token punctuation">.</span>Component
+    → <span class="token function">Object</span> <span class="token punctuation">(</span>implicitly<span class="token punctuation">)</span>
+
+<span class="token comment">// `__proto__` chain</span>
+<span class="token keyword">new</span> <span class="token class-name">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  → Greeting<span class="token punctuation">.</span>prototype
+    → React<span class="token punctuation">.</span>Component<span class="token punctuation">.</span>prototype
+      → Object<span class="token punctuation">.</span>prototype</code></pre>
+      </div>
+<p>2 Chainz.</p>
+<hr>
+<p>Since the <code class="language-text">__proto__</code> chain mirrors the class hierarchy, we can check whether a <code class="language-text">Greeting</code> extends <code class="language-text">React.Component</code> by starting with <code class="language-text">Greeting.prototype</code>, and then following down its <code class="language-text">__proto__</code> chain:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token comment">// `__proto__` chain</span>
+<span class="token keyword">new</span> <span class="token class-name">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="gatsby-highlight-code-line">  → Greeting<span class="token punctuation">.</span>prototype <span class="token comment">// 🕵️ We start here</span>
+</span><span class="gatsby-highlight-code-line">    → React<span class="token punctuation">.</span>Component<span class="token punctuation">.</span>prototype <span class="token comment">// ✅ Found it!</span>
+</span>      → Object<span class="token punctuation">.</span>prototype</code></pre>
+      </div>
+<p>Conveniently, <code class="language-text">x instanceof Y</code> does exactly this kind of search. It follows the <code class="language-text">x.__proto__</code> chain looking for <code class="language-text">Y.prototype</code> there.</p>
+<p>Normally, it’s used to determine whether something is an instance of a class:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token keyword">let</span> greeting <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Greeting</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>greeting <span class="token keyword">instanceof</span> <span class="token class-name">Greeting</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// true</span>
+<span class="token comment">// greeting (🕵️‍ We start here)</span>
+<span class="token comment">//   .__proto__ → Greeting.prototype (✅ Found it!)</span>
+<span class="token comment">//     .__proto__ → React.Component.prototype </span>
+<span class="token comment">//       .__proto__ → Object.prototype</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>greeting <span class="token keyword">instanceof</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// true</span>
+<span class="token comment">// greeting (🕵️‍ We start here)</span>
+<span class="token comment">//   .__proto__ → Greeting.prototype</span>
+<span class="token comment">//     .__proto__ → React.Component.prototype (✅ Found it!)</span>
+<span class="token comment">//       .__proto__ → Object.prototype</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>greeting <span class="token keyword">instanceof</span> <span class="token class-name">Object</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// true</span>
+<span class="token comment">// greeting (🕵️‍ We start here)</span>
+<span class="token comment">//   .__proto__ → Greeting.prototype</span>
+<span class="token comment">//     .__proto__ → React.Component.prototype</span>
+<span class="token comment">//       .__proto__ → Object.prototype (✅ Found it!)</span>
+
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>greeting <span class="token keyword">instanceof</span> <span class="token class-name">Banana</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// false</span>
+<span class="token comment">// greeting (🕵️‍ We start here)</span>
+<span class="token comment">//   .__proto__ → Greeting.prototype</span>
+<span class="token comment">//     .__proto__ → React.Component.prototype </span>
+<span class="token comment">//       .__proto__ → Object.prototype (🙅‍ Did not find it!)</span></code></pre>
+      </div>
+<p>But it would work just as fine to determine if a class extends another class:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js">console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>Greeting<span class="token punctuation">.</span>prototype <span class="token keyword">instanceof</span> <span class="token class-name">React<span class="token punctuation">.</span>Component</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// greeting</span>
+<span class="token comment">//   .__proto__ → Greeting.prototype (🕵️‍ We start here)</span>
+<span class="token comment">//     .__proto__ → React.Component.prototype (✅ Found it!)</span>
+<span class="token comment">//       .__proto__ → Object.prototype</span></code></pre>
+      </div>
+<p>And that check is how we could determine if something is a React component class or a regular function.</p>
+<hr>
+<p>That’s not what React does though. 😳</p>
+<p>One caveat to the <code class="language-text">instanceof</code> solution is that it doesn’t work when there are multiple copies of React on the page, and the component we’re checking inherits from <em>another</em> React copy’s <code class="language-text">React.Component</code>. Mixing multiple copies of React in a single project is bad for several reasons but historically we’ve tried to avoid issues when possible. (With Hooks, we <a href="https://github.com/facebook/react/issues/13991">might need to</a> force deduplication though.)</p>
+<p>One other possible heuristic could be to check for presence of a <code class="language-text">render</code> method on the prototype. However, at the time it <a href="https://github.com/facebook/react/issues/4599#issuecomment-129714112">wasn’t clear</a> how the component API would evolve. Every check has a cost so we wouldn’t want to add more than one. This would also not work if <code class="language-text">render</code> was defined as an instance method, such as with the class property syntax.</p>
+<p>So instead, React <a href="https://github.com/facebook/react/pull/4663">added</a> a special flag to the base component. React checks for the presence of that flag, and that’s how it knows whether something is a React component class or not.</p>
+<p>Originally the flag was on the base <code class="language-text">React.Component</code> class itself:</p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token comment">// Inside React</span>
+<span class="token keyword">class</span> <span class="token class-name">Component</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+Component<span class="token punctuation">.</span>isReactClass <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// We can check it like this</span>
+<span class="token keyword">class</span> <span class="token class-name">Greeting</span> <span class="token keyword">extends</span> <span class="token class-name">Component</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>Greeting<span class="token punctuation">.</span>isReactClass<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// ✅ Yes</span></code></pre>
+      </div>
+<p>However, some class implementations we wanted to target <a href="https://github.com/scala-js/scala-js/issues/1900">did not</a> copy static properties (or set the non-standard <code class="language-text">__proto__</code>), so the flag was getting lost.</p>
+<p>This is why React <a href="https://github.com/facebook/react/pull/5021">moved</a> this flag to <code class="language-text">React.Component.prototype</code>: </p>
+<div class="gatsby-highlight" data-language="js">
+      <pre class="language-js"><code class="language-js"><span class="token comment">// Inside React</span>
+<span class="token keyword">class</span> <span class="token class-name">Component</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+Component<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>isReactComponent <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// We can check it like this</span>
+<span class="token keyword">class</span> <span class="token class-name">Greeting</span> <span class="token keyword">extends</span> <span class="token class-name">Component</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>Greeting<span class="token punctuation">.</span>prototype<span class="token punctuation">.</span>isReactComponent<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// ✅ Yes</span></code></pre>
+      </div>
+<p><strong>And this is literally all there is to it.</strong></p>
+<p>You might be wondering why it’s an object and not just a boolean. It doesn’t matter much in practice but early versions of Jest (before Jest was Good™️) had automocking turned on by default. The generated mocks omitted primitive properties, <a href="https://github.com/facebook/react/pull/4663#issuecomment-136533373">breaking the check</a>. Thanks, Jest.</p>
+<p>The <code class="language-text">isReactComponent</code> check is <a href="https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/react-reconciler/src/ReactFiber.js#L297-L300">used in React</a> to this day.</p>
+<p>If you don’t extend <code class="language-text">React.Component</code>, React won’t find <code class="language-text">isReactComponent</code> on the prototype, and won’t treat component as a class. Now you know why <a href="https://stackoverflow.com/a/42680526/458193">the most upvoted answer</a> for <code class="language-text">Cannot call a class as a function</code> error is to add <code class="language-text">extends React.Component</code>. Finally, a <a href="https://github.com/facebook/react/pull/11168">warning was added</a> that warns when <code class="language-text">prototype.render</code> exists but <code class="language-text">prototype.isReactComponent</code> doesn’t.</p>
+<hr>
+<p>You might say this story is a bit of a bait-and-switch. <strong>The actual solution is really simple, but I went on a huge tangent to explain <em>why</em> React ended up with this solution, and what the alternatives were.</strong></p>
+<p>In my experience, that’s often the case with library APIs. For an API to be simple to use, you often need to consider the language semantics (possibly, for several languages, including future directions), runtime performance, ergonomics with and without compile-time steps, the state of the ecosystem and packaging solutions, early warnings, and many other things. The end result might not always be the most elegant, but it must be practical.</p>
+<p><strong>If the final API is successful, <em>its users</em> never have to think about this process.</strong> Instead they can focus on creating apps.</p>
+<p>But if you’re also curious... it’s nice to know how it works.</p></div></div></div></div></div></div><script id="webpack-manifest">/*<![CDATA[*/window.webpackManifest={"231608221292675":"app-9de042cfaab38d4abdce.js","261085952541737":"component---src-pages-posts-js-cd1847220dc74c22455a.js","195351340454287":"component---src-templates-post-js-151fda6e99914a23c475.js","162898551421021":"component---src-pages-404-js-be0b53f9f29efb807651.js","35783957827783":"component---src-pages-index-js-75c9bfdbc5a000fa0746.js","60335399758886":"path----372f0b900649fbdd2150.js","52128937219153":"path---posts-静心打磨手中利刃-627d538b0f4eea79ecfb.js","155720654889932":"path---posts-node-70d820c912a075756335.js","108919453860541":"path---posts-docker-0668c33ce97d5a816c17.js","216240011187204":"path---posts-promise-dd34c82b3d406b9c8fc3.js","252992580755484":"path---posts-es-0fe23d189c93c2cf6d85.js","34712125554247":"path---posts-react-df852450c7f2331e22d4.js","146831492438712":"path---posts-redux-da9bd1c7a066eb218b51.js","188259988993670":"path---posts-webpack-465b376944c50002b3b8.js","155243275344959":"path---posts-wepy-5a576812404c857f2a6b.js","259481028934733":"path---posts-小程序-594fd97e539eceb0b0be.js","202390707485127":"path---posts-translate-dbabd63ef0cc86d8029c.js","29362442043640":"path---posts-overreacted-106c811000a4fe22b01d.js","107370358937462":"path---posts-calm-to-polish-sword-express-fcbe0b2de030d6cc6c98.js","173402839352015":"path---posts-calm-to-polish-sword-ghost-to-passport-89e7ee61784af9f15ea5.js","162685832501665":"path---posts-docker-my-fontend-project-5eef77d637a9e4428a75.js","236054049938401":"path---posts-read-code-es-promise-polyfill-c056fe667c471ad927aa.js","270194815372944":"path---posts-read-react-redux-efaa77f3fc3f05a0d5b2.js","54342248932196":"path---posts-settle-react-es-6-119dbaf4693d20879a2f.js","164086441910093":"path---posts-shallow-into-wepy-source-code-598d7888a1449b7c2ba6.js","9756229565306":"path---posts-translate-overreacted-how-does-react-tell-a-class-from-a-function-26d3dfcb3e26d4234c6f.js","60536836248096":"path---posts-translate-overreacted-why-do-we-write-super-props-3df36ee661d4174f0651.js","254022195166212":"path---404-a0e39f21c11f6a62c5ab.js","142629428675168":"path---index-a0e39f21c11f6a62c5ab.js","140933230050240":"path---posts-6097bbb7de9da923b6d2.js","178698757827068":"path---404-html-a0e39f21c11f6a62c5ab.js","114276838955818":"component---src-layouts-index-js-c09ba235cf06125cfc47.js"}/*]]>*/</script><script>/*<![CDATA[*/["/commons-cf32f37b11eea4693204.js","/app-9de042cfaab38d4abdce.js","/path---posts-translate-overreacted-how-does-react-tell-a-class-from-a-function-26d3dfcb3e26d4234c6f.js","/component---src-templates-post-js-151fda6e99914a23c475.js","/component---src-layouts-index-js-c09ba235cf06125cfc47.js"].forEach(function(s){document.write('<script src="'+s+'" defer></'+'script>')})/*]]>*/</script></body></html>
