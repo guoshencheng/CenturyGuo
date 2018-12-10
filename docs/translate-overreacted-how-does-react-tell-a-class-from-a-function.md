@@ -236,22 +236,22 @@ function Greeting() {
 
 ---
 
-The first reason why always using `new` wouldn’t work is that for native arrow functions (not the ones compiled by Babel), calling with `new` throws an error:
+我们不能无脑使用`new`操作符的第一个原因就是如果函数是一个箭头函数(不是被Babel编译出来的)，使用`new`执行之后会抛出一个异常：
 
 ```js
 const Greeting = () => <p>Hello</p>;
-new Greeting(); // 🔴 Greeting is not a constructor
+new Greeting(); // 🔴 Greeting不是一个构造函数
 ```
 
-This behavior is intentional and follows from the design of arrow functions. One of the main perks of arrow functions is that they *don’t* have their own `this` value — instead, `this` is resolved from the closest regular function:
+这里是故意使用箭头函数的。根据箭头函数的设计，箭头函数的其中一个优点就是我们*不用*在意这个函数自己的`this` - 因为这个`this`是指向最近的普通函数的`this`:
 
-```js{2,6,7}
+```js
 class Friends extends React.Component {
   render() {
     const friends = this.props.friends;
     return friends.map(friend =>
       <Friend
-        // `this` is resolved from the `render` method
+        // `this`会使用`render`函数的`this`
         size={this.props.size}
         name={friend.name}
         key={friend.id}
@@ -261,29 +261,29 @@ class Friends extends React.Component {
 }
 ```
 
-Okay, so **arrow functions don’t have their own `this`.** But that means they would be entirely useless as constructors!
+那么所以 *箭头函数自己本身没有`this`* 这就意味着他不可能成为一个构造函数!
 
 ```js
 const Person = (name) => {
-  // 🔴 This wouldn’t make sense!
+  // 🔴 这没有用
   this.name = name;
 }
 ```
 
-Therefore, **JavaScript disallows calling an arrow function with `new`.** If you do it, you probably made a mistake anyway, and it’s best to tell you early. This is similar to how JavaScript doesn’t let you call a class *without* `new`.
+因此，**Javascript不允许使用`new`来调用箭头函数** 如果你这么做，那么你可能会导致代码出问题，所以需要提前抛出异常。这就和之前提到的为什么Javascript不能让你在调用类的时候不使用`new`的道理一样。
 
-This is nice but it also foils our plan. React can’t just call `new` on everything because it would break arrow functions! We could try detecting arrow functions specifically by their lack of `prototype`, and not `new` just them:
+这是一个很合理的做法，但是这让我们之前的计划落空。React不能让我们在所有函数前面使用`new`，因为在使用箭头函数的时候会发生报错！我们只能够尝试检查一个函数是否为箭头函数，因为箭头函数没有`prototype`，并且对这类函数，不使用`new`来调用:
 
 ```js
 (() => {}).prototype // undefined
 (function() {}).prototype // {constructor: f}
 ```
 
-But this [wouldn’t work](https://github.com/facebook/react/issues/4599#issuecomment-136562930) for functions compiled with Babel. This might not be a big deal, but there is another reason that makes this approach a dead end.
+但是这对Babel编译出来的函数[不起作用](https://github.com/facebook/react/issues/4599#issuecomment-136562930)。但是这看起来也不一定是个大问题(因为我们应该也不会在箭头函数里面写`this`)，但是这里另一个原因让我们的这个方案几乎完蛋。
 
 ---
 
-Another reason we can’t always use `new` is that it would preclude React from supporting components that return strings or other primitive types.
+另一个我们不能无脑使用`new`操作符的原因是我们还需要排除那些React支持的直接返回字符串或者其他基础类型的组件。
 
 ```js
 function Greeting() {
@@ -294,12 +294,12 @@ Greeting(); // ✅ 'Hello'
 new Greeting(); // 😳 Greeting {}
 ```
 
-This, again, has to do with the quirks of the [`new` operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new) design. As we saw earlier, `new` tells the JavaScript engine to create an object, make that object `this` inside the function, and later give us that object as a result of `new`.
+额。。。我们需要再一次看一下[`new`操作符](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new)的设计。根据我们之前所知道的，`new`告诉Javascript引擎去创建一个对象，对构造函数的内部的`this`赋值，然后在最后返回一个对象给我们。
 
-However, JavaScript also allows a function called with `new` to *override* the return value of `new` by returning some other object. Presumably, this was considered useful for patterns like pooling where we want to reuse instances:
+但是Javascript也允许一个使用`new`调用的函数返回一个另外的对象来覆盖这个函数内部的this。想必这是为了考虑这可能对类似重用对象实例之类的模式比较有用吧:
 
-```js{1-2,7-8,17-18}
-// Created lazily
+```js
+// 懒加载
 var zeroVector = null;
 
 function Vector(x, y) {
@@ -319,7 +319,7 @@ var b = new Vector(0, 0);
 var c = new Vector(0, 0); // 😲 b === c
 ```
 
-However, `new` also *completely ignores* a function’s return value if it’s *not* an object. If you return a string or a number, it’s like there was no `return` at all.
+但是，当一个函数返回非对象类型的值的时候，`new`就会无视这个返回值。比如说如果你返回一个字符串或者数字，它就会当做什么都没有返回。
 
 ```js
 function Answer() {
@@ -330,15 +330,16 @@ Answer(); // ✅ 42
 new Answer(); // 😳 Answer {}
 ```
 
-There is just no way to read a primitive return value (like a number or a string) from a function when calling it with `new`. So if React always used `new`, it would be unable to add support components that return strings!
+因为使用`new`来调用函数的时候，返回一个基本类型(比如数字或者字符串)会被无视。所以如果React无脑使用`new`,就不能够支持哪些直接返回字符串类型的组建了!
 
-That’s unacceptable so we need to compromise.
+这显然对开发者来说是不可接受的，所以我们只能在换个法子。
 
 ---
 
-What did we learn so far? React needs to call classes (including Babel output) *with* `new` but it needs to call regular functions or arrow functions (including Babel output) *without* `new`. And there is no reliable way to distinguish them.
+至今为止，我们一共总结了什么？React需要在调用class（包括Babel编译输出的）使用`new`操作符，但是我们需要在调用普通函数或者箭头函数的时候不使用`new`操作符。而现在好像还没有一个可行的方案来区分他们。
 
-**If we can’t solve a general problem, can we solve a more specific one?**
+**如果我们不能够解决普遍的问题，那我们可以尝试去解决哪个比较特殊的问题吗?**
+
 
 When you define a component as a class, you’ll likely want to extend `React.Component` for built-in methods like `this.setState()`. **Rather than try to detect all classes, can we detect only `React.Component` descendants?**
 
