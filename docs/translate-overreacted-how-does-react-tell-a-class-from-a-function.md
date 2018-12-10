@@ -340,14 +340,13 @@ new Answer(); // 😳 Answer {}
 
 **如果我们不能够解决普遍的问题，那我们可以尝试去解决哪个比较特殊的问题吗?**
 
+当我们使用类来定义组建的饿时候，我们一般会去继承`React.Component`，为了使用一些内置的函数，比如`this.setState()`。**换个想法来看，我们去区分所有的类无法做到的话，我们是不是可以考虑只检查React.Component的子类呢**
 
-When you define a component as a class, you’ll likely want to extend `React.Component` for built-in methods like `this.setState()`. **Rather than try to detect all classes, can we detect only `React.Component` descendants?**
-
-Spoiler: this is exactly what React does.
+Spoiler: 这正式React做的事情
 
 ---
 
-Perhaps, the idiomatic way to check if `Greeting` is a React component class is by testing if `Greeting.prototype instanceof React.Component`:
+当然，常用的用来检查`Greeting`是否是React组件的类的子类的方式就是取检查是否`Greeting.prototype`是否是React.Component的实例:
 
 ```js
 class A {}
@@ -356,11 +355,11 @@ class B extends A {}
 console.log(B.prototype instanceof A); // true
 ```
 
-I know what you’re thinking. What just happened here?! To answer this, we need to understand JavaScript prototypes.
+我知道你在想什么，这段代码的运行结果为什么会是这样？！为了回答这个问题，我们需要理解Javascript原型。
 
-You might be familiar with the “prototype chain”. Every object in JavaScript might have a “prototype”. When we write `fred.sayHi()` but `fred` object has no `sayHi` property, we look for `sayHi` property on `fred`’s prototype. If we don’t find it there, we look at the next prototype in the chain — `fred`’s prototype’s prototype. And so on.
+你可能对Javascript原型链非常熟悉。每个在Javascript中的对象都会有一个原型，当我们在调用`gred.sayHi()`但是`fred`的对象没有`sayHi`的属性的时候，我们会在`fred`的原型链上寻找`sayHi`的属性，如果我们不能够在原型链上找到它，我们会在这个原型链上的下一个原型链（`fred`的原型的原型），就这么循环执行下去。
 
-**Confusingly, the `prototype` property of a class or a function _does not_ point to the prototype of that value.** I’m not kidding.
+我不是在开玩笑...**有个很奇怪的问题，一个函数或者类的`prototype`属性 _并不_ 指向这个实例的`prototype`**
 
 ```js
 function Person() {}
