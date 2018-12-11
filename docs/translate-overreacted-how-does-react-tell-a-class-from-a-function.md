@@ -505,52 +505,50 @@ console.log(Greeting.prototype instanceof React.Component);
 然而这其实并不是React真实的实现。。。😳
 
 
-One caveat to the `instanceof` solution is that it doesn’t work when there are multiple copies of React on the page, and the component we’re checking inherits from *another* React copy’s `React.Component`. Mixing multiple copies of React in a single project is bad for several reasons but historically we’ve tried to avoid issues when possible. (With Hooks, we [might need to](https://github.com/facebook/react/issues/13991) force deduplication though.)
+另一个可行的方法就是去检查原型中是否存在`render`函数，但是当时并[不能确定](https://github.com/facebook/react/issues/4599#issuecomment-129714112)React的组件API将来会如何发展的。每一种检查方式都会有它不合适的地方。现在这种检查的方式当`render`被定义成当前实例的函数的时候就会不行了，比如定义在类的成员变量上。
 
-One other possible heuristic could be to check for presence of a `render` method on the prototype. However, at the time it [wasn’t clear](https://github.com/facebook/react/issues/4599#issuecomment-129714112) how the component API would evolve. Every check has a cost so we wouldn’t want to add more than one. This would also not work if `render` was defined as an instance method, such as with the class property syntax.
+所以，为了防止上面的问题，React [添加了](https://github.com/facebook/react/pull/4663) 一个特殊的标志在组件的基础父类上。React会检查这个标志是否存在，这就是React为什么会知道一个组件是React组件还是普通的函数。
 
-So instead, React [added](https://github.com/facebook/react/pull/4663) a special flag to the base component. React checks for the presence of that flag, and that’s how it knows whether something is a React component class or not.
-
-Originally the flag was on the base `React.Component` class itself:
+一般来说，这个标志被定义在`React.Component`类里:
 
 ```js
-// Inside React
+// React内部
 class Component {}
 Component.isReactClass = {};
 
-// We can check it like this
+// 我可以像这样检查
 class Greeting extends Component {}
-console.log(Greeting.isReactClass); // ✅ Yes
+console.log(Greeting.isReactClass); // ✅ 对的
 ```
 
-However, some class implementations we wanted to target [did not](https://github.com/scala-js/scala-js/issues/1900) copy static properties (or set the non-standard `__proto__`), so the flag was getting lost.
+但是，有些类的实现中[没有](https://github.com/scala-js/scala-js/issues/1900)继承静态的属性（或者不规范的设置了`__proto__`），然后标志就被丢失了。
 
-This is why React [moved](https://github.com/facebook/react/pull/5021) this flag to `React.Component.prototype`: 
+这也就是为什么后来 React [移动](https://github.com/facebook/react/pull/5021)了标志到了`React.Component.prototype`:
 
 ```js
-// Inside React
+// React内部
 class Component {}
 Component.prototype.isReactComponent = {};
 
-// We can check it like this
+// 我们可以看看是否是这样的
 class Greeting extends Component {}
 console.log(Greeting.prototype.isReactComponent); // ✅ Yes
 ```
 
-**And this is literally all there is to it.**
+**顾名思义，这个变量名**
 
-You might be wondering why it’s an object and not just a boolean. It doesn’t matter much in practice but early versions of Jest (before Jest was Good™️) had automocking turned on by default. The generated mocks omitted primitive properties, [breaking the check](https://github.com/facebook/react/pull/4663#issuecomment-136533373). Thanks, Jest.
+你可能会想，为什么这是一个对象，而不是一个bool值，这在开发使用中无伤大雅，但是在最近的几个Jest版本中(那时候Jest还不是很好用)默认打开了自动mock。它省略了mock基本数据，[使得React的check失效了](https://github.com/facebook/react/pull/4663#issuecomment-136533373)，谢谢Jest
 
-The `isReactComponent` check is [used in React](https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/react-reconciler/src/ReactFiber.js#L297-L300) to this day.
+这个`isReactComponent`的标识至今都还在[React中使用](https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/react-reconciler/src/ReactFiber.js#L297-L300)
 
-If you don’t extend `React.Component`, React won’t find `isReactComponent` on the prototype, and won’t treat component as a class. Now you know why [the most upvoted answer](https://stackoverflow.com/a/42680526/458193) for `Cannot call a class as a function` error is to add `extends React.Component`. Finally, a [warning was added](https://github.com/facebook/react/pull/11168) that warns when `prototype.render` exists but `prototype.isReactComponent` doesn’t.
+如果你不继承`React.Component`，React不能在原型链上找到`isReactComponent`这个标志，所以React不会把这个类当做一个类来看，现在你就能明白[最频繁的问题](https://stackoverflow.com/a/42680526/458193) - 像`Cannot call a class a function`的错误需要通过继承React.Component解决。最后，如果你的组件的原型上有`render`函数，但是没有`isReactComponent`不存在的时候，会抛出一个[警告](https://github.com/facebook/react/pull/11168)。
 
 ---
 
-You might say this story is a bit of a bait-and-switch. **The actual solution is really simple, but I went on a huge tangent to explain *why* React ended up with this solution, and what the alternatives were.**
+你可能觉得这篇文章总是在用一种吊胃口的方式在引导你向下阅读。**最终的解决方案非常简单，但是我们花了大篇幅来解释*为什么*React最终会使用这个方案以及还有什么其他的选择**
 
-In my experience, that’s often the case with library APIs. For an API to be simple to use, you often need to consider the language semantics (possibly, for several languages, including future directions), runtime performance, ergonomics with and without compile-time steps, the state of the ecosystem and packaging solutions, early warnings, and many other things. The end result might not always be the most elegant, but it must be practical.
+以我的经验来看，这对于一个库的API来说是一件非常正常的事情。为了让一个API能够更简单的被使用，你总是需要考虑语言(如果可能的话，可以考虑多种语言或者语言的未来)，运行时性能，编译时或者其他的用户体验，生态系统的情况，打包的解决方案按，更少的警告等等。可能最后的解决方案并不会总是那么优雅，但是一定要非常实用。
 
-**If the final API is successful, _its users_ never have to think about this process.** Instead they can focus on creating apps.
+**如果一个API是成功的，那么_他的使用者_完全不需要关心这个API内部是如何运行的**，他们只需要关心如何做自己的应用就可以了
 
-But if you’re also curious... it’s nice to know how it works.
+如果你总是保持好奇心，你会觉得知道React的这些内幕会非常开心。
