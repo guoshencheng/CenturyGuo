@@ -368,11 +368,11 @@ console.log(Person.prototype); // 🤪 Not Person's prototype
 console.log(Person.__proto__); // 😳 Person's prototype
 ```
 
-So the “prototype chain” is more like `__proto__.__proto__.__proto__` than `prototype.prototype.prototype`. This took me years to get.
+所以"原型链"应该是类似于`__proto__.__proto__.__proto__`，而不是`prototype.prototype.prototype`。我也是很多年才明白这点。
 
-What’s the `prototype` property on a function or a class, then? **It’s the `__proto__` given to all objects `new`ed with that class or a function!**
+在类或者函数上设置了`prototype`, **但最后通过`new`操作符创建的对象我们是通过`__proto__`来获取原型上属性**
 
-```js{8}
+```js
 function Person(name) {
   this.name = name;
 }
@@ -383,34 +383,34 @@ Person.prototype.sayHi = function() {
 var fred = new Person('Fred'); // Sets `fred.__proto__` to `Person.prototype`
 ```
 
-And that `__proto__` chain is how JavaScript looks up properties:
+Javascript就是使用`__proto__`链来查找属性的:
 
 ```js
 fred.sayHi();
-// 1. Does fred have a sayHi property? No.
-// 2. Does fred.__proto__ have a sayHi property? Yes. Call it!
+// 1. fred是否含有这个sayHi属性? No.
+// 2. fred.__proto__ 是否有 sayHi的属性 ？ 是的. 那么就调用它!
 
 fred.toString();
-// 1. Does fred have a toString property? No.
-// 2. Does fred.__proto__ have a toString property? No.
-// 3. Does fred.__proto__.__proto__ have a toString property? Yes. Call it!
+// 1. fred是否含有这个toString属性? No.
+// 2. fred.__proto__ 是否有 toString的属性 ？ No.
+// 3. fred.__proto__.__proto__ 是否有 toString的属性 ？ 是的. 那么就调用它!
 ```
 
-In practice, you should almost never need to touch `__proto__` from the code directly unless you’re debugging something related to the prototype chain. If you want to make stuff available on `fred.__proto__`, you’re supposed to put it on `Person.prototype`. At least that’s how it was originally designed.
+在实际使用场景中，你可能不需要自己去在代码中直接接触`__proto__`，除非你需要对原型链上相关的东西做调试。如果你想要让某个成员变量挂载在`fred.__proto__`中，你可以在`Person.prototype`中设置这个成员变量，至少这是Javascript原生设计定义类的成员变量的方式。
 
-The `__proto__` property wasn’t even supposed to be exposed by browsers at first because the prototype chain was considered an internal concept. But some browsers added `__proto__` and eventually it was begrudgingly standardized (but deprecated in favor of `Object.getPrototypeOf()`).
+`__proto__`这个属性在刚开始的时候在浏览器中甚至是不被暴露的，因为原型链是应该被当做一个内部的概念。但是有一些浏览器加上了`__proto__`，所以最后成为了一种标准(虽然最后还是被`Object.getPrototypeOf()`代替了)。
 
-**And yet I still find it very confusing that a property called `prototype` does not give you a value’s prototype** (for example, `fred.prototype` is undefined because `fred` is not a function). Personally, I think this is the biggest reason even experienced developers tend to misunderstand JavaScript prototypes.
+**但是至今关于一个类的prototype的属性在他的实例上，并不是叫做prototype这个问题依然让我很疑惑**（比如，`fred.prototype`是未定义，因为`fred`不是一个函数）。个人来说，我觉得这是造成一个Javascript开发者在原型链上比较容易搞错的地方，即使是非常有经验的开发者。
 
 ---
 
-This is a long post, eh? I’d say we’re 80% there. Hang on.
+这是一篇比较长的文章，额。我其实想说，已经快读到80%了，别放弃。
 
-We know that when say `obj.foo`, JavaScript actually looks for `foo` in `obj`, `obj.__proto__`, `obj.__proto__.__proto__`, and so on.
+我们都明白当我们使用`obj.foo`的时候，Javascript其实是在依次寻找`obj`上的`foo`、`obj.__proto__.foo`、`obj.__proto__.__proto__.foo` 等等
 
-With classes, you’re not exposed directly to this mechanism, but `extends` also works on top of the good old prototype chain. That’s how our React class instance gets access to methods like `setState`:
+利用class，你可能不需要知道这些机制，但是继承也是基于这个原型链的。这也就是React的类的实例是如何获取到类似`setState`的父类函数的:
 
-```js{1,9,13}
+```js
 class Greeting extends React.Component {
   render() {
     return <p>Hello</p>;
@@ -422,87 +422,88 @@ console.log(c.__proto__); // Greeting.prototype
 console.log(c.__proto__.__proto__); // React.Component.prototype
 console.log(c.__proto__.__proto__.__proto__); // Object.prototype
 
-c.render();      // Found on c.__proto__ (Greeting.prototype)
-c.setState();    // Found on c.__proto__.__proto__ (React.Component.prototype)
-c.toString();    // Found on c.__proto__.__proto__.__proto__ (Object.prototype)
+c.render();      // 找到 c.__proto__ (Greeting.prototype)
+c.setState();    // 找到 c.__proto__.__proto__ (React.Component.prototype)
+c.toString();    // 找到 c.__proto__.__proto__.__proto__ (Object.prototype)
 ```
 
-In other words, **when you use classes, an instance’s `__proto__` chain “mirrors” the class hierarchy:**
+换句话来说，**当你使用类的时候，会这个实例的`__proto__`链来模拟类的继承**
 
 ```js
-// `extends` chain
+// 继承链
 Greeting
   → React.Component
     → Object (implicitly)
 
-// `__proto__` chain
+// 原型链
 new Greeting()
   → Greeting.prototype
     → React.Component.prototype
       → Object.prototype
 ```
 
-2 Chainz.
+如上的两个链
 
 ---
 
-Since the `__proto__` chain mirrors the class hierarchy, we can check whether a `Greeting` extends `React.Component` by starting with `Greeting.prototype`, and then following down its `__proto__` chain:
+因为我们是使用`__proto__`来模拟类的继承，我们可以通过这点来确定`Greeting`是否继承于`React.Component`。我们可以顺着`__proto__`链来检查。
 
-```js{3,4}
-// `__proto__` chain
+```js
+// `__proto__` 链
 new Greeting()
-  → Greeting.prototype // 🕵️ We start here
-    → React.Component.prototype // ✅ Found it!
+  → Greeting.prototype // 🕵️ 我们从这里开始
+    → React.Component.prototype // ✅ 找到了!
       → Object.prototype
 ```
 
-Conveniently, `x instanceof Y` does exactly this kind of search. It follows the `x.__proto__` chain looking for `Y.prototype` there.
+顺便一提，`x`继承于`y`其实也是依照这种方式，它通过寻找`x.__proto__`的链来寻找是否存在`Y.prototype`。
 
-Normally, it’s used to determine whether something is an instance of a class:
+正常来说，这本来是用来确定某个实例是否是某个类的实例的:
 
 ```js
 let greeting = new Greeting();
 
 console.log(greeting instanceof Greeting); // true
-// greeting (🕵️‍ We start here)
-//   .__proto__ → Greeting.prototype (✅ Found it!)
+// greeting (🕵️‍ 我们从这里开始)
+//   .__proto__ → Greeting.prototype (✅ 找到了!)
 //     .__proto__ → React.Component.prototype 
 //       .__proto__ → Object.prototype
 
 console.log(greeting instanceof React.Component); // true
-// greeting (🕵️‍ We start here)
+// greeting (🕵️‍ 我们从这里开始寻找)
 //   .__proto__ → Greeting.prototype
-//     .__proto__ → React.Component.prototype (✅ Found it!)
+//     .__proto__ → React.Component.prototype (✅ 找到了!)
 //       .__proto__ → Object.prototype
 
 console.log(greeting instanceof Object); // true
-// greeting (🕵️‍ We start here)
+// greeting (🕵️‍ 我们从这里开始寻找)
 //   .__proto__ → Greeting.prototype
 //     .__proto__ → React.Component.prototype
-//       .__proto__ → Object.prototype (✅ Found it!)
+//       .__proto__ → Object.prototype (✅ 找到了!)
 
 console.log(greeting instanceof Banana); // false
-// greeting (🕵️‍ We start here)
+// greeting (🕵️‍ 我们从这里开始查找)
 //   .__proto__ → Greeting.prototype
 //     .__proto__ → React.Component.prototype 
-//       .__proto__ → Object.prototype (🙅‍ Did not find it!)
+//       .__proto__ → Object.prototype (🙅‍ 没有找到!)
 ```
 
-But it would work just as fine to determine if a class extends another class:
+而且这也对确定一个类是否是另一个类的子类有用:
 
 ```js
 console.log(Greeting.prototype instanceof React.Component);
 // greeting
-//   .__proto__ → Greeting.prototype (🕵️‍ We start here)
-//     .__proto__ → React.Component.prototype (✅ Found it!)
+//   .__proto__ → Greeting.prototype (🕵️‍ 我们从这里开始查找)
+//     .__proto__ → React.Component.prototype (✅ 找到了!)
 //       .__proto__ → Object.prototype
 ```
 
-And that check is how we could determine if something is a React component class or a regular function.
+这个检查方式就能确定一个组件是React.Component的子类还是普通函数
 
 ---
 
-That’s not what React does though. 😳
+然而这其实并不是React真实的实现。。。😳
+
 
 One caveat to the `instanceof` solution is that it doesn’t work when there are multiple copies of React on the page, and the component we’re checking inherits from *another* React copy’s `React.Component`. Mixing multiple copies of React in a single project is bad for several reasons but historically we’ve tried to avoid issues when possible. (With Hooks, we [might need to](https://github.com/facebook/react/issues/13991) force deduplication though.)
 
