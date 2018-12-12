@@ -98,7 +98,7 @@ class PolitePerson extends Person {
   }
 ```
 
-但是我们忘记了`this.greetColleagues()`在调用父类的构造函数之前被调用了，我们会以为`this.name`已经被初始化了。但是`this.name`并没有被定义，如你所见，这样的代码然人非常难理解。
+但是我们忘记了`this.greetColleagues()`在调用父类的构造函数之前被调用了，我们会以为`this.name`已经被初始化了。但是`this.name`并没有被定义，如你所见，这样的代码任然非常难理解。
 
 为了避免这样的问题，**JavaScript必须让你在使用`this`之前调用父类的构造函数，你*必须*先调用父类的构造函数**。让父类做它自己的事情！但是这个定义类的限制也同样作用于React的组件定义:
 
@@ -165,6 +165,7 @@ class Button extends React.Component {
   // ...
 }
 ```
+
 你也可以做更多的尝试，比如在一些函数中调用`this.props`，然后在*构造函数中*调用这些函数，看看结果如何。**这也是为什么我推荐你最好能够总是将props传到父类的构造函数中，即使这并不是严格上必须的**
 
 ```js
@@ -182,7 +183,7 @@ class Button extends React.Component {
 
 -----
 
-这里还有一点，很长的一段时间里，React的使用者都非常的好气。
+这里还有一点，很长的一段时间里，React的使用者都非常的好奇。
 
 你可能注意到，当你在class中使用 context api(无论是老的`contextTypes`或者现在的React16.6的`contextType`API)，`context`会作为第二个参数传递到构造函数中。
 
