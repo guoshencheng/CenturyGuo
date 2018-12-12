@@ -102,13 +102,12 @@ React元素在设计的时候是一个纯对象:
 }
 ```
 
-一般来说，你会使用`React.createElement()`来创建一个React元素，这也是必须的。
-While normally you create them with `React.createElement()`, it is not required. There are valid use cases for React to support plain element objects written like I just did above. Of course, you probably wouldn’t *want* to write them like this — but this [can be](https://github.com/facebook/react/pull/3583#issuecomment-90296667) useful for an optimizing compiler, passing UI elements between workers, or for decoupling JSX from the React package.
+一般来说，你会使用`React.createElement()`来创建一个React元素，但这不是必须的。像我上面这么写的一个纯对象来使用React也是被支持的。但是你不会希望像我这么用React，但是这[可能](https://github.com/facebook/react/pull/3583#issuecomment-90296667)对一些编译优化有用，在不同的工作进程传递React元素的对象数据，或者将JSX从React中分离出来。
 
-However, **if your server has a hole that lets the user store an arbitrary JSON object** while the client code expects a string, this could become a problem:
+但是，**如果你的服务器有一个能够让用户存储JSON对象的漏洞**，而客户端的代码期望显示的是一个字符串，这就可能会有问题了。。。。
 
-```jsx{2-10,15}
-// Server could have a hole that lets user store JSON
+```jsx
+// 因为Server可能有一个漏洞能够让用户存储JSON
 let expectedTextButGotJSON = {
   type: 'div',
   props: {
@@ -120,17 +119,17 @@ let expectedTextButGotJSON = {
 };
 let message = { text: expectedTextButGotJSON };
 
-// Dangerous in React 0.13
+// 在React 0.13中会很危险
 <p>
   {message.text}
 </p>
 ```
 
-In that case, React 0.13 would be [vulnerable](http://danlec.com/blog/xss-via-a-spoofed-react-element) to an XSS attack. To clarify, again, **this attack depends on an existing server hole**. Still, React could do a better job of protecting people against it. And starting with React 0.14, it does.
+这种情况下，React0.13很有可能会存在xss攻击的[危险](http://danlec.com/blog/xss-via-a-spoofed-react-element)，说白了，**这还是依赖于一个服务器上的漏洞**。React会在这方面一直持续改进，因此在React 0.14中修复了这个问题。
 
-The fix in React 0.14 was to [tag every React element with a Symbol](https://github.com/facebook/react/pull/4832):
+在React0.14中修复的方式是[在每个React元素中使用一个Symbol类型的标志](https://github.com/facebook/react/pull/4832)
 
-```jsx{9}
+```jsx
 {
   type: 'marquee',
   props: {
@@ -143,14 +142,16 @@ The fix in React 0.14 was to [tag every React element with a Symbol](https://git
 }
 ```
 
-This works because you can’t just put `Symbol`s in JSON. **So even if the server has a security hole and returns JSON instead of text, that JSON can’t include `Symbol.for('react.element')`.** React will check `element.$$typeof`, and will refuse to process the element if it’s missing or invalid.
+这能够成功的检查是因为你不可能在你的JSON中添加`Symbol`类型。**所以即使服务器存在一可以在一个本应该返回字符串的地方返回一个JSON的安全漏洞的情况，这个JSON也不可能包含`Symbol.for('react.element')`**。React会检查`element.$$typeof`，如果这个属性校验不通过的话，React不会将这个当做一个React元素来使用
 
-The nice thing about using `Symbol.for()` specifically is that **Symbols are global between environments like iframes and workers.** So this fix doesn’t prevent passing trusted elements between different parts of the app even in more exotic conditions. Similarly, even if there are multiple copies of React on the page, they can still “agree” on the valid `$$typeof` value.
+
+`Symbol.for()`有一个很棒的特性，就是**Symbols在一些环境之间都可以全局使用，比如iframes和workers**，也就是说，这种方式的判断在各种不同的React渲染应用中传递也不会无效，即使在跨越不同环境的情况下，也可以使用。简单点来说，即使我们在一个页面中有很多React在分别渲染，他们也可以对这个`$$typeof`的校验统一。
 
 ---
 
-What about the browsers that [don’t support](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#Browser_compatibility) Symbols?
+那么如果有些浏览器[不支持](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#Browser_compatibility) Symbols呢
 
-Alas, they don’t get this extra protection. React still includes the `$$typeof` field on the element for consistency, but it’s [set to a number](https://github.com/facebook/react/blob/8482cbe22d1a421b73db602e1f470c632b09f693/packages/shared/ReactSymbols.js#L14-L16) — `0xeac7`.
 
-Why this number specifically? `0xeac7` kinda looks like “React”.
+额。。那可能这些浏览器就不能支持这种安全措施了。React元素依然会包含`$$typeof`的属性名，但是这会变成一个[number类型](ttps://github.com/facebook/react/blob/8482cbe22d1a421b73db602e1f470c632b09f693/packages/shared/ReactSymbols.js#L14-L16) - `0xeac7`
+
+至于为什么要使用这么个数字嘛？大概是因为`0xeac7` 看起来会有点像 "React"。
