@@ -1,5 +1,5 @@
 ---
-date: '2018-12-02'
+date: '2018-12-03'
 title: '翻译：为什么React的元素有一个叫做$$typeof的属性'
 tag: translate,overreacted
 ---
