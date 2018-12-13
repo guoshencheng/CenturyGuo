@@ -5,16 +5,20 @@
       "path---posts-translate-overreacted-how-does-react-tell-a-class-from-a-function-1605e86aeffe6e303109.js.map"
     ],
     "path---posts-overreacted": [
-      "path---posts-overreacted-ed8ab5b002f7af96b0f5.js",
-      "path---posts-overreacted-ed8ab5b002f7af96b0f5.js.map"
+      "path---posts-overreacted-514e71338e31da03e961.js",
+      "path---posts-overreacted-514e71338e31da03e961.js.map"
     ],
     "path---posts-react": [
-      "path---posts-react-4f84403e6f24dfec5c2d.js",
-      "path---posts-react-4f84403e6f24dfec5c2d.js.map"
+      "path---posts-react-4ed77a92e0b6370f0567.js",
+      "path---posts-react-4ed77a92e0b6370f0567.js.map"
     ],
     "component---src-pages-index-js": [
       "component---src-pages-index-js-75c9bfdbc5a000fa0746.js",
       "component---src-pages-index-js-75c9bfdbc5a000fa0746.js.map"
+    ],
+    "path---posts-translate-overreacted-my-wishlist-for-hot-reloading": [
+      "path---posts-translate-overreacted-my-wishlist-for-hot-reloading-25636abf72531037743e.js",
+      "path---posts-translate-overreacted-my-wishlist-for-hot-reloading-25636abf72531037743e.js.map"
     ],
     "path---posts-静心打磨手中利刃": [
       "path---posts-静心打磨手中利刃-17ad9d900d78d587c2b4.js",
@@ -49,8 +53,8 @@
       "component---src-layouts-index-js-1c31ac53c9de32dabbbb.js.map"
     ],
     "path---posts": [
-      "path---posts-5d689ab557cef6b83626.js",
-      "path---posts-5d689ab557cef6b83626.js.map"
+      "path---posts-d8de5504f512bf19f9e8.js",
+      "path---posts-d8de5504f512bf19f9e8.js.map"
     ],
     "path---index": [
       "path---index-a0e39f21c11f6a62c5ab.js",
@@ -103,17 +107,17 @@
       "component---src-templates-post-js-52cf4b06d22aef3e6b9b.js.map"
     ],
     "path---posts-translate": [
-      "path---posts-translate-6fb411e23f5102908082.js",
-      "path---posts-translate-6fb411e23f5102908082.js.map"
+      "path---posts-translate-a445219a280e74c8a1b5.js",
+      "path---posts-translate-a445219a280e74c8a1b5.js.map"
     ],
     "path---posts-promise": [
       "path---posts-promise-bfd9096e6b2d351edfde.js",
       "path---posts-promise-bfd9096e6b2d351edfde.js.map"
     ],
     "app": [
-      "app-3753e803ea1a9abe3edc.js",
+      "app-9e2837738aed45ea6a72.js",
       "build-js-styles.css",
-      "app-3753e803ea1a9abe3edc.js.map",
+      "app-9e2837738aed45ea6a72.js.map",
       "build-js-styles.css.map"
     ],
     "path---posts-read-code-es-promise-polyfill": [
