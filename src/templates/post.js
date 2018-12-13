@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'gatsby-link';
 import './post.less';
+import { DiscussionEmbed } from "disqus-react";
 require("prismjs/themes/prism-tomorrow.css")
 
 export default class Post extends React.Component {
@@ -9,6 +10,11 @@ export default class Post extends React.Component {
     const post = data.markdownRemark;
     const { tag } = post.frontmatter;
     const tags = tag ? tag.split(',') : '';
+    const disqusShortname = "guoshencheng";
+    const disqusConfig = {
+      identifier: post.id,
+      title: post.frontmatter.title,
+    };
     return (
       <div className="post-container">
         <div className="post-title">
@@ -21,7 +27,7 @@ export default class Post extends React.Component {
           <span className="post-tag">
             {
               tags.map(t => (
-                <Link to={`/posts/${t}`}>{t}</Link>
+                <Link key={t} to={`/posts/${t}`}>{t}</Link>
               ))
             }
           </span>
@@ -29,6 +35,7 @@ export default class Post extends React.Component {
         <div className="markdown-body">
           <div dangerouslySetInnerHTML={{ __html: post.html }} />
         </div>
+        <DiscussionEmbed shortname={disqusShortname} config={disqusConfig} />
       </div>
     );
   }

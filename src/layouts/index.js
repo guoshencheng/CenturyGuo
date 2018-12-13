@@ -8,24 +8,27 @@ import Header from '../components/header'
 import '../github-markdown.css'
 import './index.less'
 
-const Layout = ({ children, data, location }) => (
-  <div>
-    <Helmet
-      title={data.site.siteMetadata.title}
-      meta={[
-        { name: 'description', content: 'Sample' },
-        { name: 'keywords', content: 'sample, something' },
-      ]}
-    />
-    {
-      location.pathname !== '/' 
-      && <Header siteTitle={data.site.siteMetadata.title} />
-    }
-    <div className={classnames('container', { 'with-header': location.pathname !== '/' })}>
-      {children()}
+
+const Layout = ({ children, data, location }) => {
+  return (
+    <div>
+      <Helmet
+        title={data.site.siteMetadata.title}
+        meta={[
+          { name: 'description', content: 'Sample' },
+          { name: 'keywords', content: 'sample, something' },
+        ]}
+      />
+      {
+        location.pathname !== '/' 
+        && <Header siteTitle={data.site.siteMetadata.title} />
+      }
+      <div className={classnames('container', { 'with-header': location.pathname !== '/' })}>
+        {children()}
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 Layout.propTypes = {
   children: PropTypes.func,
