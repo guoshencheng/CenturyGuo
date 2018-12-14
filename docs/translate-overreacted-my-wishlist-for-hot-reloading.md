@@ -119,15 +119,15 @@ As long as the Hook call order doesn’t change, we can preserve the state even 
 
 ### 局部性
 
-* **Editing a module should re-execute as few modules as possible.** Side effects during component module initialization are generally discouraged. But the more code you execute, the more likely something will cause a mess when called twice. We’re writing JavaScript, and React components are islands of (relative) purity but even there we don’t have strong guarantees. So if I edit a module, my hot reloading solution should re-execute that module and try to stop there if possible.
+* **编辑过一个模块后，我们应该竟可能的少重新编译模块** 组件模块在初始化的时候会产生一些副作用，这通常是不允许的。但是你执行的代码量越多，你的逻辑就有可能会越混乱，有时甚至会导致一些逻辑被重复调用。我们正在写的Javascript和React组件现在还是处于一个相对比较不完整的境地，即使是这样，我们也不敢担保我们的做的逻辑没问题。因此，如果我们编辑一个模块，我的热更新应该尽量只更新这个模块。
 
-* **Editing a component shouldn’t destroy the state of its parents or siblings.** Similar to how `setState()` only affects the tree below, editing a component shouldn’t affect anything above it.
+* **编辑一个组件不应该影响他的父组件和隔壁组件的状态** 这就和`setState()`一样，只会影响自己的子组件的状态，编辑一个组件不应该超过这样的影响力。
 
-* **Edits to non-React code should propagate upwards.** If you edit a file with constants or pure functions that’s imported from several components, those components should update. It is acceptable to lose module state in such files.
+* **编辑一个非React的代码的时候应该向上传播的更新** 如果你编辑一个含有纯函数或者常量的文件，假如这个文件被多个组件所引用，应该只更新这些组件，像这些组件丢失一些状态是可以接受的。
 
-* **A runtime error introduced during hot reloading should not propagate.** If you make a mistake in one component, it shouldn’t break your whole app. In React, this is usually solved by error boundaries. However, they are too coarse for the countless typos we make while editing. I should be able to make and fix runtime errors while I work on a component without its siblings or parents unmounting. However, errors that *don’t* happen during hot reload (and are legitimate bugs in my code) should go to the closest error boundary.
+* **一个在热更新时抛出运行时的错误不应该被传播** 如果你在写组件的时候产生了错误，这不应该让你的应用崩溃。在React中，通常的解决方案是使用错误边界。但是这对于我们编辑时候无数的错别字而言，是一种比较粗鲁的解决方案啊。我们的热更新需要能够处理一些编译时的错误，让我们在编辑组件的时候，这些错误不会让相邻组件被卸载。但是我们必须保证那些不在热更新产生的错误(用户自己的本来的错误)应该被传播。
 
-* **Preserve own state unless it’s clear the developer doesn’t want to.** If you’re just tweaking styles, it’s frustrating for the state to reset on every edit. On the other hand, if you just changed the state shape or the initial state, you’ll often prefer it to reset. By default we should try our best to preserve state. But if it leads to an error during hot reload, this is often a sign some assumption has changed, so we should should reset state and *retry* rendering in that case. Commenting things out and back in is common so it’s important to handle that gracefully. For example, removing Hooks *at the end* shouldn’t reset state.
+* **在开发者确定不需要这个状态之前，我们需要保持组件的状态** 如果你只是在调整样式，如果每次编辑代码都会让组件的状态被重置，这会让人非常不爽。如果是另一种情况，你修改了状态的结构或者初始状态，你会期望这个状态被重置。默认情况下，我们需要尽量去保持组件的状态。但是如果修改状态在热更新的时候产生了异常，这一般标志着有状态可能已经被修改了，所以我们需要重置状态并*尝试*重新渲染这个组件。注释掉或者注释回来一些代码再编码中非常常见，所以处理好这些也会非常重要。比如，在组件最后删除Hook不应该重置状态。
 
 * **Discard state when it’s clear the developer wants to.** In some cases we can also proactively detect that the user wants to reset. For example, if the Hook order changed, or if primitive Hooks like `useState` change their initial state type. We can also offer a lightweight annotation that you can use to force a component to reset on every edit. Such as `// !` or some similar convention that’s fast to add and remove while you focus on how component mounts.
 
@@ -166,3 +166,4 @@ This was my wish list for how hot reloading in React — or any component system
 I don’t know how many of these goals we can satisfy with JavaScript. But there’s one more reason I’m looking forward to working on hot reloading again. As an engineer I’m more organized than before. In particular, **I’ve finally learned my lesson to write up requirements like this before diving into another implementation.**
 
 Maybe this one will actually work! But if it doesn’t, at least I’ve left some breadcrumbs for the next person who tries it.
+
