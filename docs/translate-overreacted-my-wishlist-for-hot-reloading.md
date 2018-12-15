@@ -129,7 +129,7 @@ As long as the Hook call order doesn’t change, we can preserve the state even 
 
 * **在开发者确定不需要这个状态之前，我们需要保持组件的状态** 如果你只是在调整样式，如果每次编辑代码都会让组件的状态被重置，这会让人非常不爽。如果是另一种情况，你修改了状态的结构或者初始状态，你会期望这个状态被重置。默认情况下，我们需要尽量去保持组件的状态。但是如果修改状态在热更新的时候产生了异常，这一般标志着有状态可能已经被修改了，所以我们需要重置状态并*尝试*重新渲染这个组件。注释掉或者注释回来一些代码再编码中非常常见，所以处理好这些也会非常重要。比如，在组件最后删除Hook不应该重置状态。
 
-* **Discard state when it’s clear the developer wants to.** In some cases we can also proactively detect that the user wants to reset. For example, if the Hook order changed, or if primitive Hooks like `useState` change their initial state type. We can also offer a lightweight annotation that you can use to force a component to reset on every edit. Such as `// !` or some similar convention that’s fast to add and remove while you focus on how component mounts.
+* **让明确知道用户想要丢弃状态的时候丢弃状态** 有时候我们可以主动的判断用户是否需要重置状态。比如如果Hook的状态被改变了或者一些基本的Hook，比如`useState`改变了初始的状态。我们可以给予用户一个比较简单的注释，当发现这个注释的时候，我们可以在用户的每一次编辑之后强制重置一个组件的状态。比如`// !`或者其他相似的可以方便快速的添加或者取消的注释，这样开发者就能够更专注于调试组建的重载。
 
 * **Support updating “fixed” things.** If a component is wrapped in `memo()`, hot reload should still update it. If an effect is called with `[]`, it should still be replaced. Code is like an invisible variable. Previously, I thought it was important to force deep updates below for things like `renderRow={this.renderRow}`. But in the Hooks world, we rely on closures anyway this seems unnecessary anymore. A different reference should be sufficient.
 
