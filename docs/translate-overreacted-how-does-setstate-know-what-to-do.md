@@ -57,33 +57,32 @@ ReactDOM.render(<Button />, document.getElementById('container'));
 
 如果你使用过其他的渲染器比如[React ART](https://github.com/facebook/react/tree/master/packages/react-art)，你就会知道，在同一个页面，我们还能同时使用很多渲染器。(比如说，在ReactDOM的DOM树中渲染ART组件)。这使得全局标志或变量无法维持。
 
-因此 **`React.Component`**
-So somehow **`React.Component` delegates handling state updates to the platform-specific code.** Before we can understand how this happens, let’s dig deeper into how packages are separated and why.
+因此 **`React.Component`将对于状态的改变的实现委托给了各个平台各自的代码** 在我们能够理解这是怎么做到的之前，我们先研究一下为什么这些包会被分开以及是怎么分开的。
 
 ---
 
-There is a common misconception that the React “engine” lives inside the `react` package. This is not true.
+这里有个普遍的误区就是大家会觉得React"渲染引擎"是在react的包内的。但这并不是对的。
 
-In fact, ever since the [package split in React 0.14](https://reactjs.org/blog/2015/07/03/react-v0.14-beta-1.html#two-packages), the `react` package intentionally only exposes APIs for *defining* components. Most of the *implementation* of React lives in the “renderers”.
+事实上自从[React0.14的包分割](https://reactjs.org/blog/2015/07/03/react-v0.14-beta-1.html#two-packages)，`react`包只用于暴露一些定义组建的API接口。大部分的*实现*都被放到了"renderer"中
 
-`react-dom`, `react-dom/server`, `react-native`, `react-test-renderer`, `react-art` are some examples of renderers (and you can [build your own](https://github.com/facebook/react/blob/master/packages/react-reconciler/README.md#practical-examples)).
+`react-dom`, `react-dom/server`, `react-native`, `react-test-renderer`, `react-art`这些都是`renderer`(或者你也可以[编写你自己的](https://github.com/facebook/react/blob/master/packages/react-reconciler/README.md#practical-examples))
 
-This is why the `react` package is useful regardless of which platform you target. All its exports, such as `React.Component`, `React.createElement`, `React.Children` utilities and (eventually) [Hooks](https://reactjs.org/docs/hooks-intro.html), are independent of the target platform. Whether you run React DOM, React DOM Server, or React Native, your components would import and use them in the same way.
+这就是为什么`react`包不关注你所使用的平台是什么。他所输出的模块，比如`React.Component`，`React.createElement`，`React.Children`这些工具或者[Hooks](https://reactjs.org/docs/hooks-intro.html)，都是和目标平台无关的。无论你是使用React DOM或者React DOM Server或者React Native，你都可以把你的组件引入并使用。
 
-In contrast, the renderer packages expose platform-specific APIs like `ReactDOM.render()` that let you mount a React hierarchy into a DOM node. Each renderer provides an API like this. Ideally, most *components* shouldn’t need to import anything from a renderer. This keeps them more portable.
+相比之下，这些renderer包暴露了平台相关的API，比如 `ReactDOM.render()`让你能够将一个React树渲染到一个DOM节点上。每个renderer都提供了类似的API。通过这种方案，组件就不需要将关于renderer的东西引入了。这让他们更接口化。
 
-**What most people imagine as the React “engine” is inside each individual renderer.** Many renderers include a copy of the same code — we call it the [“reconciler”](https://github.com/facebook/react/tree/master/packages/react-reconciler). A [build step](https://reactjs.org/blog/2017/12/15/improving-the-repository-infrastructure.html#migrating-to-google-closure-compiler) smooshes the reconciler code together with the renderer code into a single highly optimized bundle for better performance. (Copying code is usually not great for bundle size but the vast majority of React users only needs one renderer at a time, such as `react-dom`.)
+**众所周知，React的渲染引擎在各个renderer中被实现** 很多renderers在背部包含了一份react内部相同的代码 - 我们把这个叫做["调节算法"](https://github.com/facebook/react/tree/master/packages/react-reconciler)。这些renderer将调节算法和renderer的代码整合成了一个高性能的渲染库。(复制核心的调节算法代码通常会影响最后包的大小，但是对于那些通常只是用一种renderer的开发者来说，还是可以接受的，比如`react-dom`)。
 
-The takeaway here is that the `react` package only lets you *use* React features but doesn’t know anything about *how* they’re implemented. The renderer packages (`react-dom`, `react-native`, etc) provide the implementation of React features and platform-specific logic. Some of that code is shared (“reconciler”) but that’s an implementation detail of individual renderers.
+`react`赋予你可以使用React的功能，但是不会让你知道他们是怎么实现的。这些renderer(`react-dom`, 'react-native' 等等)完成了React最后渲染和逻辑在各自平台上的实现。他们其中可能有的引用了内部的调节器，然后对于各自的平台，完成相应的实现。
 
 ---
 
-Now we know why *both* `react` and `react-dom` packages need to be updated for new features. For example, when React 16.3 added the Context API, `React.createContext()` was exposed on the React package.
+现在我们知道为什么`react`和`react-dom`包对于某一个功能都需要更新一个版本。比如，当React 16.3 添加了 Context API之后，React的包就暴露了`React.createContext()`的接口。
 
-But `React.createContext()` doesn’t actually *implement* the context feature. The implementation would need to be different between React DOM and React DOM Server, for example. So `createContext()` returns a few plain objects:
+但是`React.createContext()`不是React自己实现了context这个功能。具体的实现在React DOM和React DOM Server中是不同的。所以`createContext()`只是返回若干个对象:
 
 ```js
-// A bit simplified
+// 做了一点简化
 function createContext(defaultValue) {
   let context = {
     _currentValue: defaultValue,
@@ -102,10 +101,11 @@ function createContext(defaultValue) {
 }
 ```
 
-When you use `<MyContext.Provider>` or `<MyContext.Consumer>` in the code, it’s the *renderer* that decides how to handle them. React DOM might track context values in one way, but React DOM Server might do it differently.
+当你使用`<MyContext.Provider>` 或者 `<MyContext.Consumer>`的时候，其实是*renderer*来决定如何处理这些对象。React DOM和React DOM Server各自都会用不同的方式来处理context。
 
-**So if you update `react` to 16.3+ but don’t update `react-dom`, you’d be using a renderer that isn’t yet aware of the special `Provider` and `Consumer` types.** This is why an older `react-dom` would [fail saying these types are invalid](https://stackoverflow.com/a/49677020/458193).
+**所以当你更新到`react` 16.3+但是你没有跟新`react-dom`的话，你的renderer可能不能够准确的识别`Provider`和`Consumer`的结构** 这也是为什么老版本的`react-dom`可能会[不能识别新的context的结构](https://stackoverflow.com/a/49677020/458193)
 
+同样的，React Native也有相同的问题。但是不像React DOM，React在更新之后不会立刻强制要求像React Native这样的包更新。这些包拥有自己的更新计划。
 The same caveat applies to React Native. However, unlike React DOM, a React release doesn’t immediately “force” a React Native release. They have an independent release schedule. The updated renderer code is [separately synced](https://github.com/facebook/react-native/commits/master/Libraries/Renderer/oss) into the React Native repository once in a few weeks. This is why features become available in React Native on a different schedule than in React DOM.
 
 ---
