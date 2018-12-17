@@ -105,61 +105,60 @@ function createContext(defaultValue) {
 
 **所以当你更新到`react` 16.3+但是你没有跟新`react-dom`的话，你的renderer可能不能够准确的识别`Provider`和`Consumer`的结构** 这也是为什么老版本的`react-dom`可能会[不能识别新的context的结构](https://stackoverflow.com/a/49677020/458193)
 
-同样的，React Native也有相同的问题。但是不像React DOM，React在更新之后不会立刻强制要求像React Native这样的包更新。这些包拥有自己的更新计划。
-The same caveat applies to React Native. However, unlike React DOM, a React release doesn’t immediately “force” a React Native release. They have an independent release schedule. The updated renderer code is [separately synced](https://github.com/facebook/react-native/commits/master/Libraries/Renderer/oss) into the React Native repository once in a few weeks. This is why features become available in React Native on a different schedule than in React DOM.
+同样的，React Native也有相同的问题。但是不像React DOM，React在更新之后不会立刻强制要求像React Native这样的包更新。这些包拥有自己的更新计划。renderer的更新是在React更新后的几周之内[同步更新](https://github.com/facebook/react-native/commits/master/Libraries/Renderer/oss)的。所以React Native和React DOM拥有不同的更新周期。
 
 ---
 
-Okay, so now we know that the `react` package doesn’t contain anything interesting, and the implementation lives in renderers like `react-dom`, `react-native`, and so on. But that doesn’t answer our question. How does `setState()` inside `React.Component` “talk” to the right renderer?
+所以我们现在知道`react`包没有什么update的实现，这些实现都被实现在了`react-dom`、`react-native`这些包里面，但这并没有解决我们的问题。`React.Component`的`setState()`是如何和这些renderer交互的。
 
-**The answer is that every renderer sets a special field on the created class.** This field is called `updater`. It’s not something *you* would set — rather, it’s something React DOM, React DOM Server or React Native set right after creating an instance of your class:
+**答案就是每个renderer都给React的实例添加了一个字段** 这个字段被命名为`updater`。这个字段对于开发者来说是没有用的，也不需要去操作，这个字段应该由React DOM，React DOM Server或者React Native来设置，这些renderer会在创建一个React实例的时候创建这个字段:
 
 
-```js{4,9,14}
-// Inside React DOM
+```js
+// React DOM 内部
 const inst = new YourComponent();
 inst.props = props;
 inst.updater = ReactDOMUpdater;
 
-// Inside React DOM Server
+// React DOM Server 内部
 const inst = new YourComponent();
 inst.props = props;
 inst.updater = ReactDOMServerUpdater;
 
-// Inside React Native
+// React Native 内部
 const inst = new YourComponent();
 inst.props = props;
 inst.updater = ReactNativeUpdater;
 ```
 
-Looking at the [`setState` implementation in `React.Component`](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react/src/ReactBaseClasses.js#L58-L67), all it does is delegate work to the renderer that created this component instance:
+查看一下[`setState`在`React.Component`中的实现](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react/src/ReactBaseClasses.js#L58-L67)，`setState`做的只是将所有的处理交给创建React实例时候的renderer:
 
 ```js
-// A bit simplified
+// 简化一下
 setState(partialState, callback) {
-  // Use the `updater` field to talk back to the renderer!
+  // 使用`updater`来调用renderer的逻辑!
   this.updater.enqueueSetState(this, partialState, callback);
 }
 ```
 
-React DOM Server [might want to](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-dom/src/server/ReactPartialRenderer.js#L442-L448) ignore a state update and warn you, whereas React DOM and React Native would let their copies of the reconciler [handle it](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-reconciler/src/ReactFiberClassComponent.js#L190-L207).
+React DOM Server [可能会](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-dom/src/server/ReactPartialRenderer.js#L442-L448)忽略state的更新并抛出一个警告，而React DOM 和React Native会让他们的调节器来[处理](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-reconciler/src/ReactFiberClassComponent.js#L190-L207)state的更新 
 
-And this is how `this.setState()` can update the DOM even though it’s defined in the React package. It reads `this.updater` which was set by React DOM, and lets React DOM schedule and handle the update.
+这就是为什么`this.setState()`可以更新DOM，即使在React的包中并没有定义如何更新DOM。这个函数会地调用React DOM 添加的`this.updater`的处理方法，并且让React DOM来主持这次更新。
 
 ---
 
-We know about classes now, but what about Hooks?
+我们现在明白了React.Component的类是如何工作的了，那么Hooks又是如何工作的呢？
 
-When people first look at the [Hooks proposal API](https://reactjs.org/docs/hooks-intro.html), they often wonder: how does `useState` “know what to do”? The assumption is that it’s more “magical” than a base `React.Component` class with `this.setState()`.
+当开发者看到[Hook 提案 API](https://reactjs.org/docs/hooks-intro.html)了之后，可能会疑惑：`useState`又是怎么知道具体应该怎么更新的呢？他们可能会猜想这实现的方式可能会比`React.Component`的`this.setState()`更加"神奇"。
 
-But as we have seen today, the base class `setState()` implementation has been an illusion all along. It doesn’t do anything except forwarding the call to the current renderer. And `useState` Hook [does exactly the same thing](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react/src/ReactHooks.js#L55-L56).
+但是从我们现在来看，其实React.Component的`setState()`的实现只是一个空壳。他只是将任务交给了renderer。而其实`useState`Hook[做了相同的事情](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react/src/ReactHooks.js#L55-L56)
 
-**Instead of an `updater` field, Hooks use a “dispatcher” object.** When you call `React.useState()`, `React.useEffect()`, or another built-in Hook, these calls are forwarded to the current dispatcher.
+**相比于添加了一个`updater`的字段，Hooks添加了一个"dispatcher"的字段** 当你在调用`React.useState()`或者`React.useEffect()`之类的Hook的时候，其实最后会被交给当前的disaptcher来处理。
 
 ```js
-// In React (simplified a bit)
+// 在 React 中(简化了一下) 
 const React = {
-  // Real property is hidden a bit deeper, see if you can find it!
+  // 真实的属性被藏在更深处，你可以尝试自己找一下
   __currentDispatcher: null,
 
   useState(initialState) {
@@ -173,10 +172,10 @@ const React = {
 };
 ```
 
-And individual renderers set the dispatcher before rendering your component:
+每个renderer会在渲染一个组件之前先设置dispatcher:
 
 ```js{3,8-9}
-// In React DOM
+// 在 React DOM中
 const prevDispatcher = React.__currentDispatcher;
 React.__currentDispatcher = ReactDOMDispatcher;
 let result;
@@ -188,16 +187,17 @@ try {
 }
 ```
 
-For example, the React DOM Server implementation is [here](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-dom/src/server/ReactPartialRendererHooks.js#L340-L354), and the reconciler implementation shared by React DOM and React Native is [here](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-reconciler/src/ReactFiberHooks.js).
+比如React DOM Server的实现是[这样的](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-dom/src/server/ReactPartialRendererHooks.js#L340-L354)，而React DOM 和React Native中的调解器实现是[这样的](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-reconciler/src/ReactFiberHooks.js)。
 
-This is why a renderer such as `react-dom` needs to access the same `react` package that you call Hooks from. Otherwise, your component won’t “see” the dispatcher! This may not work when you have [multiple copies of React](https://github.com/facebook/react/issues/13991) in the same component tree. However, this has always led to obscure bugs so Hooks force you to solve the package duplication before it costs you.
+这也是为什么一些像`react-dom`这样的renderer在使用Hooks的时候需要相同版本的`react`包，否则，你的组件可能不能找到dispatcher!当你使用[不同版本的React](https://github.com/facebook/react/issues/13991)的时候，Hook就会不起作用。像这种情况总是会产生一些无法归宿问题的bug，所以Hooks会在这些bug出现之前，强制让你使用相同的React包。
 
-While we don’t encourage this, you can technically override the dispatcher yourself for advanced tooling use cases. (I lied about  `__currentDispatcher` name but you can find the real one in the React repo.) For example, React DevTools will use [a special purpose-built dispatcher](https://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-debug-tools/src/ReactDebugHooks.js#L203-L214) to introspect the Hooks tree by capturing JavaScript stack traces. *Don’t repeat this at home.*
+虽然我们不推荐这么做，但是在特定的调试情况下，你也可以自己重写dispatcher。(我之前说的`__currentDispatcher`这个字段不是真实的，你可以通过React仓库自行找出真实的字段)比如 React DevTools就会使用一个特殊的[dispatcher](ttps://github.com/facebook/react/blob/ce43a8cd07c355647922480977b46713bd51883e/packages/react-debug-tools/src/ReactDebugHooks.js#L203-L214) 来通过追踪Javascript的调用栈来审查Hooks树。*Don’t repeat this at home.*(小朋友别乱玩)
 
-This also means Hooks aren’t inherently tied to React. If in the future more libraries want to reuse the same primitive Hooks, in theory the dispatcher could move to a separate package and be exposed as a first-class API with a less “scary” name. In practice, we’d prefer to avoid premature abstraction until there is a need for it.
 
-Both the `updater` field and the `__currentDispatcher` object are forms of a generic programming principle called *dependency injection*. In both cases, the renderers “inject” implementations of features like `setState` into the generic React package to keep your components more declarative.
+这也意味着Hooks并不是强关联React。如果之后会有更多的库来使用这些基本的Hooks，理论上disaptcher会被分到其他的包里面并暴露一个更加友善的API。
 
-You don’t need to think about how this works when you use React. We’d like React users to spend more time thinking about their application code than abstract concepts like dependency injection. But if you’ve ever wondered how `this.setState()` or `useState()` know what to do, I hope this helps.
+`updater`和`__currentDispatcher`这两个字段遵循了一个*依赖注入*的通用编程理念。这两种实现中，renderer将`setState`的实现注入到React的包中，让你的组件可以被方便的定义。
+
+你在使用React的时候并不需要去思考这些。我们希望React的开发者能够花更多的事件在他们的应用代码上，而不是这些抽象的概念，比如 依赖注入。但是如果你曾对`this.setStete()`护着`useState()`是如何工作的非常好奇，这篇文章会帮助到你。
 
 ---
