@@ -1,6 +1,6 @@
 ---
 date: '2018-12-09'
-title: '翻译：setState是如何知道接下来需要更新什么的'
+title: '翻译：setState是如何处理更新的'
 tag: translate,overreacted
 ---
 
