@@ -4,6 +4,8 @@ title: '翻译：优秀的API应该能够预知未来的改变'
 tag: translate,overreacted
 ---
 
+> 本文出自[overreacted](https://overreacted.io/)，这是[Dan Abramov](https://mobile.twitter.com/dan_abramov)写的博客，我觉得对很有用所以特意做了这个翻译[系列](/posts/overreacted)，原文链接请查看[这里](https://overreacted.io/optimized-for-change/)
+
 什么造就了一个好的API？
 
 一个*好的*API设计应该是好记且不含糊的。它应该有良好的可读性，高准确的和高性能的代码，让开发者[坠入成功的深渊](https://blog.codinghorror.com/falling-into-the-pit-of-success/)。
