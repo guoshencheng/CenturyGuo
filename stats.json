@@ -4,13 +4,17 @@
       "path---posts-translate-overreacted-how-does-react-tell-a-class-from-a-function-1605e86aeffe6e303109.js",
       "path---posts-translate-overreacted-how-does-react-tell-a-class-from-a-function-1605e86aeffe6e303109.js.map"
     ],
+    "path---posts-translate-overreacted-optimized-for-change": [
+      "path---posts-translate-overreacted-optimized-for-change-5f971cfdfed632457cfc.js",
+      "path---posts-translate-overreacted-optimized-for-change-5f971cfdfed632457cfc.js.map"
+    ],
     "path---posts-overreacted": [
-      "path---posts-overreacted-7ffe569d4fa301137162.js",
-      "path---posts-overreacted-7ffe569d4fa301137162.js.map"
+      "path---posts-overreacted-1046587ce66fe9f6454e.js",
+      "path---posts-overreacted-1046587ce66fe9f6454e.js.map"
     ],
     "path---posts-react": [
-      "path---posts-react-409b79aa2bd5842f2a58.js",
-      "path---posts-react-409b79aa2bd5842f2a58.js.map"
+      "path---posts-react-df1395c8b6db463b02bc.js",
+      "path---posts-react-df1395c8b6db463b02bc.js.map"
     ],
     "component---src-pages-index-js": [
       "component---src-pages-index-js-75c9bfdbc5a000fa0746.js",
@@ -57,8 +61,8 @@
       "component---src-layouts-index-js-1c31ac53c9de32dabbbb.js.map"
     ],
     "path---posts": [
-      "path---posts-57b5d64bc09aff2f7244.js",
-      "path---posts-57b5d64bc09aff2f7244.js.map"
+      "path---posts-23e55041930d8c104ea7.js",
+      "path---posts-23e55041930d8c104ea7.js.map"
     ],
     "path---index": [
       "path---index-a0e39f21c11f6a62c5ab.js",
@@ -111,8 +115,8 @@
       "component---src-templates-post-js-52cf4b06d22aef3e6b9b.js.map"
     ],
     "path---posts-translate": [
-      "path---posts-translate-388a44d806e1bdc50da7.js",
-      "path---posts-translate-388a44d806e1bdc50da7.js.map"
+      "path---posts-translate-9155eb1aa856bff6f11a.js",
+      "path---posts-translate-9155eb1aa856bff6f11a.js.map"
     ],
     "path---posts-promise": [
       "path---posts-promise-bfd9096e6b2d351edfde.js",
@@ -123,9 +127,9 @@
       "path---posts-translate-overreacted-how-does-setstate-know-what-to-do-10f7ba480c83cbf72c7b.js.map"
     ],
     "app": [
-      "app-ec3b518550f3fdaf9179.js",
+      "app-67a066bea014415f3b7d.js",
       "build-js-styles.css",
-      "app-ec3b518550f3fdaf9179.js.map",
+      "app-67a066bea014415f3b7d.js.map",
       "build-js-styles.css.map"
     ],
     "path---posts-read-code-es-promise-polyfill": [
