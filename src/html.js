@@ -21,6 +21,7 @@ const fontString = `
 }
 html {
   font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+  font-weight: 300;
 }
 `
 
