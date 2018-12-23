@@ -15,8 +15,7 @@ const IndexPage = ({ siteTitle }) => (
           <div className="home-page">
             <MediaQuery minDeviceWidth={480}>
               <div className="home-title">
-                <C size="60" color="white" />
-                <PressStart2P str="entury's World" size={50} color="white"/>
+                <PressStart2P str="Century's World" size={35} color="white"/>
               </div>
             </MediaQuery>
             <MediaQuery maxDeviceWidth={480}>
@@ -31,12 +30,12 @@ const IndexPage = ({ siteTitle }) => (
             <div className="mashroom-container">
               <MashRoom />
             </div>
-            <div className="operations game-text">
+            <div className="operations">
               <Link to="/posts">
-                <PressStart2P str="Posts" charWidth={1.1} size={20} color="white"/>
+                <PressStart2P str="POSTS" charWidth={1.1} size={15} color="white"/>
               </Link>
               <a target="_blank" href="https://github.com/guoshencheng">
-                <PressStart2P str="Github" charWidth={1.1} size={20} color="white"/>
+                <PressStart2P str="GITHUB" charWidth={1.1} size={15} color="white"/>
               </a>
             </div>
           </div>
