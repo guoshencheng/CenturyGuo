@@ -27,9 +27,9 @@ const IndexPage = ({ siteTitle }) => (
                 </div>
               </div>
             </MediaQuery>
-            <div className="mashroom-container">
+            {/* <div className="mashroom-container">
               <MashRoom />
-            </div>
+            </div> */}
             <div className="operations">
               <Link to="/posts">
                 <PressStart2P str="POSTS" charWidth={1.1} size={15} color="white"/>
