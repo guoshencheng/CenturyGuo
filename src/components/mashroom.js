@@ -49,7 +49,7 @@ export default ({ size, ...restProps }) => (
             rx={1.5}
             rx={1.5}
             style={{
-              animationDelay: i.animationDelay,
+              // animationDelay: i.animationDelay,
               fill: i.deep ? 'rgba(253,209,14,.7)' : 'rgba(253,209,14,.6)',
               stroke: 'none'
             }}
