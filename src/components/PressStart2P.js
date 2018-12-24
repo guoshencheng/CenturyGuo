@@ -30,15 +30,10 @@ const formatMatrix = matrix => {
   return items;
 }
 
-export const Icon = ({ matrix, size = 140, lineHeight = 1.2, charWidth = 1.05, className, color = 'black', ...restProps }) => (
+export const Icon = ({ matrix, className, color = 'black', ...restProps }) => (
   <svg 
     className={classnames('press-start-2p-svg')} 
     viewBox="0 0 140 140"
-    width={size}
-    height={size}
-    style={{
-      padding: `${size * (lineHeight - 1) / 2} ${size * (charWidth - 1) / 2}`
-    }}
     {...restProps}
   >
     {
