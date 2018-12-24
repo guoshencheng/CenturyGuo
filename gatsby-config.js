@@ -28,5 +28,17 @@ module.exports = {
       }
     },
     'gatsby-plugin-remove-trailing-slashes',
+    {
+      resolve: `gatsby-plugin-manifest`,
+      options: {
+        name: `Century's World`,
+        short_name: `guoshencheng`,
+        start_url: `/`,
+        background_color: `#52a260`,
+        theme_color: `#52a260`,
+        display: `standalone`,
+        icon: `src/assets/icon.png`,
+      },
+    },
   ],
 }
