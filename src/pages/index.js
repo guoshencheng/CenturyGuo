@@ -12,8 +12,11 @@ const IndexPage = ({ siteTitle }) => (
       <tr>
         <td>
           <div className="home-page">
+            <div className="mashroom-container">
+              <MashRoom />
+            </div>
             <div className="home-title">
-              <PressStart2P str="Century's World" size={35} color="white"/>
+              <PressStart2P str="Century's World" color="white"/>
             </div>
             <div className="operations">
               <Link to="/posts">
