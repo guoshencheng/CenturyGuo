@@ -1,7 +1,7 @@
 ---
 title: "深入egg-core前篇"
 date: '2018-12-18'
-tag: node
+tag: node,egg
 ---
 
 > 我知道node并不是一个语言，所以本文提及的**node作为服务器语言**皆代表node环境下的Javascript
