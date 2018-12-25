@@ -164,3 +164,28 @@ if (cluster.isMaster) {
 ```
 
 这段代码fork了若干个进程，这些进程都会用于处理监听8000的端口号，在同一个端口号下作了负载，而使用`childProcess.fork`的话，监听相同端口号会失败，因此这就是cluster的用处。
+
+在egg-cluster中并没有显示的调用`cluster.fork`，可以找到的是它调用了一个叫做[cfork](https://github.com/node-modules/cfork)的库。在刚开始看源码的时候就看了一下这个库，但没有太仔细的查看，大致知道这是个充分利用cpu来执行`cluster.fork`的工具，然后针对官方有关健壮性中提到的:
+
+> - 关闭异常 Worker 进程所有的 TCP Server（将已有的连接快速断开，且不再接收新的连接），断开和 Master 的 IPC 通道，不再接受新的用户请求。
+> - Master 立刻 fork 一个新的 Worker 进程，保证在线的『工人』总数不变。
+> - 异常 Worker 等待一段时间，处理完已经接受的请求后退出。
+
+我一直在寻找对应的代码，因为寻遍了egg-cluster和egg仓库，合理的处理cluster的exit的事件的只有这些代码:
+
+```javascript
+cluster.on('exit', (worker, code, signal) => {
+  this.messenger.send({
+    action: 'app-exit',
+    data: { workerPid: worker.process.pid, code, signal },
+    to: 'master',
+    from: 'app',
+  });
+});
+```
+
+而这个代码的消息最后会调用`onAppExit()`这个函数，而这个函数只是将worker冲workerManager中删除和清除一些监听，充其量就是一个clean的操作，并没有关于**fork一个新的Worker进程**的操作，这是我困惑不已，排除了很多可能后终于在cfork这个仓库中找到了相关的代码，原来之前漏看了很多代码，这个cfork本身就提供了所谓:
+
+> Master 立刻 fork 一个新的 Worker 进程，保证在线的『工人』总数不变
+
+本文主要是从官方文档的功能为入口，从源码的角度来验证具体的实现，解析了egg启动后的agent和app的执行顺序，fork workers的实现和worker报错后的行为。还是有很多地方没讲清楚，需要读者自行阅读以下源码。
