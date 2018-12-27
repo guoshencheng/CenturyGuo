@@ -1,5 +1,4 @@
 import React from 'react';
-import classnames from 'classnames'
 
 import './mashroom.less';
 
@@ -47,7 +46,7 @@ export default ({ size, ...restProps }) => (
             width={10} 
             height={10}
             rx={1.5}
-            rx={1.5}
+            ry={1.5}
             style={{
               // animationDelay: i.animationDelay,
               fill: i.deep ? 'rgba(253,209,14,.7)' : 'rgba(253,209,14,.6)',

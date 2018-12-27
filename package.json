@@ -6,21 +6,23 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "disqus-react": "^1.0.5",
-    "gatsby": "1.9.277",
-    "gatsby-link": "^1.6.46",
+    "gatsby": "^2.0.76",
+    "gatsby-link": "^2.0.7",
     "gatsby-plugin-google-analytics": "^2.0.8",
-    "gatsby-plugin-less": "^1.1.8",
-    "gatsby-plugin-manifest": "1.0.27",
-    "gatsby-plugin-react-helmet": "^2.0.11",
-    "gatsby-plugin-remove-trailing-slashes": "^1.0.9",
-    "gatsby-remark-prismjs": "^2.0.5",
-    "gatsby-source-filesystem": "^1.5.39",
-    "gatsby-transformer-remark": "^1.7.44",
+    "gatsby-plugin-less": "^2.0.8",
+    "gatsby-plugin-manifest": "^2.0.12",
+    "gatsby-plugin-react-helmet": "^3.0.5",
+    "gatsby-plugin-remove-trailing-slashes": "^2.0.6",
+    "gatsby-remark-prismjs": "^3.1.4",
+    "gatsby-source-filesystem": "^2.0.12",
+    "gatsby-transformer-remark": "^2.1.17",
     "highlight.js": "^9.12.0",
+    "less": "^3.9.0",
     "prismjs": "^1.15.0",
     "react": "^16.5.0",
     "react-dom": "^16.5.0",
-    "react-helmet": "^5.2.0"
+    "react-helmet": "^5.2.0",
+    "webpack": "^4.28.2"
   },
   "keywords": [
     "gatsby"

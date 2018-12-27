@@ -16,7 +16,7 @@ const Header = ({ siteTitle }) => (
       </div>
     </div>
     <div className="header-line-item header-link">
-      <Link to="/">
+      <Link to="/posts">
         <PressStart2P str="POSTS" size={15} color="rgba(0, 0, 0, 0.6)"/>
       </Link>
     </div>

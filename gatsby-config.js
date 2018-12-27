@@ -3,6 +3,9 @@ const path = require('path');
 module.exports = {
   siteMetadata: {
     title: 'Century\'s world',
+    author: 'guoshencheng@gmail.com',
+    description: 'guoshencheng\'s personal website',
+    siteUrl: 'https://guoshencheng.com'
   },
   plugins: [
     'gatsby-plugin-react-helmet',
