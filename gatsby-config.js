@@ -9,6 +9,7 @@ module.exports = {
     keywords: 'century guo guoshencheng',
   },
   plugins: [
+    'gatsby-plugin-sitemap',
     'gatsby-plugin-react-helmet',
     {
       resolve: 'gatsby-transformer-remark',
