@@ -8,7 +8,7 @@ import Header from '../components/header'
 import '../github-markdown.css'
 import './layout.less'
 
-export const query = graphql`
+const query = graphql`
   query SiteTitleQuery {
     site {
       siteMetadata {

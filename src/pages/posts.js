@@ -4,7 +4,7 @@ import { graphql, StaticQuery } from 'gatsby';
 import Layout from '../components/layout';
 import './posts.less';
 
-export const query = graphql`
+const query = graphql`
 query AllMarkdownRemakSchema($tag: String) {
   allMarkdownRemark(
     sort: {
