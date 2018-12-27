@@ -16,22 +16,31 @@ export const query = graphql`
         author
         description
         siteUrl
+        keywords
       }
     }
   }
 
 `
 
-const Layout = ({ children, showHeader }) => (
+const Layout = ({ children, showHeader, keywords, title }) => (
   <StaticQuery
     query={query}
     render={data => (
       <div>
         <Helmet
-          title={data.site.siteMetadata.title}
+          title={title ? `${data.site.siteMetadata.title} - ${title}` : data.site.siteMetadata.title}
           meta={[
-            { name: 'description', content: 'Sample' },
-            { name: 'keywords', content: 'sample, something' },
+            { name: 'description', content: data.site.siteMetadata.description },
+            { name: 'keywords', content: keywords || data.site.siteMetadata.keywords || '' },
+            {
+              property: 'og:title',
+              content: title || data.site.siteMetadata.title,
+            },
+            {
+              name: 'og:description',
+              content: data.site.siteMetadata.description,
+            },
           ]}
         />
         {

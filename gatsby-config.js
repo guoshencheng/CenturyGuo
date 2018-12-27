@@ -5,7 +5,8 @@ module.exports = {
     title: 'Century\'s world',
     author: 'guoshencheng@gmail.com',
     description: 'guoshencheng\'s personal website',
-    siteUrl: 'https://guoshencheng.com'
+    siteUrl: 'https://guoshencheng.com',
+    keywords: 'century guo guoshencheng',
   },
   plugins: [
     'gatsby-plugin-react-helmet',

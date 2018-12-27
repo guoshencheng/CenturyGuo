@@ -18,6 +18,8 @@ export default class Post extends React.Component {
     };
     return (
       <Layout
+        title={post.frontmatter.title}
+        keywords={tag}
         showHeader
       >
         <div className="post-container">
