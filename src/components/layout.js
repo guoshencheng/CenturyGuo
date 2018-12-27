@@ -30,6 +30,9 @@ const Layout = ({ children, showHeader, keywords, title }) => (
       <div>
         <Helmet
           title={title ? `${data.site.siteMetadata.title} - ${title}` : data.site.siteMetadata.title}
+          script={[{
+            src: 'https://zz.bdstatic.com/linksubmit/push.js'
+          }]}
           meta={[
             { name: 'description', content: data.site.siteMetadata.description },
             { name: 'keywords', content: keywords || data.site.siteMetadata.keywords || '' },
