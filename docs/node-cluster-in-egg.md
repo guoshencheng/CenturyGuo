@@ -1,5 +1,5 @@
 ---
-title: "egg的集群管理"
+title: "Egg的集群管理"
 date: '2018-12-25'
 tag: node,egg
 ---
