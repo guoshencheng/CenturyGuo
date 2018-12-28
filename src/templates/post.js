@@ -11,6 +11,7 @@ export default class Post extends React.Component {
     const { data } = this.props;
     const post = data.markdownRemark;
     const { tag } = post.frontmatter;
+    const excerpt = post.excerpt;
     const tags = tag ? tag.split(',') : '';
     const disqusShortname = "guoshencheng";
     const disqusConfig = {
@@ -21,6 +22,7 @@ export default class Post extends React.Component {
       <Layout
         title={post.frontmatter.title}
         keywords={tag}
+        description={excerpt}
         showHeader
       >
         <div className="post-container">
@@ -58,6 +60,7 @@ export const query = graphql`
         date(formatString: "DD MMMM, YYYY")
         tag
       }
+      excerpt
     }
   }
 `;

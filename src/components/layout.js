@@ -23,7 +23,7 @@ const query = graphql`
 
 `
 
-const Layout = ({ children, showHeader, keywords, title }) => (
+const Layout = ({ children, showHeader, keywords, title, description }) => (
   <StaticQuery
     query={query}
     render={data => (
@@ -36,7 +36,7 @@ const Layout = ({ children, showHeader, keywords, title }) => (
           meta={[
             { name: 'google-site-verification', content: 'nDcortrmOitFkAImU-EeXZi_ommPGj6HiXB2GmXRBjo' },
             { name: 'msvalidate.01', content: 'B47C607274B7109AEF27A38F88C9FE53' },
-            { name: 'description', content: data.site.siteMetadata.description },
+            { name: 'description', content: `${title || data.site.siteMetadata.title} - ${data.site.siteMetadata.description} ${description || ''} ${keywords || data.site.siteMetadata.keywords || ''}`},
             { name: 'keywords', content: keywords || data.site.siteMetadata.keywords || '' },
             {
               property: 'og:title',
