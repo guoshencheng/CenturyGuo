@@ -1,6 +1,6 @@
 ---
 title: "Setting up your React /ES6 Development environment with Webpack, Express and Babel"
-date: 2017-01-27
+date: "2017-01-27"
 tag: react,webpack
 ---
 
