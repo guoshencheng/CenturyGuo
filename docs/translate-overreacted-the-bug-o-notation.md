@@ -129,20 +129,19 @@ function setState(nextState) {
 
 **如果有一个问题出现在某个输入中，我们只需要从这个输出向前*单*步追溯 - 直到`setState`的调用** 这段代码调试渲染结果的Bug-O复杂度是🐞(*n*) ，其中*n*是渲染的代码执行分支数。这里只有4个(因为我们只有4中情况在`switch`中)。
 
-
-We might still have race conditions in *setting* the state, but debugging those is easier because each intermediate state can be logged and inspected. We can also disallow any undesired transitions explicitly:
+这种方式会遗留一些逻辑判断来设置状态，但是调试这些状态的设置会相对简单一些，因为这些中间状态都可以被打印或者断点调试。我们甚至可以明确的阻止一些不期望发生的改变:
 
 ```js
 function trySubmit() {
   if (currentState.step === 'pending') {
-    // Don't allow to submit twice
+    // 不允许提交两次
     return;
   }
 ```
 
-Of course, always resetting the DOM comes with a tradeoff. Naïvely removing and recreating the DOM every time would destroy its internal state, lose focus, and cause terrible performance problems in larger applications.
+众所周知，频繁的设置DOM元素会造成一些消耗。天真的每次都移除并重新创建DOM元素会丢失DOM元素内部的状态，丢失焦点，在大型的应用中可能会造成严重的性能问题。
 
-That’s why libraries like React can be helpful. They let you *think* in the paradigm of always recreating the UI from scratch without necessarily doing it:
+这就是一些类似于React的框架之所用。它们让你从总是重新创建UI元素的*思维*改变为不需要关心这些。
 
 ```js
 function FormStatus() {
@@ -190,10 +189,10 @@ function FormStatus() {
 }
 ```
 
-The code may look different, but the principle is the same. The component abstraction enforces boundaries so that you know no *other* code on the page could mess with its DOM or state. Componentization helps reduce the Bug-O.
+这块代码可能看起来很不一样，但是设计原则是相同的。这种组件的定义方式框定了开发者，让开发者能够清楚的知道这个页面没有混淆了DOM和state操作的*其他*代码了。组件化降低了Bug-O指标
 
-In fact, if *any* value looks wrong in the DOM of a React app, you can trace where it comes from by looking at the code of components above it in the React tree one by one. No matter the app size, tracing a rendered value is 🐞(*tree height*).
+事实上，在React应用中如果*任何*在DOM中的值如果有问题的话，你可以通过逐个追踪这个组件的代码生成的React树来寻找这个问题的来源。无论这个应用的大小如何，寻找一个渲染的值的来源只需要🐞(*树的高度*)
 
-**Next time you see an API discussion, consider: what is the 🐞(*n*) of common debugging tasks in it?** What about existing APIs and principles you’re deeply familiar with? Redux, CSS, inheritance — they all have their own Bug-O.
+**下次当你想对一个API评估，你就会思考：使用这个API并调试它的🐞(*n*)是什么** 有哪些API和设计原则你比较熟悉的？Redux, CSS, inheritance - 他们都拥有自己的Bug-O。
 
 ---
