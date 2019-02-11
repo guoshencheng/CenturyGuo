@@ -6,20 +6,21 @@ tag: translate,overreacted
 
 > 本文出自[overreacted](https://overreacted.io/)，这是[Dan Abramov](https://mobile.twitter.com/dan_abramov)写的博客，我觉得对很有用所以特意做了这个翻译[系列](/posts/overreacted)，原文链接请查看[这里](https://overreacted.io/why-do-hooks-rely-on-call-order/)
 
-At React Conf 2018, the React team presented the [Hooks proposal](https://reactjs.org/docs/hooks-intro.html).
+在React Conf 2018大会上，React团队向大家呈现了[Hook提案](https://reactjs.org/docs/hooks-intro.html)
 
-If you’d like to understand what Hooks are and what problems they solve, check out [our talks](https://www.youtube.com/watch?v=dpw9EHDh2bM) introducing them and [my follow-up article](https://medium.com/@dan_abramov/making-sense-of-react-hooks-fdbde8803889) addressing common misconceptions.
+如果你想要理解什么是Hooks以及它们解决了什么问题，可以查看[我们在大会上介绍的视频](https://www.youtube.com/watch?v=dpw9EHDh2bM)以及我阐述大家对Hook的概念的误解的文章。
 
-Chances are you won’t like Hooks at first:
+你可能刚开始不会特别喜欢Hooks这个提案:
 
 ![Negative HN comment](./hooks-hn1.png)
 
-They’re like a music record that grows on you only after a few good listens:
+但Hooks就像是音乐一样，在你听了一段时间后，你对他的好感度会慢慢上升:
 
 ![Positive HN comment from the same person four days later](./hooks-hn2.png)
 
-When you read the docs, don’t miss [the most important page](https://reactjs.org/docs/hooks-custom.html) about building your own Hooks! Too many people get fixated on some part of our messaging they disagree with (e.g. that learning classes is difficult) and miss the bigger picture behind Hooks. And the bigger picture is that **Hooks are like *functional mixins* that let you create and compose your own abstractions.**
+当你阅读这篇文章的时候，千万别落下了这篇关于如何构建自定义Hooks的[文章](https://reactjs.org/docs/hooks-custom.html)，这篇文章很重要哦！很多人会断章取义的来反驳我们对Hooks介绍(比如学习React class是比较难以理解的)，却没有看到Hooks产生背景原因。Hooks产生的背景原因是**Hooks 就像是 *函数Mixins* 那样让你能够抽象并组合你的逻辑**
 
+Hooks[接受了先前的一些设计理念的影响](https://reactjs.org/docs/hooks-faq.html#what-is-the-prior-art-for-hooks)
 Hooks [are influenced by some prior art](https://reactjs.org/docs/hooks-faq.html#what-is-the-prior-art-for-hooks) but I haven’t seen anything *quite* like them until Sebastian shared his idea with the team. Unfortunately, it’s easy to overlook the connection between the specific API choices and the valuable properties unlocked by this design. With this post I hope to help more people understand the rationale for the most controversial aspect of Hooks proposal.
 
 **The rest of this post assumes you know the `useState()` Hook API and how to write a custom Hook. If you don’t, check out the earlier links. Also, keep in mind Hooks are experimental and you don’t have to learn them right now!**
