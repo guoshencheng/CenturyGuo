@@ -11,6 +11,7 @@
 <url> <loc>https://guoshencheng.com/posts/webpack</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/wepy</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/小程序</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://guoshencheng.com/posts/杂谈</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/translate</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/overreacted</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/calm-to-polish-sword-express</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
@@ -23,15 +24,16 @@
 <url> <loc>https://guoshencheng.com/posts/read-react-redux</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/settle-react-es6</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/shallow-into-wepy-source-code</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://guoshencheng.com/posts/summary-start-at-2019</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/translate-overreacted-how-does-react-tell-a-class-from-a-function</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
-<url> <loc>https://guoshencheng.com/posts/translate-overreacted-how-does-setstate-know-what-to-do</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
-<url> <loc>https://guoshencheng.com/posts/translate-overreacted-my-wishlist-for-hot-reloading</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/translate-overreacted-optimized-for-change</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
-<url> <loc>https://guoshencheng.com/posts/translate-overreacted-the-bug-o-notation</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/translate-overreacted-why-do-react-elements-have-typeof-property</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
-<url> <loc>https://guoshencheng.com/posts/translate-overreacted-why-do-we-write-super-props</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://guoshencheng.com/posts/translate-overreacted-how-does-setstate-know-what-to-do</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/what-is-config-keys-doing</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts/what-make-rules-of-directory-for-egg-project</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://guoshencheng.com/posts/translate-overreacted-my-wishlist-for-hot-reloading</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://guoshencheng.com/posts/translate-overreacted-the-bug-o-notation</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
+<url> <loc>https://guoshencheng.com/posts/translate-overreacted-why-do-we-write-super-props</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 <url> <loc>https://guoshencheng.com/posts</loc> <changefreq>daily</changefreq> <priority>0.7</priority> </url>
 </urlset>
