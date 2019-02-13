@@ -159,7 +159,7 @@ function Form() {
 
 ### 缺陷 #3: 只能调用同一个Hook一次
 
-Another variation of the “keyed” `useState` proposal is to use something like Symbols. Those can’t clash, right?
+另一种实现索引`useState()`的方式就是使用类似Symbols，这样就不会出事了，对吗?
 
 ```jsx
 // ⚠️ This is NOT the React Hooks API
@@ -173,9 +173,10 @@ function Form() {
   const [surname, setSurname] = useState(surnameKey);
   const [width, setWidth] = useState(widthKey);
   // ...
+
 ```
 
-This proposal seems to work for extracting the `useWindowWidth()` Hook:
+这种方式在我们提取`useWidowWidth()`Hooks的时候看起来没什么问题:
 
 ```jsx{4,11-17}
 // ⚠️ This is NOT the React Hooks API
@@ -197,7 +198,7 @@ function useWindowWidth() {
 }
 ```
 
-But if we attempt to extract input handling, it would fail:
+但是，当我们想要提取input的处理的时候，就会有问题了:
 
 ```jsx{4,5,19-29}
 // ⚠️ This is NOT the React Hooks API
@@ -231,28 +232,28 @@ function useFormInput() {
 }
 ```
 
-(I’ll admit this `useFormInput()` Hook isn’t particularly useful but you could imagine it handling things like validation and dirty state flag a la [Formik](https://github.com/jaredpalmer/formik).)
+（我承认`useFormInput()`这个Hook并不是非常有用，但是你应该想象，假如说要做类似于校验或者给一些不合法的状态标记比如[Formik](https://github.com/jaredpalmer/formik)的时候）
 
-Can you spot the bug?
+知道这个bug出在哪里了吗?
 
-We’re calling `useFormInput()` twice but our `useFormInput()` always calls `useState()` with the same key. So effectively we’re doing something like:
+我们调用了`useFormInput()`了两次，但是`useFromInput()`都调用`useState()`，并使用了同一个命名，因此，事实上，我们就是在做类似这样的事情:
 
 ```jsx
   const [name, setName] = useState(valueKey);
   const [surname, setSurname] = useState(valueKey);
 ```
 
-And this is how we get a clash again.
+因此我们的代码就又出问题了。
 
-The actual Hooks proposal doesn’t have this problem because **each _call_ to `useState()` gets its own isolated state.** Relying on a persistent call index frees us from worrying about name clashes.
+而实际上的Hooks的实现不会有这些问题，因为**每当我们_调用_ `useState()` 都会获取到一个相互隔离的状态** 依赖一个固定的调用顺序却释放了我们对于State命名的忧虑。
 
-### Flaw #4: The Diamond Problem
+### 缺陷 #4: 菱形问题
 
-This is technically the same flaw as the previous one but it’s worth mentioning for its notoriety. It’s even [described on Wikipedia](https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem). (Apparently, it’s sometimes called “the deadly diamond of death” — cool beans.)
+从技术上来讲，其实这个权限和之前的问题差不多。但由于实在臭名昭著因而不得不提。这甚至被[描述在了Wikipedia](https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem)。(众所众知，这也被我们称作"致命方块" - 非常酷的名字)
 
-Our own mixin system [suffered from it](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html#mixins-cause-name-clashes).
+我们的mixin系统[也有可能存在这种问题](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html#mixins-cause-name-clashes)
 
-Two custom Hooks like `useWindowWidth()` and `useNetworkStatus()` might want to use the same custom Hook like `useSubscription()` under the hood:
+假如两个自定义Hook`useWindowWidth()`和`useNetworkStatus()`可能会使用相同的一个自定义Hook，比如`useSubscription()`：
 
 ```jsx{12,23-27,32-42}
 function StatusMessage() {
@@ -301,11 +302,11 @@ function useNetworkStatus() {
 }
 ```
 
-This is a completely valid use case. **It should be safe for a custom Hook author to start or stop using another custom Hook without worrying whether it is “already used” somewhere in the chain.** In fact, *you can never know* the whole chain unless you audit every component using your Hook on every change.
+这个例子完全是合理的。**对于一个自定义Hook的开发者来说，在使用或者移除调用另一个自定义Hook的时候不需要考虑这个Hook的调用链上是否还有其他的地方在调用是安全的** 在实际生产中，*你可能很难知道*整个Hook的调用链，除非你审查了所有组件调用的Hook。
 
-(As a counterexample, the legacy React `createClass()` mixins did not let you do this. Sometimes you’d have two mixins that both do exactly what you need but are mutually incompatible due to extending the same “base” mixin.)
+(作为一个补充例子，React中遗留的代码`createClass()` mixins 不能够实现比如你有两个mixin都是你想要实现的，但是他们互相矛盾，因为他们都继承了同一个"基础"的mixin)
 
-This is our “diamond”: 💎
+一下的实现方式形成了”方块问题“: 💎
 
 ```
        / useWindowWidth()   \                   / useState()  🔴 Clash
@@ -313,7 +314,7 @@ Status                        useSubscription()
        \ useNetworkStatus() /                   \ useEffect() 🔴 Clash
 ```
 
-Reliance on the persistent call order naturally resolves it:
+依赖一个固定的调用顺序解决了这个问题:
 
 ```
                                                  / useState()  ✅ #1. State
@@ -325,13 +326,13 @@ Status
                                                  \ useEffect() ✅ #4. Effect
 ```
 
-Function calls don’t have a “diamond” problem because they form a tree. 🎄 
+函数调用不会含有"方块问题"因为最后的调用会形成树桩。🎄 
 
-### Flaw #5: Copy Paste Breaks Things
+###  权限 #5: 复制黏贴会造成代码问题
 
-Maybe we could salvage the keyed state proposal by introducing some sort of namespacing. There are a few different ways to do it.
+或许我们能够通过命名空间的方式来挽救命名state这种设计。实现这种做法的方式有很多。
 
-One way could be to isolate state keys with closures. This would require you to “instantiate” custom Hooks and add a function wrapper around each of them:
+其中一种就是通过闭包来隔离这些state的命名。这需要你在使用自定义Hook的时候实例化它，并且在每个Hook外添加一个函数闭包:
 
 ```jsx{5,6}
 /*******************
