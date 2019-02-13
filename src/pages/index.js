@@ -19,6 +19,11 @@ const IndexPage = ({ siteTitle }) => (
                 <PressStart2P str="Century's World" color="white"/>
               </div>
               <div className="operations">
+                {
+                // <Link to="/me">
+                  // <PressStart2P str="README" color="white"/>
+                // </Link>
+                }
                 <Link to="/posts">
                   <PressStart2P str="POSTS" color="white"/>
                 </Link>
