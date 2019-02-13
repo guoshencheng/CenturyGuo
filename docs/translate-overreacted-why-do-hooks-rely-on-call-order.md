@@ -75,22 +75,21 @@ function Form() {
 
 ---
 
-这篇文章不会让你太累。不过这取决你想要了解的数量，因为我们的提案少则几十多则几百。
-This post won’t be exhaustive. Depending on how granular you’re counting, we’ve seen from a dozen to *hundreds* of different alternative proposals. We’ve also been [thinking](https://github.com/reactjs/react-future) about alternative component APIs for the last five years.
+这篇文章不会让你太累。不过这取决你想要了解的数量，因为我们的提案少则几十多则几百。过去的五年，我们[想了](https://github.com/reactjs/react-future)很多关于组件API的提案。
 
-Blog posts like this are tricky because even if you cover a hundred alternatives, somebody can tweak one and say: “Ha, you didn’t think of *that*!”
+像我这篇文章这么介绍会比较讨巧，因为即使介绍了所有的提案，依然会有人跳出来怼你说: "哈？你没有提到*那个*!"
 
-In practice, different alternative proposals tend to overlap in their downsides. Rather than enumerate *all* the suggested APIs (which would take me months), I’ll demonstrate the most common flaws with specific examples. Categorizing other possible APIs by these problems could be an exercise to the reader. 🧐
+在实际生产环境中，不同的提案一般只会覆盖提议者当下的场景。我会通过一些特殊的例子来演示这些提案的普遍缺陷，而不是枚举所有建议的提案(这些天有的也花了我好几个月)，通过这些API的问题来归类它们对于一个读者来说是一种锻炼。🧐
 
-*That is not to say that Hooks are flawless.* But once you get familiar with the flaws of other solutions, you might find that the Hooks design makes some sense.
+*这不是说Hooks是完美无瑕的* 只不过，当你开始了解其他解决方案的缺陷的时候，你会对Hooks的设计更有好感
 
 ---
 
-### Flaw #1: Can’t Extract a Custom Hook
+### 缺陷 #1: 不能够提取出自定义Hook
 
-Surprisingly, many alternative proposals don’t allow [custom Hooks](https://reactjs.org/docs/hooks-custom.html) at all. Perhaps we didn’t emphasize custom Hooks enough in the “motivation” docs. It’s difficult to do until the primitives are well-understood. So it’s a chicken-and-egg problem. But custom Hooks are largely the point of the proposal.
+令人惊讶的是，很多的提案根本不支持[自定义Hook](https://reactjs.org/docs/hooks-custom.html)。或许我们没有在"Hook的动机"的文档中对自定义Hook的注重还不够。在能够很好的理解我们做Hook的初衷之前，作出这个提案是一个很难的事情。所以，这是一个先有鸡还是先有蛋的问题。但是自定义Hook确实是这个提案相对重要的需求。
 
-For example, an alternative banned multiple `useState()` calls in a component. You’d keep state in one object. That works for classes, right?
+比如，除了在组件的顶端调用多次`useState()`来使用state，你还可以将所有state放置在单个对象中，这样还可以在class中也使用，对吗?
 
 ```jsx
 function Form() {
@@ -103,7 +102,7 @@ function Form() {
 }
 ```
 
-To be clear, Hooks *do* allow this style. You don’t *have to* split your state into a bunch of state variables (see our [recommendations](https://reactjs.org/docs/hooks-faq.html#should-i-use-one-or-many-state-variables) in the FAQ).
+需要澄清的是，Hooks*当然*支持这种写法的。你不必将你的state分割成多个变量(查看我们在问答中的[建议](https://reactjs.org/docs/hooks-faq.html#should-i-use-one-or-many-state-variables))
 
 But the point of supporting multiple `useState()` calls is so that you can *extract* parts of stateful logic (state + effects) out of your components into custom Hooks which can *also* independently use local state and effects:
 
@@ -128,16 +127,16 @@ function useWindowWidth() {
 }
 ```
 
-If you only allow one `useState()` call per component, you lose the ability of custom Hooks to introduce local state. Which is the point of custom Hooks.
+如果你只允许你的组件调用一次`useState()`，你就会失去使用一个自定义Hooks的方式来定义state。这也是自定义Hooks想解决的问题。
 
-### Flaw #2: Name Clashes
+### 缺陷 #2: 命名奔溃
 
-One common suggestion is to let `useState()` accept a key argument (e.g. a string) that uniquely identifies a particular state variable within a component.
+还有一个比较普遍的建议是让`useState()`接受一个key的参数(比如一个字符串)，这个参数是唯一定义一个组件的某个状态变量的。
 
-There are a few variations on this idea, but they roughly look like this:
+这个想法的设计有很多方式，但是他们大致是像这么做的:
 
 ```jsx
-// ⚠️ This is NOT the React Hooks API
+  // ⚠️  这不是React Hook的API
 function Form() {
   // We pass some kind of state key to useState()
   const [name, setName] = useState('name');
@@ -146,19 +145,19 @@ function Form() {
   // ...
 ```
 
-This tries to avoid reliance on the call index (yay explicit keys!) but introduces another problem — name clashes.
+这种方式防止了对调用顺序的依赖(通过明确的定义键值)但是却产生了另一个问题 - 命名奔溃。
 
-Granted, you probably won’t be tempted to call `useState('name')` twice in the same component except by mistake. This can happen accidentally but we could argue that about any bug. However, it’s quite likely that when you work on a *custom Hook*, you’ll want to add or remove state variables and effects.
+理所应当的，你一般不会再你的组件中重复调用`useState('name')`两次，除非是你写错了代码。但是这偶然也是会发生的，一旦发生了，我们会找这个问题很久。而且，在你定义一个*自定义组件*的时候会特别容易发生。
 
-With this proposal, any time you add a new state variable inside a custom Hook, you risk breaking any components that use it (directly or transitively) because *they might already use the same name* for their own state variables.
+使用这种方式的实现，每当你在你的自定义Hook中添加一个state的时候，你将冒着任何在使用这个自定义Hook组件(直接的或者间接的)出问题的风险，因为*这些组件可能已经有了相同命名的state*。
 
-This is an example of an API that’s not [optimized for change](/optimized-for-change/). The current code might always look “elegant”, but it is very fragile to changes in requirements. We should [learn](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html#mixins-cause-name-clashes) from our mistakes.
+这种实现方式是关于API[需要能够顺应未来的改变](https://overreacted.io/optimized-for-change)的反例。这些代码看起来是"优雅的"，但是当需求变动的时候，这些代码是非常脆弱的。我们应当冲我们的失败中[吸取教训](https://reactjs.org/blog/2016/07/13/mixins-considered-harmful.html#mixins-cause-name-clashes)
 
-The actual Hooks proposal solves this by relying on the call order: even if two Hooks use a `name` state variable, they would be isolated from each other. Every `useState()` call gets its own “memory cell”.
+事实上最后Hooks提案是通过依赖调用顺序来解决这个问题的: 即使两个Hook使用了相同的`name`状态变量，他们互相之间都是隔离的。每个`useState()`的调用都分配给了他们属于自己的"记忆单元"。
 
-There are still a few other ways we could work around this flaw but they also have their own issues. Let’s explore this problem space more closely.
+其实还有很多的方式来解决这个缺陷，但是这些方案都有它们自己本身的问题。让我们更深入的来看看这些问题。
 
-### Flaw #3: Can’t Call the Same Hook Twice
+### 缺陷 #3: 只能调用同一个Hook一次
 
 Another variation of the “keyed” `useState` proposal is to use something like Symbols. Those can’t clash, right?
 
