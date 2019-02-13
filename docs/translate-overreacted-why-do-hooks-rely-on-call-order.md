@@ -20,22 +20,23 @@ tag: translate,overreacted
 
 当你阅读这篇文章的时候，千万别落下了这篇关于如何构建自定义Hooks的[文章](https://reactjs.org/docs/hooks-custom.html)，这篇文章很重要哦！很多人会断章取义的来反驳我们对Hooks介绍(比如学习React class是比较难以理解的)，却没有看到Hooks产生背景原因。Hooks产生的背景原因是**Hooks 就像是 *函数Mixins* 那样让你能够抽象并组合你的逻辑**
 
-Hooks[接受了先前的一些设计理念的影响](https://reactjs.org/docs/hooks-faq.html#what-is-the-prior-art-for-hooks)
+Hooks[接受了先前的一些设计理念的影响](https://reactjs.org/docs/hooks-faq.html#what-is-the-prior-art-for-hooks), 
 Hooks [are influenced by some prior art](https://reactjs.org/docs/hooks-faq.html#what-is-the-prior-art-for-hooks) but I haven’t seen anything *quite* like them until Sebastian shared his idea with the team. Unfortunately, it’s easy to overlook the connection between the specific API choices and the valuable properties unlocked by this design. With this post I hope to help more people understand the rationale for the most controversial aspect of Hooks proposal.
 
-**The rest of this post assumes you know the `useState()` Hook API and how to write a custom Hook. If you don’t, check out the earlier links. Also, keep in mind Hooks are experimental and you don’t have to learn them right now!**
+**接下来的文章会建立在你了解`useState()`Hook的API并且直到如何编写一个自定义的Hook之上。如果你还不会，请先查看之前的链接。不过我得提醒一点，Hook是一个测试阶段的API，你也可以现在不去立马去学习它。**
 
-(Disclaimer: this is a personal post and doesn’t necessarily reflect the opinions of the React team. It’s large, the topic is complex, and I may have made mistakes somewhere.)
+(免责声明: 这是一篇个人文章，并不代表React开发团队的意见。这个话题太大太复杂，在一些地方，我可能会误解)
 
 ---
 
-The first and probably the biggest shock when you learn about Hooks is that they rely on *persistent call index between re-renders*. This has some [implications](https://reactjs.org/docs/hooks-rules.html).
 
-This decision is obviously controversial. This is why, [against our principles](https://www.reddit.com/r/reactjs/comments/9xs2r6/sebmarkbages_response_to_hooks_rfc_feedback/e9wh4um/), we only published this proposal after we felt the documentation and talks describe it well enough for people to give it a fair chance.
+当你看到Hooks之后最大的疑惑点大概就是Hooks是需要保持一定的执行顺序的。但做成这样是有原因的。
 
-**If you’re concerned about some aspects of the Hooks API design, I encourage you to read Sebastian’s [full response](https://github.com/reactjs/rfcs/pull/68#issuecomment-439314884) to the 1,000+ comment RFC discussion.** It is thorough but also quite dense. I could probably turn every paragraph of this comment into its own blog post. (In fact, I already [did](/how-does-setstate-know-what-to-do/) that once!)
+显然，Hooks这种做法是有争议的。为了遵循我们的开发原则，这也是为什么我们在觉得我们的提案已经有非常完善的文档并且我们能够描述这个功能足够好且开发者愿意尝试使用这个提案了之后才发布了它。
 
-There is one specific part that I’d like to focus on today. As you may recall, each Hook can be used in a component more than once. For example, we can declare [multiple state variables](https://reactjs.org/docs/hooks-state.html#tip-using-multiple-state-variables) by calling `useState()` repeatedly:
+**如果你还是对Hooks API设计方面有疑问的话，我建议你去阅读Sebastian对于1000多个意见征求讨论的[全部回答](https://github.com/reactjs/rfcs/pull/68#issuecomment-439314884)** 这些讨论都非常彻底也非常深入。我甚至可以将他的讨论的每个段落都写成一篇文章。(事实上，我已经写过[一篇了](https://overreacted.io/how-does-setstate-know-what-to-do/))
+
+以下是我这次特别要讲解的。当你在组件中多次调用Hooks的时候。比如，我们可以多次使用`useState()`定义[多个state变量](https://reactjs.org/docs/hooks-state.html#tip-using-multiple-state-variables):
 
 ```jsx{2,3,4}
 function Form() {
@@ -68,12 +69,13 @@ function Form() {
 }
 ```
 
-Note that we use array destructuring syntax to name `useState()` state variables but these names are not passed to React. Instead, in this example **React treats `name` as “the first state variable”, `surname` as “the second state variable”, and so on**. Their *call index* is what gives them a stable identity between re-renders. This mental model is well-described [in this article](https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e).
+这里我们需要注意的是，我们使用了结构数组的语法糖来定义`useState()`产生的状态变量，但是这些变量名并没有被传入React。在这个例子里 **React把"第一个状态变量"定义为`name`, 把"第二个状态变量"定义为`surname`**。这些`useState()`的调用顺序让我们能够在重新渲染这个组件的时候识别这些state，这种实现思路在这篇[文章中](https://medium.com/@ryardley/react-hooks-not-magic-just-arrays-cd4f1857236e)讲解的很好。
 
-On a surface level, relying on the call index just *feels wrong*. A gut feeling is a useful signal but it can be misleading — especially if we haven’t fully internalized the problem we’re solving. **In this post, I’ll take a few commonly suggested alternative designs for Hooks and show where they break down.**
+表面上来看，依赖调用顺序是一个错误的选择。勇气很有用但是常常让人产生错误 - 尤其是你还不知道其内部是如何做成这样的。**这篇文章中，我会提取一些其他的实现Hook的通用的解决方案的设计，并解释为什么它们最后都不能被使用**
 
 ---
 
+这篇文章不会让你太累。不过这取决你想要了解的数量，因为我们的提案少则几十多则几百。
 This post won’t be exhaustive. Depending on how granular you’re counting, we’ve seen from a dozen to *hundreds* of different alternative proposals. We’ve also been [thinking](https://github.com/reactjs/react-future) about alternative component APIs for the last five years.
 
 Blog posts like this are tricky because even if you cover a hundred alternatives, somebody can tweak one and say: “Ha, you didn’t think of *that*!”
