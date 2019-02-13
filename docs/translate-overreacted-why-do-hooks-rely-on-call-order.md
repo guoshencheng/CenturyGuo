@@ -104,7 +104,7 @@ function Form() {
 
 需要澄清的是，Hooks*当然*支持这种写法的。你不必将你的state分割成多个变量(查看我们在问答中的[建议](https://reactjs.org/docs/hooks-faq.html#should-i-use-one-or-many-state-variables))
 
-But the point of supporting multiple `useState()` calls is so that you can *extract* parts of stateful logic (state + effects) out of your components into custom Hooks which can *also* independently use local state and effects:
+其实支持调用多次`useState()`的目的是在于能够从你的组件中提取关于状态的逻辑(state和effects)到自定义的Hook中，在这些自定义的Hook中，我们能够单独管理自己的state和effects：
 
 ```jsx{6-7}
 function Form() {
@@ -354,9 +354,9 @@ function createUseFormInput() {
 }
 ```
 
-This approach is rather heavy-handed. One of the design goals of Hooks is to avoid the deeply nested functional style that is prevalent with higher-order components and render props. Here, we have to “instantiate” *any* custom Hook before its use — and use the resulting function *exactly once* in the body of a component. This isn’t much simpler than calling Hooks unconditionally.
+这种方式增加了我们编写代码的负担。我们在做Hook的时候的其中一个设计目标就是想要避免过深的函数嵌套，这种方式在高阶组件和render属性渲染的设计中已经被过分的使用。在这种设计中，我们必须要实例化我们想使用的自定义Hook - 然后在组件的函数中使用生成的函数(其实就一次)。这比我们无条件的使用Hook要复杂不少。
 
-Additionally, you have to repeat every custom Hook used in a component twice. Once in the top level scope (or inside a function scope if we’re writing a custom Hook), and once at the actual call site. This means you have to jump between the rendering and top-level declarations even for small changes:
+另外，像这样的使用方式，你需要在你的组件中维护两个地方，你需要在文件的顶部(或者在自定Hook的函数闭包中)定义一次，在调用的地方调用一次。这意味着你需要在render函数和文件顶部的定义之间跳转，即使是一丁点的改动。
 
 ```js{2,3,7,8}
 // ⚠️ This is NOT the React Hooks API
@@ -371,24 +371,24 @@ function Form() {
 }
 ```
 
-You also need to be very precise with their names. You would always have “two levels” of names — factories like `createUseFormInput` and the instantiated Hooks like `useNameFormInput` and `useSurnameFormInput`.
+你还需要精确的定义他们的名字，你一般需要定义两种层次的名字 - 工厂函数定义成`createUseFormInput`而Hook实例会被定义为类似`useNameFormInput`或者`useSurnameFormInput`。
 
-If you call the same custom Hook “instance” twice you’d get a state clash. In fact, the code above has this mistake — have you noticed? It should be:
+如果你调用了同一个Hook实例两次，你代码可能就会出现bug了，事实上，以上的代码就有这个问题 - 你注意到了吗? 这段你代码应该写成:
 
 ```js
   const name = useNameFormInput();
   const surname = useSurnameFormInput(); // Not useNameFormInput!
 ```
 
-These problems are not insurmountable but I would argue that they add *more* friction than following the [Rules of Hooks](https://reactjs.org/docs/hooks-rules.html).
+这些问题往往是不可避免的，但是我对有些人总喜欢增加这么多问题而不愿意遵守[Hook的编写规则](https://reactjs.org/docs/hooks-rules.html)感到生气。
 
-Importantly, they break the expectations of copy-paste. Extracting a custom Hook without an extra closure wrapper *still works* with this approach but only until you call it twice. (Which is when it creates a conflict.) It’s unfortunate when an API seems to work but then forces you to Wrap All the Things™️ once you realize there is a conflict somewhere deep down the chain.
+更重要的是，他们打破了我们所期望的复制粘贴即可提取Hook的期望，当一个API需要强制你在调用所有东西的时候都加上一个闭包的时候会让人多么不爽。
 
-### Flaw #6: We Still Need a Linter
+### 缺陷 #6: 我们还是需要一个Linter
 
-There is another way to avoid conflicts with keyed state. If you know about it, you were probably really annoyed I still haven’t acknowledged it! Sorry.
+我们还有一个方法来避免state的索引值冲突。如果你了解过这个方法，你可能会对我还没有承认这种方式而感到生气! 抱歉。
 
-The idea is that we could *compose* keys every time we write a custom Hook. Something like this:
+这个方法就是我们可以在使用自定义Hook的时候拼接键值。比如像这样:
 
 ```js{4,5,16,17}
 // ⚠️ This is NOT the React Hooks API
