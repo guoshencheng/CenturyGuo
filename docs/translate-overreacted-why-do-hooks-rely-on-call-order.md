@@ -417,7 +417,7 @@ function useFormInput(formInputKey) {
 }
 ```
 
-Out of different alternatives, I dislike this approach the least. I don’t think it’s worth it though.
+和其他的选择不同，我根本不喜欢这种方式。我觉得这不值得尝试。
 
 Code passing non-unique or badly composed keys would *accidentally work* until a Hook is called multiple times or clashes with another Hook. Worse, if it’s meant to be conditional (we’re trying to “fix” the unconditional call requirement, right?), we might not even encounter the clashes until later.
 
@@ -485,11 +485,11 @@ If we have to lint anyway, the requirement to correctly compose keys becomes “
 
 Small things add up.
 
-### Flaw #7: Can’t Pass Values Between Hooks
+### 缺陷 #7: 不能再Hook之间传递参数
 
-One of the best features of Hooks is that you can pass values between them.
+我们所期望的Hook的最重要的功能之一就是要能够在Hook之间互相传值。
 
-Here is a hypothetical example of a message recipient picker that shows whether the currently chosen friend is online:
+假想这么一个例子，一个在线的好友选择器。
 
 ```jsx{8,9}
 const friendList = [
@@ -532,16 +532,16 @@ function useFriendStatus(friendID) {
 }
 ```
 
-When you change the recipient, our `useFriendStatus()` Hook would unsubscribe from the previous friend’s status, and subscribe to the next one.
+当你选择选择的好友的id的时候，我们的`useFriendStatus()`Hook会取消订阅好友的状态，并订阅下一个好友。
 
-This works because we can pass the return value of the `useState()` Hook to the `useFriendStatus()` Hook:
+我们能够实现这个这归功于我们能够将`useState()`的变量传递到`useFriendState()`Hook中:
 
 ```js{2}
   const [recipientID, setRecipientID] = useState(1);
   const isRecipientOnline = useFriendStatus(recipientID);
 ```
 
-Passing values between Hooks is very powerful. For example, [React Spring](https://medium.com/@drcmda/hooks-in-react-spring-a-tutorial-c6c436ad7ee4) lets you create a trailing animation of several values “following” each other:
+在Hook之间传递变量这个Feature是非常有用的。比如[React Spring](https://medium.com/@drcmda/hooks-in-react-spring-a-tutorial-c6c436ad7ee4) 让你能够创建多个逐个执行的动画：
 
 ```js
   const [{ pos1 }, set] = useSpring({ pos1: [0, 0], config: fast });
@@ -549,24 +549,24 @@ Passing values between Hooks is very powerful. For example, [React Spring](https
   const [{ pos3 }] = useSpring({ pos3: pos2, config: slow });
 ```
 
-(Here’s a [demo](https://codesandbox.io/s/ppxnl191zx).)
+(这里有个[例子](https://codesandbox.io/s/ppxnl191zx).)
 
-Proposals that put Hook initialization into default argument values or that write Hooks in a decorator form make it difficult to express this kind of logic.
+提案期望能够将初始的值作为一个默认参数传入，或者传入一个装饰器来补充一些需要特殊处理的逻辑。
 
-If calling Hooks doesn’t happen in the function body, you can no longer easily pass values between them, transform those values without creating many layers of components, or add `useMemo()` to memoize an intermediate computation. You also can’t easily reference these values in effects because they can’t capture them in a closure. There are ways to work around these issues with some convention but they require you to mentally “match up” inputs and outputs. This is tricky and violates React’s otherwise direct style.
+如果Hook不在组件函数中的函数体中，你就不能够在它们之间轻松的传递参数，你也就不能在不使用高阶组件嵌套的情况下使用这些state，或者使用`useMemo()`来记录中间的计算结果。你也不能轻松的在effect中使用这些变量，因为这些变量不是在闭包中的。针对这些问题，常规手段有很多，但是这些手段往往需要你的大脑里记住函数执行的时候的输入或者输出，这些都是比较取巧的做法，违反了React的设计规范 。
 
-Passing values between Hooks is at the heart of our proposal. Render props pattern was the closest you could get to it without Hooks, but you couldn’t get full benefits without something like [Component Component](https://ui.reach.tech/component-component) which has a lot of syntactic noise due to a “false hierarchy”. Hooks flatten that hierarchy to passing values — and function calls is the simplest way to do that.
+在Hook之间传递参数是我们这个提案的核心。你可以使用嵌套Render属性组件的方式来避免使用Hook，但是除非你使用了类似于[Component Component](https://ui.reach.tech/component-component), 不然要使用全部的功能还是很困难的，Hook扁平化了状态的层级，并将这些状态互相传递 - 函数的调用是能做到这点的最简单的实现方式。
 
-### Flaw #8: Too Much Ceremony
+### 缺陷 #8: 太矫情
 
-There are many proposals that fall under this umbrella. Most attempt to avoid the perceived dependency of Hooks on React. There is a wide variety of ways to do it: by making built-in Hooks available on `this`, making them an extra argument you have to pass through everything, and so on.
+有很多的实现方案的自我安全意识太强了。很多人在实现Hook的时候期望Hook不去依赖React。但实际上，实现Hook的方式很多: 在React中内建一个Hook来使用`this`，或者将这些所需要的参数都通过参数来传递，等等。
 
-I think [Sebastian’s answer](https://github.com/reactjs/rfcs/pull/68#issuecomment-439314884) addresses this way better than I could describe so I encourage you to check out its first section (“Injection Model”).
+我觉得[Sebastian的回答](https://github.com/reactjs/rfcs/pull/68#issuecomment-439314884)这里比我说的要好，所以我强烈建议你去查看这个章节("模块注入")。
 
-I’ll just say there is a reason programmers tend to prefer `try` / `catch` for error handling to passing error codes through every function. It’s the same reason why we prefer ES Modules with `import` (or CommonJS `require`) to AMD’s “explicit” definitions where `require` is passed to us.
+比起在函数中传递错误，开发者更喜欢使用`try` / `catch`来处理错误，就好像是比起AMD明确的定义`require`并传递给我们调用，我们更喜欢直接使用ES Module的`import`(或者 CommonJS的`require`)
 
 ```js
-// Anyone miss AMD?
+// 大家忘了AMD了吗？
 define(['require', 'dependency1', 'dependency2'], function (require) {
   var dependency1 = require('dependency1'),
   var dependency2 = require('dependency2');
@@ -574,11 +574,11 @@ define(['require', 'dependency1', 'dependency2'], function (require) {
 });
 ```
 
-Yes, AMD may be more “honest” to the fact that modules aren’t actually synchronously loaded in a browser environment. But once you learn about that, writing the `define` sandwich becomes a mindless chore.
+对的，AMD可能更加"诚实"的告诉你在浏览器中读取模块是一个异步的过程。单当你知道了这点之后，总是写一个`define`的闭包就会变得很蠢。
 
-`try` / `catch`, `require`, and React Context API are pragmatic examples of how we want to have some “ambient” handler available to us instead of explicitly threading it through every level — even if in general we value explicitness. I think the same is true for Hooks.
+`try` / `catch`, `require` 以及React Context API 证明了我们比起在层级之间传递明确的传递参数更期望能够让”环境“提供一些API来帮助我们处理。至少我觉得这对于Hook而言是对的。
 
-This is similar to how, when we define components, we just grab `Component` from `React`. Maybe our code would be more decoupled from React if we exported a factory for every component instead:
+这就好像是当我们要定义一个组件的时候，我们从`React`中获取`Component`。或许这样的为每个组件加上一个工厂函数的闭包的代码就能够从React中解耦出来了
 
 ```js
 function createModal(React) {
@@ -588,18 +588,20 @@ function createModal(React) {
 }
 ```
 
-But in practice this ends up being just an annoying indirection. When we actually want to stub React with something else, we can always do that at the module system level instead.
+但是事实上这一定会造成开发者的愤怒，假如我们有一天真的想要在项目中移除对React的依赖并使用另外的框架，我们通常会在模块系统层面做一些工作。
 
-The same applies to Hooks. Still, as [Sebastian’s answer](https://github.com/reactjs/rfcs/pull/68#issuecomment-439314884) mentions, it is *technically possible* to “redirect” Hooks exported from `react` to a different implementation. ([One of my previous posts](/how-does-setstate-know-what-to-do/) mentions how.)
+这也被应用在Hooks上。至今，正如[Sebastian的回答](https://github.com/reactjs/rfcs/pull/68#issuecomment-439314884)提到的，我们也可以通过技术的手段”直接“让从`react`中导出的Hooks变成不同的实现([我之前的一篇文章也有提到](https://overreacted.io/how-does-setstate-know-what-to-do/))
 
-Another way to impose more ceremony is by making Hooks [monadic](https://paulgray.net/an-alternative-design-for-hooks/) or adding a first-class concept like `React.createHook()`. Aside from the runtime overhead, any solution that adds wrappers loses a huge benefit of using plain functions: *they are as easy to debug as it gets*.
+另一个我觉得比较矫情的做法就是让Hook[链式](https://paulgray.net/an-alternative-design-for-hooks/)或者添加一个一级类概念比如`React.createHook()`。除了运行时的消耗，任何使用额外闭包的方式都会丢失一个使用纯函数的一个巨大优势: *良好的调试体验*
 
-Plain functions let you step in and out with a debugger without any library code in the middle, and see exactly how values flow inside your component body. Indirections make this difficult. Solutions similar in spirit to either higher-order components (“decorator” Hooks) or render props (e.g. `adopt` proposal or `yield`ing from generators) suffer from the same problem. Indirections also complicate static typing.
+纯函数让你能够直接单步进入函数调试，并且能够直观的查看变量是如何在你的组件内部流动的。间接性(额外的闭包)让这些都变得困难。类似的解决方案比如高阶组件或者render属性就拥有这种问题。另外间接性解决方案会复杂化静态检查。
 
 ---
 
-As I mentioned earlier, this post doesn’t aim to be exhaustive. There are other interesting problems with different proposals. Some of them are more obscure (e.g. related to concurrency or advanced compilation techniques) and might be a topic for another blog post in the future.
+如我之前提到的，这篇文章并不会让你感觉太累。不同的解决放啊还有很多有意思的问题，有一些会更加灰度，可能会在之后的话题中提到。
 
-Hooks aren’t perfect either, but it’s the best tradeoff we could find for solving these problems. There are things we [still need to fix](https://github.com/reactjs/rfcs/pull/68#issuecomment-440780509), and there exist things that are more awkward with Hooks than classes. That is also a topic for another blog post.
+Hook还不是那么完美，但是在现今的解决方案中是一个更好的选择。还有一些问题我们是[需要修复的](https://github.com/reactjs/rfcs/pull/68#issuecomment-440780509)，而且还有一些问题比如现在Hook的用法比起class来说会更显得笨拙。这可能也会是之后的一篇文章的话题。
 
-Whether I covered your favorite alternative proposal or not, I hope this writeup helped shed some light on our thinking process and the criteria we consider when choosing an API. As you can see, a lot of it (such as making sure that copy-pasting, moving code, adding and removing dependencies works as expected) has to do with [optimizing for change](/optimized-for-change/). I hope that React users will appreciate these aspects.
+不知道我是否覆盖了你所认可的实现方式，我只希望这篇文章能够帮助大家更好的理解我们对Hook的实现的心路以及我们在选择API的标准。就如你看到的，很多的解决方案()需要对[将来的需求做一些优化](https://overreacted.io/optimized-for-change/)。我希望React的开发者们能够认可这个观点。
+
+
