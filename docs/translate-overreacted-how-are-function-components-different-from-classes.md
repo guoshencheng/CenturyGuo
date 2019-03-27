@@ -4,13 +4,13 @@ title: '翻译：函数申明的组件和类申明的组件区别在哪里'
 tag: translate,overreacted
 ---
 
-How do React function components differ from React classes?
+React的函数申明组件和类申明的组件到底有什么不同？
 
-For a while, the canonical answer has been that classes provide access to more features (like state). With [Hooks](https://reactjs.org/docs/hooks-intro.html), that’s not true anymore.
+有一段时间，一个普遍的答案就是类申明的组件会提供更多的功能（比如state）。但是当[Hooks](https://reactjs.org/docs/hooks-intro.html)出现了之后这种说法就不对了。
 
-Maybe you’ve heard one of them is better for performance. Which one? Many of such benchmarks are [flawed](https://medium.com/@dan_abramov/this-benchmark-is-indeed-flawed-c3d6b5b6f97f?source=your_stories_page---------------------------) so I’d be careful [drawing conclusions](https://github.com/ryardley/hooks-perf-issues/pull/2) from them. Performance primarily depends on what the code is doing rather than whether you chose a function or a class. In our observation, the performance differences are negligible, though optimization strategies are a bit [different](https://reactjs.org/docs/hooks-faq.html#are-hooks-slow-because-of-creating-functions-in-render).
+可能你会听说，他们中的其中一种会有更好的性能。那么究竟是哪个呢？很多标准都是[有缺陷的](https://medium.com/@dan_abramov/this-benchmark-is-indeed-flawed-c3d6b5b6f97f?source=your_stories_page---------------------------)。所以在通过这些标准来获得结论的时候需要谨慎。性能最重要的还是在于你的代码本身而不是在于你选择了用类来申明还是用函数。在我看来，即使它们在吸能你优化的策略上面有些许的[不同](https://reactjs.org/docs/hooks-faq.html#are-hooks-slow-because-of-creating-functions-in-render)，性能的差异是很小的。
 
-In either case we [don’t recommend](https://reactjs.org/docs/hooks-faq.html#should-i-use-hooks-classes-or-a-mix-of-both) rewriting your existing components unless you have other reasons and don’t mind being an early adopter. Hooks are still new (like React was in 2014), and some “best practices” haven’t yet found their way into the tutorials.
+无论在上面说的什么情况下，我们都[不推荐](https://reactjs.org/docs/hooks-faq.html#should-i-use-hooks-classes-or-a-mix-of-both)你将你的原有组件换一个申明方式重写。但如果你有什么特殊原因，别多想，乘早选择合适的方案。Hooks还非常的新(就像2014年de React一样)，类似于"最好的体验"的建议并没有写到教程里面去。
 
 So where does that leave us? Are there any fundamental differences between React functions and classes at all? Of course, there are — in the mental model. **In this post, I will look at the biggest difference between them.** It existed ever since function components were [introduced](https://reactjs.org/blog/2015/09/10/react-v0.14-rc1.html#stateless-function-components) in 2015 but it’s often overlooked:
 
