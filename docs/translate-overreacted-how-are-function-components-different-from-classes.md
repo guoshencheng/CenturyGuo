@@ -12,11 +12,11 @@ React的函数申明组件和类申明的组件到底有什么不同？
 
 无论在上面说的什么情况下，我们都[不推荐](https://reactjs.org/docs/hooks-faq.html#should-i-use-hooks-classes-or-a-mix-of-both)你将你的原有组件换一个申明方式重写。但如果你有什么特殊原因，别多想，乘早选择合适的方案。Hooks还非常的新(就像2014年de React一样)，类似于"最好的体验"的建议并没有写到教程里面去。
 
-So where does that leave us? Are there any fundamental differences between React functions and classes at all? Of course, there are — in the mental model. **In this post, I will look at the biggest difference between them.** It existed ever since function components were [introduced](https://reactjs.org/blog/2015/09/10/react-v0.14-rc1.html#stateless-function-components) in 2015 but it’s often overlooked:
+那么除了Hook解决的问题，这两种申明方式还有什么根本上的区别？你们的直觉会告诉你们 - 当然是有的。**这篇文章中我们会介绍这两种申明方式的最大的差别**，这个差别从我们2015年[第一次介绍函数申明组件](https://reactjs.org/blog/2015/09/10/react-v0.14-rc1.html#stateless-function-components)的时候就已经存在了，只是它总是被我们忽略。
 
->**Function components capture the rendered values.**
+> **函数申明的组件会记录被渲染的变量**
 
-Let’s unpack what this means.
+让我们来讲解一下这句话的含义
 
 ---
 
