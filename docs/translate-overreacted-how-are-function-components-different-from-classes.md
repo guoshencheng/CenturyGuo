@@ -20,11 +20,11 @@ React的函数申明组件和类申明的组件到底有什么不同？
 
 ---
 
-**Note: this post isn’t a value judgement of either classes or functions. I’m only describing the difference between these two programming models in React. For questions about adopting functions more widely, refer to the [Hooks FAQ](https://reactjs.org/docs/hooks-faq.html#adoption-strategy).**
+**注意：这篇文章不是在于判断函数申明和类申明哪个更加好用。我只是讲述一下这两种申明模式在React中的区别。如果你有关于如何让函数申明方式能够使用很多类申明的功能，请查看[Hook FAQ](https://reactjs.org/docs/hooks-faq.html#adoption-strategy)**
 
 ---
 
-Consider this component:
+加入有这么一个组件:
 
 ```jsx
 function ProfilePage(props) {
@@ -42,7 +42,7 @@ function ProfilePage(props) {
 }
 ```
 
-It shows a button that simulates a network request with `setTimeout` and then shows a confirmation alert. For example, if `props.user` is `'Dan'`, it will show `'Followed Dan'` after three seconds. Simple enough.
+这个组件渲染了一个按钮，这个按钮使用`setTimeout`模拟了一个请求，并在请求完成之后弹出一个确认框。比如，如果`props.user`是`'Dan'`，三秒后就会显示`'Follow Dan'`的弹窗。非常简单。
 
 *(Note it doesn’t matter whether I use arrows or function declarations in the above example. `function handleClick()` would work exactly the same way.)*
 
