@@ -44,9 +44,9 @@ function ProfilePage(props) {
 
 这个组件渲染了一个按钮，这个按钮使用`setTimeout`模拟了一个请求，并在请求完成之后弹出一个确认框。比如，如果`props.user`是`'Dan'`，三秒后就会显示`'Follow Dan'`的弹窗。非常简单。
 
-*(Note it doesn’t matter whether I use arrows or function declarations in the above example. `function handleClick()` would work exactly the same way.)*
+*(注意这里我们不用担心我在定义`handleClick`是否使用了箭头函数。使用`function handleClick()`来定义也一样没有问题)*
 
-How do we write it as a class? A naïve translation might look like this:
+如果我们使用类申明的方式来定义会是怎么样，通常我们会像这样转换:
 
 ```jsx
 class ProfilePage extends React.Component {
@@ -63,14 +63,13 @@ class ProfilePage extends React.Component {
   }
 }
 ```
+大部分人都会觉得这两个代码片段是等价的。人们经常在这两种定义方式间重构，但是却没有注意到他们的本质区别
 
-It is common to think these two snippets of code are equivalent. People often freely refactor between these patterns without noticing their implications:
+![看一下这两个版本的区别](https://overreacted.io/wtf-1d3c7a341ee3fcadc79df00e7d872e4b.gif)
 
-![Spot the difference between two versions](./wtf.gif)
+**事实上，这两个代码片段其实是有微小的区别的**，你可以仔细的查看它们。你现在找到区别了吗？我个人是花了很长时间才明白他们的区别的。
 
-**However, these two snippets of code are subtly different.** Take a good look at them. Do you see the difference yet? Personally, it took me a while to see this.
-
-**There are spoilers ahead so here’s a [live demo](https://codesandbox.io/s/pjqnl16lm7) if you wanna figure it out on your own.** The rest of this article explains the difference and why it matters.
+**我可以剧透一下。如果你想自己找到区别所在的话，你可以查看一下这个[在线例子](https://codesandbox.io/s/pjqnl16lm7)** 接下来，这篇文章会解释这两个片段的区别以及为什么会有这个区别
 
 ---
 
