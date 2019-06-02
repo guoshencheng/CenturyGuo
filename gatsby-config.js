@@ -32,6 +32,13 @@ module.exports = {
         path: path.resolve(__dirname, './docs'),
       }
     },
+    {
+      resolve: 'gatsby-source-filesystem',
+      options: {
+        name: 'plan',
+        path: path.resolve(__dirname, './plan'),
+      }
+    },
     'gatsby-plugin-remove-trailing-slashes',
     {
       resolve: `gatsby-plugin-manifest`,
