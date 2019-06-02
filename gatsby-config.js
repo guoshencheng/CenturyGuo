@@ -1,5 +1,23 @@
 const path = require('path');
 
+const filesystemPlugin = [{
+  resolve: 'gatsby-source-filesystem',
+  options: {
+    name: 'src',
+    path: path.resolve(__dirname, './docs'),
+  }
+}]
+
+if (process.env.NODE_ENV === 'development') {
+  filesystemPlugin.push({
+    resolve: 'gatsby-source-filesystem',
+    options: {
+      name: 'plan',
+      path: path.resolve(__dirname, './plan'),
+    }
+  })
+}
+
 module.exports = {
   siteMetadata: {
     title: 'Century\'s world',
@@ -25,20 +43,7 @@ module.exports = {
       }
     },
     'gatsby-plugin-less',
-    {
-      resolve: 'gatsby-source-filesystem',
-      options: {
-        name: 'src',
-        path: path.resolve(__dirname, './docs'),
-      }
-    },
-    {
-      resolve: 'gatsby-source-filesystem',
-      options: {
-        name: 'plan',
-        path: path.resolve(__dirname, './plan'),
-      }
-    },
+    ...filesystemPlugin,
     'gatsby-plugin-remove-trailing-slashes',
     {
       resolve: `gatsby-plugin-manifest`,
