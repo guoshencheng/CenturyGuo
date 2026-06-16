@@ -1,5 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
+import Card from "../components/Card.astro";
 import { getCollection } from "astro:content";
 
 const posts = await getCollection("blog");
@@ -12,60 +13,58 @@ posts.forEach((post) => {
 const allTags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
-<Base pageTitle="Tags" description="标签列表">
-  <p class="tags-intro">
-    <span class="tags-prompt">century@blog:~$</span>
-    <span class="tags-cmd"> ls -l ~/tags/</span>
-  </p>
-
-  <div class="tags-list">
-    {allTags.map(([tag, count]) => (
-      <a href={`/tags/${tag}`} class="tag-row">
-        <span class="tag-row__name">#{tag}</span>
-        <span class="tag-row__count">{count} posts</span>
-      </a>
-    ))}
-  </div>
+<Base pageTitle="Tags" description="标签列表" terminalTitle="century@blog:~/tags">
+  <Card prompt="> CENTURY_GUO:/tags">
+    {allTags.length === 0 ? (
+      <p class="tags-empty">No tags yet.</p>
+    ) : (
+      <div class="tags-cloud">
+        {allTags.map(([tag, count]) => (
+          <a href={`/tags/${tag}`} class="tags-cloud__item">
+            <span class="tags-cloud__name">#{tag}</span>
+            <span class="tags-cloud__count">{count} posts</span>
+          </a>
+        ))}
+      </div>
+    )}
+  </Card>
 </Base>
 
 <style>
-  .tags-intro {
+  .tags-empty {
+    color: var(--color-text-muted);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
-    margin-bottom: var(--space-lg);
   }
 
-  .tags-prompt { color: var(--color-accent); }
-  .tags-cmd { color: var(--color-link); }
-
-  .tags-list {
+  .tags-cloud {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
+    flex-wrap: wrap;
+    gap: var(--space-sm);
   }
 
-  .tag-row {
-    display: flex;
-    justify-content: space-between;
+  .tags-cloud__item {
+    display: inline-flex;
     align-items: center;
-    padding: var(--space-sm) var(--space-md);
-    border: var(--border);
-    border-radius: var(--radius);
-    transition: border-color 0.15s;
+    gap: var(--space-sm);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: var(--color-link);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s;
   }
 
-  .tag-row:hover {
+  .tags-cloud__item:hover {
+    color: var(--color-link-hover);
     border-color: var(--color-link);
   }
 
-  .tag-row__name {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-  }
-
-  .tag-row__count {
+  .tags-cloud__count {
     font-size: 11px;
     color: var(--color-text-muted);
-    font-family: var(--font-mono);
   }
 </style>
