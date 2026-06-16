@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
+import Card from "../../components/Card.astro";
 import { formatDate } from "../../utils/formatDate";
 import "../../styles/markdown.css";
 
@@ -17,64 +18,111 @@ const { title, date, tags, description } = post.data;
 const { Content } = await post.render();
 ---
 
-<Base pageTitle={title} description={description}>
-  <article class="article">
-    <header class="article-header">
-      <div class="article-meta">
-        <span>[{formatDate(date)}]</span>
-        <span class="article-prompt">$</span>
-        <span class="article-cmd">cat {post.slug}.md</span>
-      </div>
-      <h1>{title}</h1>
-      {description && (
-        <p class="article-desc">{description}</p>
-      )}
-      {tags.length > 0 && (
-        <div class="article-tags">
-          {tags.map((tag) => (
-            <a href={`/tags/${tag}`} class="article-tag">#{tag}</a>
-          ))}
+<Base
+  pageTitle={title}
+  description={description}
+  terminalTitle={`century@blog:~/posts/${post.slug}.md`}
+>
+  <Card prompt={`> CENTURY_GUO:/posts/${post.slug}`}>
+    <article class="article">
+      <header class="article-header">
+        <a href={`/posts/${post.slug}`} class="article-title">
+          {title}
+        </a>
+        <div class="article-meta">
+          {formatDate(date)}
+          {tags.length > 0 && (
+            <span class="article-meta-tags">
+              {" | "}
+              {tags.map((tag) => `#${tag}`).join(" ")}
+            </span>
+          )}
         </div>
-      )}
-    </header>
+        {description && <p class="article-desc">{description}</p>}
+        {tags.length > 0 && (
+          <div class="article-tags">
+            {tags.map((tag) => (
+              <a href={`/tags/${tag}`} class="article-tag">{tag}</a>
+            ))}
+          </div>
+        )}
+      </header>
 
-    <div class="article-body">
-      <Content />
-    </div>
+      <div class="article-body">
+        <Content />
+      </div>
 
-    <footer class="article-footer">
-      <a href="/" class="article-back">cd ~/posts/</a>
-    </footer>
-  </article>
+      <footer class="article-footer">
+        <a href="/" class="article-back">cd ~/posts/</a>
+      </footer>
+    </article>
+  </Card>
 </Base>
 
 <style>
-  .article {
-    counter-reset: heading;
+  .article-header {
+    margin-bottom: var(--space-xl);
+  }
+
+  .article-title {
+    display: inline-block;
+    background: var(--color-accent);
+    color: #ffffff;
+    padding: 4px 14px;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1.4;
+    transition: filter 0.15s;
+  }
+
+  .article-title:hover {
+    filter: brightness(1.1);
   }
 
   .article-meta {
-    font-family: var(--font-mono);
+    margin-top: var(--space-sm);
     font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    margin-bottom: var(--space-md);
+    color: var(--color-link);
+    font-family: var(--font-mono);
   }
 
-  .article-prompt {
-    color: var(--color-accent);
-    margin: 0 var(--space-xs);
-  }
-
-  .article-cmd {
+  .article-meta-tags {
     color: var(--color-link);
   }
 
   .article-desc {
-    font-size: var(--text-sm);
+    margin: var(--space-sm) 0 0;
+    font-size: var(--text-base);
     color: var(--color-text-muted);
-    margin: var(--space-sm) 0 var(--space-md);
-    line-height: 1.6;
+    line-height: 1.7;
     font-style: italic;
+  }
+
+  .article-tags {
+    margin-top: var(--space-sm);
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .article-tag {
+    display: inline-block;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--color-link);
+    font-family: var(--font-mono);
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .article-tag:hover {
+    color: var(--color-link-hover);
+    border-color: var(--color-link);
   }
 
   .article-body {
@@ -92,24 +140,9 @@ const { Content } = await post.render();
     font-size: var(--text-sm);
   }
 
-  .article-tags {
-    display: flex;
-    gap: var(--space-sm);
-    flex-wrap: wrap;
-  }
-
-  .article-tag {
-    font-size: 11px;
-    font-family: var(--font-mono);
-    color: var(--color-text-muted);
-    padding: 2px 8px;
-    border: var(--border);
-    border-radius: 3px;
-    transition: color 0.15s, border-color 0.15s;
-  }
-
-  .article-tag:hover {
-    color: var(--color-link);
-    border-color: var(--color-link);
+  @media (max-width: 640px) {
+    .article-title {
+      font-size: var(--text-lg);
+    }
   }
 </style>
