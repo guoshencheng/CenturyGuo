@@ -6,7 +6,7 @@ import { join, basename } from "node:path";
  * Usage: npx tsx scripts/wechat-sync.ts <path-to-markdown>
  */
 
-const BLOG_URL = "https://guoshencheng.com";
+const BLOG_URL = "https://blog.shemu.top";
 
 function parseFrontmatter(raw: string): {
   frontmatter: Record<string, unknown>;
