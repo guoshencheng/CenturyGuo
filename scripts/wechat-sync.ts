@@ -154,13 +154,8 @@ const slug = basename(inputPath, ".md").replace(/^\d{4}-\d{2}-\d{2}-/, "");
 
 const contentHtml = convertMarkdownToWechat(body);
 
-const fullHtml = `<!--
-  WeChat Article HTML
-  Title: ${title}
-  Source: ${BLOG_URL}/posts/${slug}
-  Generated: ${new Date().toISOString()}
--->
-<section style="max-width:680px;margin:0 auto;font-size:15px;color:#333;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;line-height:1.8;">
+const articleHtml = `
+<section id="wechat-content" style="max-width:680px;margin:0 auto;font-size:15px;color:#333;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;line-height:1.8;">
 
   ${contentHtml}
 
@@ -168,7 +163,110 @@ const fullHtml = `<!--
   <p style="color:#999;font-size:13px;text-align:center;">
     原文链接：<a href="${BLOG_URL}/posts/${slug}" style="color:#16c79a;">${BLOG_URL}/posts/${slug}</a>
   </p>
-</section>`;
+</section>
+`;
+
+const fullHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title} — 微信公众号预览</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .toolbar h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    .toolbar button {
+      background: #07c160;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .toolbar button:hover {
+      background: #06ad56;
+    }
+    .preview-box {
+      max-width: 680px;
+      margin: 24px auto;
+      padding: 24px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .notice {
+      max-width: 680px;
+      margin: 16px auto 0;
+      padding: 12px 16px;
+      background: #fffbe6;
+      border: 1px solid #ffe58f;
+      border-radius: 4px;
+      color: #ad6800;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <h1>${title}</h1>
+    <button onclick="copyToWeChat()">复制全文</button>
+  </div>
+
+  <div class="notice">
+    点击下方按钮后，进入微信公众号编辑器，按 <strong>Ctrl+V / Cmd+V</strong> 粘贴。如果按钮无效，请手动选中下方白色区域内的内容，复制后粘贴。
+  </div>
+
+  <div class="preview-box">
+    ${articleHtml}
+  </div>
+
+  <script>
+    function copyToWeChat() {
+      const content = document.getElementById('wechat-content');
+      const range = document.createRange();
+      range.selectNodeContents(content);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      try {
+        const success = document.execCommand('copy');
+        if (success) {
+          alert('已复制，去微信公众号编辑器粘贴即可');
+        } else {
+          alert('复制失败，请手动选中内容复制');
+        }
+      } catch (err) {
+        alert('复制失败，请手动选中内容复制');
+      }
+      selection.removeAllRanges();
+    }
+  </script>
+</body>
+</html>`;
 
 const outDir = join(import.meta.dirname ?? __dirname, "output");
 if (!existsSync(outDir)) {
