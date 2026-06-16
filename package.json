@@ -1,45 +1,21 @@
 {
-  "name": "guoshencheng",
-  "description": "Guoshencheng's personal website",
-  "version": "1.0.0",
-  "author": "Century Guo <guoshencheng@gmail.com>",
-  "dependencies": {
-    "classnames": "^2.2.6",
-    "disqus-react": "^1.0.5",
-    "gatsby": "^2.0.76",
-    "gatsby-link": "^2.0.7",
-    "gatsby-plugin-google-analytics": "^2.0.8",
-    "gatsby-plugin-less": "^2.0.8",
-    "gatsby-plugin-manifest": "^2.0.12",
-    "gatsby-plugin-react-helmet": "^3.0.5",
-    "gatsby-plugin-remove-trailing-slashes": "^2.0.6",
-    "gatsby-plugin-sitemap": "^2.0.3",
-    "gatsby-remark-prismjs": "^3.1.4",
-    "gatsby-source-filesystem": "^2.0.12",
-    "gatsby-transformer-remark": "^2.1.17",
-    "highlight.js": "^9.12.0",
-    "less": "^3.9.0",
-    "prismjs": "^1.15.0",
-    "react": "^16.5.0",
-    "react-dom": "^16.5.0",
-    "react-helmet": "^5.2.0",
-    "webpack": "^4.28.2"
-  },
-  "keywords": [
-    "gatsby"
-  ],
-  "license": "MIT",
+  "name": "century-blog",
+  "version": "2.0.0",
+  "type": "module",
   "scripts": {
-    "build": "gatsby build",
-    "develop": "gatsby develop",
-    "format": "prettier --write 'src/**/*.js'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "wechat": "npx tsx scripts/wechat-sync.ts"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.0",
+    "@astrojs/sitemap": "^3.0.0",
+    "astro": "^5.0.0"
   },
   "devDependencies": {
-    "prettier": "^1.13.7"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gatsbyjs/gatsby-starter-default"
+    "marked": "^15.0.0",
+    "tsx": "^4.0.0"
   }
 }
