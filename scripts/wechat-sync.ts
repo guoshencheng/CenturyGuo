@@ -34,58 +34,79 @@ function parseFrontmatter(raw: string): {
 
 function convertMarkdownToWechat(md: string): string {
   let html = "";
+  const lines = md.split("\n");
+  let i = 0;
 
-  const blocks = md.split(/\n\n+/);
+  while (i < lines.length) {
+    const line = lines[i];
 
-  for (const block of blocks) {
-    const trimmed = block.trim();
-    if (!trimmed) continue;
-
-    // Code blocks (fenced)
-    if (trimmed.startsWith("```")) {
-      const lines = trimmed.split("\n");
-      const lang = lines[0].replace("```", "").trim();
-      const code = lines.slice(1, -1).join("\n");
-      const escapedCode = escapeHtml(code);
-      if (lang) {
-        html += `<pre style="background:#282c34;color:#abb2bf;padding:16px;border-radius:4px;overflow-x:auto;font-size:13px;line-height:1.6;font-family:Menlo,Monaco,Consolas,monospace;"><code>${escapedCode}</code></pre>\n`;
-      } else {
-        html += `<pre style="background:#282c34;color:#abb2bf;padding:16px;border-radius:4px;overflow-x:auto;font-size:13px;line-height:1.6;font-family:Menlo,Monaco,Consolas,monospace;">${escapedCode}</pre>\n`;
-      }
+    // Empty lines separate blocks
+    if (!line.trim()) {
+      i++;
       continue;
     }
+
+    // Fenced code blocks
+    if (line.startsWith("```")) {
+      const lang = line.replace("```", "").trim();
+      const codeLines: string[] = [];
+      i++;
+      while (i < lines.length && !lines[i].startsWith("```")) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++; // skip closing ```
+      const code = codeLines.join("\n");
+      const escapedCode = escapeHtml(code);
+      html += `<pre style="background:#282c34;color:#abb2bf;padding:16px;border-radius:4px;overflow-x:auto;font-size:13px;line-height:1.6;font-family:Menlo,Monaco,Consolas,monospace;">${lang ? `<code>${escapedCode}</code>` : escapedCode}</pre>\n`;
+      continue;
+    }
+
+    // Collect a block of non-empty lines
+    const blockLines: string[] = [line];
+    i++;
+    while (
+      i < lines.length &&
+      lines[i].trim() &&
+      !lines[i].startsWith("```")
+    ) {
+      blockLines.push(lines[i]);
+      i++;
+    }
+
+    const block = blockLines.join("\n").trim();
 
     // Headings
-    if (trimmed.startsWith("#### ")) {
-      html += `<h4 style="font-size:15px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(trimmed.slice(5))}</h4>\n`;
+    if (block.startsWith("#### ")) {
+      html += `<h4 style="font-size:15px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(block.slice(5))}</h4>\n`;
       continue;
     }
-    if (trimmed.startsWith("### ")) {
-      html += `<h4 style="font-size:15px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(trimmed.slice(4))}</h4>\n`;
+    if (block.startsWith("### ")) {
+      html += `<h4 style="font-size:15px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(block.slice(4))}</h4>\n`;
       continue;
     }
-    if (trimmed.startsWith("## ")) {
-      html += `<h3 style="font-size:18px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(trimmed.slice(3))}</h3>\n`;
+    if (block.startsWith("## ")) {
+      html += `<h3 style="font-size:18px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(block.slice(3))}</h3>\n`;
       continue;
     }
-    if (trimmed.startsWith("# ")) {
-      html += `<h2 style="font-size:22px;font-weight:700;margin:1em 0 0.5em;text-align:center;">${processInline(trimmed.slice(2))}</h2>\n`;
+    if (block.startsWith("# ")) {
+      html += `<h2 style="font-size:22px;font-weight:700;margin:1em 0 0.5em;text-align:center;">${processInline(block.slice(2))}</h2>\n`;
       continue;
     }
 
     // Blockquotes
-    if (trimmed.startsWith("> ")) {
-      const quoteLines = trimmed.split("\n").map((l) => l.replace(/^> ?/, ""));
+    if (block.startsWith("> ")) {
+      const quoteLines = block.split("\n").map((l) => l.replace(/^> ?/, ""));
       const quoteContent = processInline(quoteLines.join("\n"));
       html += `<blockquote style="border-left:3px solid #e94560;padding:8px 16px;margin:1em 0;color:#666;background:#f9f9f9;border-radius:0 4px 4px 0;">${quoteContent}</blockquote>\n`;
       continue;
     }
 
     // Unordered lists
-    if (trimmed.match(/^[-*]\s/m)) {
+    if (block.match(/^[-*]\s/m)) {
       html += `<ul style="padding-left:1.5em;margin:0.5em 0;">\n`;
-      trimmed.split("\n").forEach((line) => {
-        const content = line.replace(/^[-*]\s+/, "");
+      block.split("\n").forEach((listLine) => {
+        const content = listLine.replace(/^[-*]\s+/, "");
         if (content.trim()) {
           html += `<li style="margin:0.25em 0;line-height:2;">${processInline(content)}</li>\n`;
         }
@@ -95,10 +116,10 @@ function convertMarkdownToWechat(md: string): string {
     }
 
     // Ordered lists
-    if (trimmed.match(/^\d+\.\s/m)) {
+    if (block.match(/^\d+\.\s/m)) {
       html += `<ol style="padding-left:1.5em;margin:0.5em 0;">\n`;
-      trimmed.split("\n").forEach((line) => {
-        const content = line.replace(/^\d+\.\s+/, "");
+      block.split("\n").forEach((listLine) => {
+        const content = listLine.replace(/^\d+\.\s+/, "");
         if (content.trim()) {
           html += `<li style="margin:0.25em 0;line-height:2;">${processInline(content)}</li>\n`;
         }
@@ -108,7 +129,7 @@ function convertMarkdownToWechat(md: string): string {
     }
 
     // Regular paragraphs
-    html += `<p style="line-height:2;margin:1em 0;">${processInline(trimmed)}</p>\n`;
+    html += `<p style="line-height:2;margin:1em 0;">${processInline(block)}</p>\n`;
   }
 
   return html;
