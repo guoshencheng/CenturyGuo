@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Card from "../../components/Card.astro";
 import PostCard from "../../components/PostCard.astro";
 import { getCollection } from "astro:content";
 
@@ -20,36 +21,45 @@ const posts = allPosts
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 ---
 
-<Base pageTitle={`#${tag}`} description={`${tag} 标签下的文章`}>
-  <p class="tag-page-intro">
-    <span class="tag-page-prompt">century@blog:~$</span>
-    <span class="tag-page-cmd"> grep -rl "#{tag}" ~/posts/</span>
-  </p>
-  <p class="tag-page-count">found {posts.length} post(s)</p>
+<Base
+  pageTitle={`#${tag}`}
+  description={`${tag} 标签下的文章`}
+  terminalTitle={`century@blog:~/tags/${tag}`}
+>
+  <Card prompt={`> CENTURY_GUO:/tags/${tag}`}>
+    <p class="tag-page-count">found {posts.length} post(s)</p>
 
-  <div class="tag-page-list">
-    {posts.map((post) => <PostCard post={post} />)}
-  </div>
+    {posts.length === 0 ? (
+      <p class="tag-page-empty">No posts found for this tag.</p>
+    ) : (
+      <div class="tag-page-list">
+        {posts.map((post) => <PostCard post={post} />)}
+      </div>
+    )}
 
-  <p class="tag-page-back">
-    <a href="/tags">cd ~/tags/</a>
-  </p>
+    <p class="tag-page-back">
+      <a href="/tags">cd ~/tags/</a>
+    </p>
+  </Card>
 </Base>
 
 <style>
-  .tag-page-intro {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-xs);
-  }
-
-  .tag-page-prompt { color: var(--color-accent); }
-  .tag-page-cmd { color: var(--color-link); }
-
   .tag-page-count {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     margin-bottom: var(--space-lg);
+    font-family: var(--font-mono);
+  }
+
+  .tag-page-empty {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .tag-page-list {
+    display: flex;
+    flex-direction: column;
   }
 
   .tag-page-back {
