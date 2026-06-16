@@ -28,7 +28,7 @@ grid.forEach((row, rowIndex) => {
       rects.push({
         x: colIndex,
         y: rowIndex,
-        delay: (rowIndex * 8 + colIndex) * 0.03,
+        delay: -(((7 - rowIndex) * 8 + (7 - colIndex)) * 0.05),
       });
     }
   });
@@ -73,21 +73,23 @@ grid.forEach((row, rowIndex) => {
   }
 
   .mushroom--animated rect {
-    animation: rotateplane 4s 1 ease-in-out;
-    animation-fill-mode: forwards;
+    animation: rotateplane 10s infinite ease-in-out;
   }
 
   @keyframes rotateplane {
     0% {
       transform: perspective(120px) rotateX(0deg) rotateY(0deg);
     }
-    20% {
+    40% {
+      transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    }
+    45% {
       transform: perspective(120px) rotateX(-180.1deg) rotateY(0);
     }
-    50% {
+    55% {
       transform: perspective(120px) rotateX(-180.1deg) rotateY(0);
     }
-    70% {
+    60% {
       transform: perspective(120px) rotateX(-360deg) rotateY(0deg);
     }
     100% {
