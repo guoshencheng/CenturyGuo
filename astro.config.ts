@@ -2,7 +2,7 @@ import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
-  site: "https://guoshencheng.com",
+  site: "https://blog.shemu.top",
   integrations: [sitemap()],
   markdown: {
     shikiConfig: {
