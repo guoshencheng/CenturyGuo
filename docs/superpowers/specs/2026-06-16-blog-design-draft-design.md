@@ -174,6 +174,8 @@
   - `padding: 4px 14px`
   - `font-size: 20px`
   - `font-weight: bold`
+  - `text-align: center`
+  - 宽度仅包裹文字（inline-block），不撑满整行
   - hover：亮度微调或下划线
 - `.post-card__meta`：
   - `color: var(--color-link)`
