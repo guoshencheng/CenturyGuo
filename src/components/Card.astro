@@ -1,0 +1,43 @@
+---
+export interface Props {
+  prompt?: string;
+}
+
+const { prompt = "> CENTURY_GUO:/" } = Astro.props;
+---
+
+<div class="card">
+  <div class="card__prompt">{prompt}</div>
+  <div class="card__body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .card {
+    background: var(--color-card-bg);
+    border-radius: 8px;
+    padding: var(--space-lg);
+  }
+
+  .card__prompt {
+    color: var(--color-accent);
+    font-size: var(--text-sm);
+    letter-spacing: 1px;
+    margin-bottom: var(--space-lg);
+  }
+
+  .card__body > :first-child {
+    margin-top: 0;
+  }
+
+  .card__body > :last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 640px) {
+    .card {
+      padding: var(--space-md);
+    }
+  }
+</style>
