@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
-import { join, basename } from "node:path";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from "node:fs";
+import { join, basename, dirname, resolve, relative } from "node:path";
 import { marked } from "marked";
 
 /**
@@ -74,7 +74,7 @@ function convertMarkdownToWechat(md: string): string {
       )
       // Links
       .replace(/<a /g, '<a style="color:#16c79a;" ')
-      // Images
+      // Images: keep src pointing to local copied image, add upload reminder
       .replace(
         /<img([^>]*)>/g,
         '<img$1 style="max-width:100%;border-radius:4px;margin:1em 0;" /><!-- TODO: upload to WeChat and replace src -->'
@@ -85,6 +85,94 @@ function convertMarkdownToWechat(md: string): string {
         '<hr style="border:none;border-top:1px solid #eee;margin:2em 0;" />'
       )
   );
+}
+
+interface ImageRef {
+  originalPath: string;
+  copiedPath: string;
+  filename: string;
+}
+
+function findProjectRoot(startDir: string): string {
+  let current = startDir;
+  while (current !== dirname(current)) {
+    if (existsSync(join(current, "package.json")) || existsSync(join(current, "astro.config.ts"))) {
+      return current;
+    }
+    current = dirname(current);
+  }
+  return startDir;
+}
+
+function collectAndCopyImages(
+  md: string,
+  mdFileDir: string,
+  outputImagesDir: string
+): ImageRef[] {
+  const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  const images: ImageRef[] = [];
+  let match;
+  const projectRoot = findProjectRoot(mdFileDir);
+
+  while ((match = imageRegex.exec(md)) !== null) {
+    const src = match[2];
+
+    // Skip external URLs and data URIs
+    if (/^(https?:|data:)/.test(src)) {
+      continue;
+    }
+
+    // Resolve site-absolute paths like /images/... against public/
+    const resolvedPath = src.startsWith("/")
+      ? join(projectRoot, "public", src)
+      : resolve(mdFileDir, src);
+
+    if (!existsSync(resolvedPath)) {
+      console.warn(`   ⚠️ Image not found: ${resolvedPath}`);
+      continue;
+    }
+
+    const filename = basename(src);
+    const copiedPath = join(outputImagesDir, filename);
+
+    // Avoid name collisions by appending index if needed
+    let uniqueCopiedPath = copiedPath;
+    let uniqueFilename = filename;
+    let counter = 1;
+    while (
+      images.some((img) => img.copiedPath === uniqueCopiedPath) ||
+      existsSync(uniqueCopiedPath)
+    ) {
+      const extIndex = filename.lastIndexOf(".");
+      const name = extIndex > 0 ? filename.slice(0, extIndex) : filename;
+      const ext = extIndex > 0 ? filename.slice(extIndex) : "";
+      uniqueFilename = `${name}-${counter}${ext}`;
+      uniqueCopiedPath = join(outputImagesDir, uniqueFilename);
+      counter++;
+    }
+
+    copyFileSync(resolvedPath, uniqueCopiedPath);
+
+    images.push({
+      originalPath: src,
+      copiedPath: uniqueCopiedPath,
+      filename: uniqueFilename,
+    });
+  }
+
+  return images;
+}
+
+function rewriteImagePaths(md: string, images: ImageRef[]): string {
+  let result = md;
+  for (const img of images) {
+    // Replace the original relative path with the copied image filename
+    // The HTML will reference ./images/filename
+    const escapedOriginal = img.originalPath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`!\\[([^\\]]*)\\]\\(${escapedOriginal}\\)`, "g");
+    result = result.replace(regex, `![$1](./images/${img.filename})`);
+  }
+  return result;
 }
 
 // --- Main ---
@@ -98,8 +186,19 @@ const raw = readFileSync(inputPath, "utf-8");
 const { frontmatter, body } = parseFrontmatter(raw);
 const title = String(frontmatter.title ?? basename(inputPath, ".md"));
 const slug = basename(inputPath, ".md").replace(/^\d{4}-\d{2}-\d{2}-/, "");
+const mdFileDir = dirname(resolve(inputPath));
 
-const contentHtml = convertMarkdownToWechat(body);
+const outDir = join(import.meta.dirname ?? __dirname, "output");
+const outputImagesDir = join(outDir, "images");
+if (!existsSync(outputImagesDir)) {
+  mkdirSync(outputImagesDir, { recursive: true });
+}
+
+// Collect local images, copy them to output/images/, and rewrite markdown paths
+const images = collectAndCopyImages(body, mdFileDir, outputImagesDir);
+const bodyWithLocalImages = rewriteImagePaths(body, images);
+
+const contentHtml = convertMarkdownToWechat(bodyWithLocalImages);
 
 const articleHtml = `
 <section id="wechat-content" style="max-width:680px;margin:0 auto;font-size:15px;color:#333;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;line-height:1.8;">
@@ -215,14 +314,20 @@ const fullHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 
-const outDir = join(import.meta.dirname ?? __dirname, "output");
-if (!existsSync(outDir)) {
-  mkdirSync(outDir, { recursive: true });
-}
 const outPath = join(outDir, `${slug}.html`);
 writeFileSync(outPath, fullHtml, "utf-8");
 
 console.log(`✅ WeChat HTML generated: ${outPath}`);
 console.log(`   Title: ${title}`);
 console.log(`   Open this file in browser and click "复制全文" to paste into WeChat editor.`);
-console.log(`   Remember to: upload images to WeChat media library first.`);
+
+if (images.length > 0) {
+  console.log(`\n   📎 Found ${images.length} local image(s):`);
+  for (const img of images) {
+    console.log(`      - ${img.filename}`);
+  }
+  console.log("   Please upload these images to WeChat media library first,");
+  console.log("   then replace the image src in the HTML or directly in WeChat editor.");
+} else {
+  console.log("   No local images found.");
+}
