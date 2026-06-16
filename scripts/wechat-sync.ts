@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
+import { marked } from "marked";
 
 /**
  * Convert Astro blog markdown to WeChat-compatible HTML.
@@ -33,132 +34,57 @@ function parseFrontmatter(raw: string): {
 }
 
 function convertMarkdownToWechat(md: string): string {
-  let html = "";
-  const lines = md.split("\n");
-  let i = 0;
+  const rawHtml = marked.parse(md, { async: false }) as string;
 
-  while (i < lines.length) {
-    const line = lines[i];
-
-    // Empty lines separate blocks
-    if (!line.trim()) {
-      i++;
-      continue;
-    }
-
-    // Fenced code blocks
-    if (line.startsWith("```")) {
-      const lang = line.replace("```", "").trim();
-      const codeLines: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].startsWith("```")) {
-        codeLines.push(lines[i]);
-        i++;
-      }
-      i++; // skip closing ```
-      const code = codeLines.join("\n");
-      const escapedCode = escapeHtml(code);
-      html += `<pre style="background:#282c34;color:#abb2bf;padding:16px;border-radius:4px;overflow-x:auto;font-size:13px;line-height:1.6;font-family:Menlo,Monaco,Consolas,monospace;">${lang ? `<code>${escapedCode}</code>` : escapedCode}</pre>\n`;
-      continue;
-    }
-
-    // Collect a block of non-empty lines
-    const blockLines: string[] = [line];
-    i++;
-    while (
-      i < lines.length &&
-      lines[i].trim() &&
-      !lines[i].startsWith("```")
-    ) {
-      blockLines.push(lines[i]);
-      i++;
-    }
-
-    const block = blockLines.join("\n").trim();
-
-    // Headings
-    if (block.startsWith("#### ")) {
-      html += `<h4 style="font-size:15px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(block.slice(5))}</h4>\n`;
-      continue;
-    }
-    if (block.startsWith("### ")) {
-      html += `<h4 style="font-size:15px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(block.slice(4))}</h4>\n`;
-      continue;
-    }
-    if (block.startsWith("## ")) {
-      html += `<h3 style="font-size:18px;font-weight:600;margin:1.5em 0 0.5em;">${processInline(block.slice(3))}</h3>\n`;
-      continue;
-    }
-    if (block.startsWith("# ")) {
-      html += `<h2 style="font-size:22px;font-weight:700;margin:1em 0 0.5em;text-align:center;">${processInline(block.slice(2))}</h2>\n`;
-      continue;
-    }
-
-    // Blockquotes
-    if (block.startsWith("> ")) {
-      const quoteLines = block.split("\n").map((l) => l.replace(/^> ?/, ""));
-      const quoteContent = processInline(quoteLines.join("\n"));
-      html += `<blockquote style="border-left:3px solid #e94560;padding:8px 16px;margin:1em 0;color:#666;background:#f9f9f9;border-radius:0 4px 4px 0;">${quoteContent}</blockquote>\n`;
-      continue;
-    }
-
-    // Unordered lists
-    if (block.match(/^[-*]\s/m)) {
-      html += `<ul style="padding-left:1.5em;margin:0.5em 0;">\n`;
-      block.split("\n").forEach((listLine) => {
-        const content = listLine.replace(/^[-*]\s+/, "");
-        if (content.trim()) {
-          html += `<li style="margin:0.25em 0;line-height:2;">${processInline(content)}</li>\n`;
-        }
-      });
-      html += `</ul>\n`;
-      continue;
-    }
-
-    // Ordered lists
-    if (block.match(/^\d+\.\s/m)) {
-      html += `<ol style="padding-left:1.5em;margin:0.5em 0;">\n`;
-      block.split("\n").forEach((listLine) => {
-        const content = listLine.replace(/^\d+\.\s+/, "");
-        if (content.trim()) {
-          html += `<li style="margin:0.25em 0;line-height:2;">${processInline(content)}</li>\n`;
-        }
-      });
-      html += `</ol>\n`;
-      continue;
-    }
-
-    // Regular paragraphs
-    html += `<p style="line-height:2;margin:1em 0;">${processInline(block)}</p>\n`;
-  }
-
-  return html;
-}
-
-function processInline(text: string): string {
-  // Bold
-  text = text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  // Italic
-  text = text.replace(/\*(.+?)\*/g, "<em>$1</em>");
-  // Inline code
-  text = text.replace(/`([^`]+)`/g,
-    '<code style="background:#f0f0f0;padding:2px 6px;border-radius:3px;font-size:13px;color:#e94560;font-family:Menlo,Monaco,Consolas,monospace;">$1</code>'
+  return (
+    rawHtml
+      // Code blocks first, before inline code replacement
+      .replace(
+        /<pre><code([^>]*)>([\s\S]*?)<\/code><\/pre>/g,
+        '<pre style="background:#282c34;color:#abb2bf;padding:16px;border-radius:4px;overflow-x:auto;font-size:13px;line-height:1.6;font-family:Menlo,Monaco,Consolas,monospace;"><code$1 style="background:transparent;color:inherit;font-family:inherit;font-size:inherit;padding:0;">$2</code></pre>'
+      )
+      // Shift headings: h1->h2, h2->h3, h3->h4
+      .replace(
+        /<h1>([\s\S]*?)<\/h1>/g,
+        '<h2 style="font-size:22px;font-weight:700;margin:1em 0 0.5em;text-align:center;">$1</h2>'
+      )
+      .replace(
+        /<h2>([\s\S]*?)<\/h2>/g,
+        '<h3 style="font-size:18px;font-weight:600;margin:1.5em 0 0.5em;">$1</h3>'
+      )
+      .replace(
+        /<h3>([\s\S]*?)<\/h3>/g,
+        '<h4 style="font-size:15px;font-weight:600;margin:1.5em 0 0.5em;">$1</h4>'
+      )
+      // Paragraphs
+      .replace(/<p>/g, '<p style="line-height:2;margin:1em 0;">')
+      // Lists
+      .replace(/<ul>/g, '<ul style="padding-left:1.5em;margin:0.5em 0;">')
+      .replace(/<ol>/g, '<ol style="padding-left:1.5em;margin:0.5em 0;">')
+      .replace(/<li>/g, '<li style="margin:0.25em 0;line-height:2;">')
+      // Blockquote
+      .replace(
+        /<blockquote>/g,
+        '<blockquote style="border-left:3px solid #e94560;padding:8px 16px;margin:1em 0;color:#666;background:#f9f9f9;border-radius:0 4px 4px 0;">'
+      )
+      // Inline code (not inside pre, already handled above)
+      .replace(
+        /<code>/g,
+        '<code style="background:#f0f0f0;padding:2px 6px;border-radius:3px;font-size:13px;color:#e94560;font-family:Menlo,Monaco,Consolas,monospace;">'
+      )
+      // Links
+      .replace(/<a /g, '<a style="color:#16c79a;" ')
+      // Images
+      .replace(
+        /<img([^>]*)>/g,
+        '<img$1 style="max-width:100%;border-radius:4px;margin:1em 0;" /><!-- TODO: upload to WeChat and replace src -->'
+      )
+      // Horizontal rule
+      .replace(
+        /<hr>/g,
+        '<hr style="border:none;border-top:1px solid #eee;margin:2em 0;" />'
+      )
   );
-  // Links
-  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" style="color:#16c79a;">$1</a>');
-  // Images -- placeholder
-  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g,
-    '<img src="$2" alt="$1" style="max-width:100%;border-radius:4px;margin:1em 0;" /><!-- TODO: upload to WeChat and replace src -->'
-  );
-  return text;
-}
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
 }
 
 // --- Main ---
@@ -298,5 +224,5 @@ writeFileSync(outPath, fullHtml, "utf-8");
 
 console.log(`✅ WeChat HTML generated: ${outPath}`);
 console.log(`   Title: ${title}`);
-console.log(`   Open this file and paste into WeChat editor.`);
+console.log(`   Open this file in browser and click "复制全文" to paste into WeChat editor.`);
 console.log(`   Remember to: upload images to WeChat media library first.`);
