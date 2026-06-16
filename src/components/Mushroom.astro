@@ -9,34 +9,30 @@ const accentDeep = "rgba(233, 69, 96, 0.8)";
 const accentLight = "rgba(233, 69, 96, 0.65)";
 const cell = size / 8;
 const viewBox = `0 0 ${size} ${size}`;
-const rects = [
-  [1, 2],
-  [2, 2],
-  [3, 2],
-  [4, 2],
-  [0, 3],
-  [1, 3],
-  [2, 3],
-  [3, 3],
-  [4, 3],
-  [5, 3],
-  [1, 4],
-  [2, 4],
-  [3, 4],
-  [4, 4],
-  [2, 5],
-  [3, 5],
-  [4, 5],
-  [5, 5],
-  [2, 6],
-  [3, 6],
-  [4, 6],
-  [5, 6],
-  [2, 7],
-  [3, 7],
-  [4, 7],
-  [5, 7],
+
+const grid = [
+  [0, 0, 1, 1, 1, 1, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1, 0],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [0, 1, 1, 1, 1, 1, 1, 0],
+  [0, 0, 1, 1, 1, 1, 0, 0],
+  [0, 0, 1, 1, 1, 1, 0, 0],
 ];
+
+const rects: Array<{ x: number; y: number; delay: number }> = [];
+grid.forEach((row, rowIndex) => {
+  row.forEach((cellValue, colIndex) => {
+    if (cellValue) {
+      rects.push({
+        x: colIndex,
+        y: rowIndex,
+        delay: -((rowIndex * 8 + colIndex) * 0.05),
+      });
+    }
+  });
+});
 ---
 
 <svg
@@ -47,31 +43,26 @@ const rects = [
   aria-label="Century's Blog Logo"
 >
   {
-    rects.map(([x, y], index) => {
-      const row = y;
-      const col = x;
-      const delay = -((row * 8 + col) * 0.05);
-      return (
-        <rect
-          x={x * cell}
-          y={y * cell}
-          width={cell}
-          height={cell}
-          rx={cell * 0.15}
-          ry={cell * 0.15}
-          fill={
-            y % 2 === 0
-              ? x % 2 === 0
-                ? accentDeep
-                : accentLight
-              : x % 2 === 0
-                ? accentLight
-                : accentDeep
-          }
-          style={animated ? { animationDelay: `${delay}s` } : undefined}
-        />
-      );
-    })
+    rects.map((rect) => (
+      <rect
+        x={rect.x * cell}
+        y={rect.y * cell}
+        width={cell}
+        height={cell}
+        rx={cell * 0.15}
+        ry={cell * 0.15}
+        fill={
+          rect.y % 2 === 0
+            ? rect.x % 2 === 0
+              ? accentDeep
+              : accentLight
+            : rect.x % 2 === 0
+              ? accentLight
+              : accentDeep
+        }
+        style={animated ? { animationDelay: `${rect.delay}s` } : undefined}
+      />
+    ))
   }
 </svg>
 
@@ -83,7 +74,6 @@ const rects = [
 
   .mushroom--animated rect {
     animation: rotateplane 10s infinite ease-in-out;
-    transform-origin: center;
   }
 
   @keyframes rotateplane {
