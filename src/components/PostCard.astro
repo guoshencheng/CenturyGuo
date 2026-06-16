@@ -11,20 +11,25 @@ const { title, date, tags, description } = post.data;
 ---
 
 <article class="post-card">
-  <time class="post-card__date" datetime={date.toISOString()}>
-    [{formatDate(date)}]
-  </time>
-  <span class="post-card__prompt">$</span>
   <a href={`/posts/${post.slug}`} class="post-card__title">
     {title}
   </a>
+  <div class="post-card__meta">
+    {formatDate(date)}
+    {tags.length > 0 && (
+      <span class="post-card__meta-tags">
+        {" | "}
+        {tags.map((tag) => `#${tag}`).join(" ")}
+      </span>
+    )}
+  </div>
   {description && (
     <p class="post-card__desc">{description}</p>
   )}
   {tags.length > 0 && (
     <div class="post-card__tags">
       {tags.map((tag) => (
-        <a href={`/tags/${tag}`} class="post-card__tag">#{tag}</a>
+        <a href={`/tags/${tag}`} class="post-card__tag">{tag}</a>
       ))}
     </div>
   )}
@@ -32,35 +37,50 @@ const { title, date, tags, description } = post.data;
 
 <style>
   .post-card {
-    padding: var(--space-md) 0;
+    padding-bottom: var(--space-lg);
+    margin-bottom: var(--space-lg);
     border-bottom: 1px solid var(--color-border);
   }
 
   .post-card:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
     border-bottom: none;
   }
 
-  .post-card__date {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-  }
-
-  .post-card__prompt {
-    color: var(--color-accent);
-    margin: 0 var(--space-xs);
-    font-size: var(--text-sm);
-  }
-
   .post-card__title {
-    font-size: var(--text-base);
-    font-weight: 600;
+    display: inline-block;
+    background: var(--color-accent);
+    color: #ffffff;
+    padding: 4px 14px;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1.4;
+    transition: filter 0.15s;
+  }
+
+  .post-card__title:hover {
+    filter: brightness(1.1);
+  }
+
+  .post-card__meta {
+    margin-top: var(--space-sm);
+    font-size: var(--text-sm);
+    color: var(--color-link);
+    font-family: var(--font-mono);
+  }
+
+  .post-card__meta-tags {
+    color: var(--color-link);
   }
 
   .post-card__desc {
-    margin: var(--space-xs) 0 0;
-    font-size: var(--text-sm);
+    margin: var(--space-sm) 0 0;
+    font-size: var(--text-base);
     color: var(--color-text-muted);
-    line-height: 1.6;
+    line-height: 1.7;
   }
 
   .post-card__tags {
@@ -71,12 +91,26 @@ const { title, date, tags, description } = post.data;
   }
 
   .post-card__tag {
+    display: inline-block;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 4px 10px;
     font-size: 11px;
-    color: var(--color-text-muted);
+    color: var(--color-link);
     font-family: var(--font-mono);
+    text-decoration: none;
+    transition: color 0.15s, border-color 0.15s;
   }
 
   .post-card__tag:hover {
-    color: var(--color-link);
+    color: var(--color-link-hover);
+    border-color: var(--color-link);
+  }
+
+  @media (max-width: 640px) {
+    .post-card__title {
+      font-size: 18px;
+    }
   }
 </style>
