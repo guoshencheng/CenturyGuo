@@ -6,11 +6,15 @@ import "../styles/base.css";
 export interface Props {
   pageTitle?: string;
   description?: string;
+  terminalTitle?: string;
+  isHome?: boolean;
 }
 
 const {
   pageTitle,
   description = "guoshencheng's personal blog",
+  terminalTitle,
+  isHome = false,
 } = Astro.props;
 
 const siteTitle = "Century's World";
@@ -27,20 +31,22 @@ const fullTitle = pageTitle ? `${pageTitle} — ${siteTitle}` : siteTitle;
     <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body>
-    <header class="site-header">
-      <a href="/" class="site-brand" title="Home">
-        <Mushroom size={40} />
-        <span class="site-brand__text">{siteTitle}</span>
-      </a>
-      <nav class="site-nav">
-        <a href="/">~/posts</a>
-        <a href="/tags">~/tags</a>
-        <a href="/rss.xml">~/rss</a>
-      </nav>
-    </header>
+    {!isHome && (
+      <header class="site-header">
+        <a href="/" class="site-brand" title="Home">
+          <Mushroom size={40} />
+          <span class="site-brand__text">{siteTitle}</span>
+        </a>
+        <nav class="site-nav">
+          <a href="/">~/posts</a>
+          <a href="/tags">~/tags</a>
+          <a href="/rss.xml">~/rss</a>
+        </nav>
+      </header>
+    )}
 
     <main>
-      <Terminal>
+      <Terminal title={terminalTitle}>
         <slot />
       </Terminal>
     </main>
