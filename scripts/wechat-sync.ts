@@ -1,13 +1,17 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from "node:fs";
-import { join, basename, dirname, resolve, relative } from "node:path";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync, readdirSync } from "node:fs";
+import { join, basename, dirname, resolve } from "node:path";
 import { marked } from "marked";
 
 /**
  * Convert Astro blog markdown to WeChat-compatible HTML.
- * Usage: npx tsx scripts/wechat-sync.ts <path-to-markdown>
+ *
+ * Usage:
+ *   npm run wechat <path-to-markdown>
+ *   npm run wechat:all
  */
 
 const BLOG_URL = "https://blog.shemu.top";
+const BLOG_DIR = resolve(process.cwd(), "src/content/blog");
 
 function parseFrontmatter(raw: string): {
   frontmatter: Record<string, unknown>;
@@ -176,31 +180,37 @@ function rewriteImagePaths(md: string, images: ImageRef[]): string {
 }
 
 // --- Main ---
-const inputPath = process.argv[2];
-if (!inputPath) {
-  console.error("Usage: npx tsx scripts/wechat-sync.ts <path-to-markdown>");
-  process.exit(1);
+const args = process.argv.slice(2);
+
+if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
+  console.log(`Usage:
+  npm run wechat <path-to-markdown>   Convert a single markdown file
+  npm run wechat:all                  Convert all markdown files in src/content/blog
+  npm run wechat:open                 Open scripts/output in Finder/Explorer
+`);
+  process.exit(args.length === 0 ? 1 : 0);
 }
 
-const raw = readFileSync(inputPath, "utf-8");
-const { frontmatter, body } = parseFrontmatter(raw);
-const title = String(frontmatter.title ?? basename(inputPath, ".md"));
-const slug = basename(inputPath, ".md").replace(/^\d{4}-\d{2}-\d{2}-/, "");
-const mdFileDir = dirname(resolve(inputPath));
+function processMarkdownFile(inputPath: string): void {
+  const raw = readFileSync(inputPath, "utf-8");
+  const { frontmatter, body } = parseFrontmatter(raw);
+  const title = String(frontmatter.title ?? basename(inputPath, ".md"));
+  const slug = basename(inputPath, ".md").replace(/^\d{4}-\d{2}-\d{2}-/, "");
+  const mdFileDir = dirname(resolve(inputPath));
 
-const outDir = join(import.meta.dirname ?? __dirname, "output");
-const outputImagesDir = join(outDir, "images");
-if (!existsSync(outputImagesDir)) {
-  mkdirSync(outputImagesDir, { recursive: true });
-}
+  const outDir = join(import.meta.dirname ?? __dirname, "output");
+  const outputImagesDir = join(outDir, "images");
+  if (!existsSync(outputImagesDir)) {
+    mkdirSync(outputImagesDir, { recursive: true });
+  }
 
-// Collect local images, copy them to output/images/, and rewrite markdown paths
-const images = collectAndCopyImages(body, mdFileDir, outputImagesDir);
-const bodyWithLocalImages = rewriteImagePaths(body, images);
+  // Collect local images, copy them to output/images/, and rewrite markdown paths
+  const images = collectAndCopyImages(body, mdFileDir, outputImagesDir);
+  const bodyWithLocalImages = rewriteImagePaths(body, images);
 
-const contentHtml = convertMarkdownToWechat(bodyWithLocalImages);
+  const contentHtml = convertMarkdownToWechat(bodyWithLocalImages);
 
-const articleHtml = `
+  const articleHtml = `
 <section id="wechat-content" style="max-width:680px;margin:0 auto;font-size:15px;color:#333;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;line-height:1.8;">
 
   ${contentHtml}
@@ -317,17 +327,37 @@ const fullHtml = `<!DOCTYPE html>
 const outPath = join(outDir, `${slug}.html`);
 writeFileSync(outPath, fullHtml, "utf-8");
 
-console.log(`✅ WeChat HTML generated: ${outPath}`);
-console.log(`   Title: ${title}`);
-console.log(`   Open this file in browser and click "复制全文" to paste into WeChat editor.`);
+  console.log(`✅ WeChat HTML generated: ${outPath}`);
+  console.log(`   Title: ${title}`);
+  console.log(`   Open this file in browser and click "复制全文" to paste into WeChat editor.`);
 
-if (images.length > 0) {
-  console.log(`\n   📎 Found ${images.length} local image(s):`);
-  for (const img of images) {
-    console.log(`      - ${img.filename}`);
+  if (images.length > 0) {
+    console.log(`\n   📎 Found ${images.length} local image(s):`);
+    for (const img of images) {
+      console.log(`      - ${img.filename}`);
+    }
+    console.log("   Please upload these images to WeChat media library first,");
+    console.log("   then replace the image src in the HTML or directly in WeChat editor.");
+  } else {
+    console.log("   No local images found.");
   }
-  console.log("   Please upload these images to WeChat media library first,");
-  console.log("   then replace the image src in the HTML or directly in WeChat editor.");
+}
+
+// Dispatch based on argument
+if (args[0] === "--all") {
+  if (!existsSync(BLOG_DIR)) {
+    console.error(`❌ Blog directory not found: ${BLOG_DIR}`);
+    process.exit(1);
+  }
+  const files = readdirSync(BLOG_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => join(BLOG_DIR, f));
+  console.log(`📚 Found ${files.length} markdown file(s) in ${BLOG_DIR}\n`);
+  for (const file of files) {
+    console.log(`\n--- Processing: ${basename(file)} ---`);
+    processMarkdownFile(file);
+  }
+  console.log(`\n✨ All done. Output in scripts/output/`);
 } else {
-  console.log("   No local images found.");
+  processMarkdownFile(args[0]);
 }

@@ -7,7 +7,9 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "wechat": "npx tsx scripts/wechat-sync.ts"
+    "wechat": "tsx scripts/wechat-sync.ts",
+    "wechat:all": "tsx scripts/wechat-sync.ts --all",
+    "wechat:open": "open scripts/output"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.0",
