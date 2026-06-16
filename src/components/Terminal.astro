@@ -1,0 +1,61 @@
+---
+const { title = "century@blog:~" } = Astro.props;
+---
+<style>
+  .terminal {
+    background: var(--color-bg);
+    border: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 0 auto;
+  }
+
+  .terminal-bar {
+    background: var(--color-surface);
+    border-bottom: var(--border);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .terminal-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .terminal-dot--red    { background: var(--color-terminal-dot-red); }
+  .terminal-dot--yellow { background: var(--color-terminal-dot-yellow); }
+  .terminal-dot--green  { background: var(--color-terminal-dot-green); }
+
+  .terminal-bar__title {
+    margin-left: 10px;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .terminal-body {
+    padding: var(--space-lg);
+  }
+
+  @media (max-width: 640px) {
+    .terminal-body {
+      padding: var(--space-md);
+    }
+  }
+</style>
+
+<div class="terminal">
+  <div class="terminal-bar">
+    <span class="terminal-dot terminal-dot--red"></span>
+    <span class="terminal-dot terminal-dot--yellow"></span>
+    <span class="terminal-dot terminal-dot--green"></span>
+    <span class="terminal-bar__title">{title}</span>
+  </div>
+  <div class="terminal-body">
+    <slot />
+  </div>
+</div>

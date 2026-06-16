@@ -1,0 +1,82 @@
+---
+import { formatDate } from "../utils/formatDate";
+import type { CollectionEntry } from "astro:content";
+
+export interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { title, date, tags, description } = post.data;
+---
+
+<article class="post-card">
+  <time class="post-card__date" datetime={date.toISOString()}>
+    [{formatDate(date)}]
+  </time>
+  <span class="post-card__prompt">$</span>
+  <a href={`/posts/${post.slug}`} class="post-card__title">
+    {title}
+  </a>
+  {description && (
+    <p class="post-card__desc">{description}</p>
+  )}
+  {tags.length > 0 && (
+    <div class="post-card__tags">
+      {tags.map((tag) => (
+        <a href={`/tags/${tag}`} class="post-card__tag">#{tag}</a>
+      ))}
+    </div>
+  )}
+</article>
+
+<style>
+  .post-card {
+    padding: var(--space-md) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .post-card:last-child {
+    border-bottom: none;
+  }
+
+  .post-card__date {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .post-card__prompt {
+    color: var(--color-accent);
+    margin: 0 var(--space-xs);
+    font-size: var(--text-sm);
+  }
+
+  .post-card__title {
+    font-size: var(--text-base);
+    font-weight: 600;
+  }
+
+  .post-card__desc {
+    margin: var(--space-xs) 0 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+
+  .post-card__tags {
+    margin-top: var(--space-sm);
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .post-card__tag {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .post-card__tag:hover {
+    color: var(--color-link);
+  }
+</style>

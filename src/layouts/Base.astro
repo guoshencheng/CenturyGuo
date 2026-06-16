@@ -1,0 +1,104 @@
+---
+import Terminal from "../components/Terminal.astro";
+import Mushroom from "../components/Mushroom.astro";
+import "../styles/base.css";
+
+export interface Props {
+  pageTitle?: string;
+  description?: string;
+}
+
+const {
+  pageTitle,
+  description = "guoshencheng's personal blog",
+} = Astro.props;
+
+const siteTitle = "Century's World";
+const fullTitle = pageTitle ? `${pageTitle} — ${siteTitle}` : siteTitle;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{fullTitle}</title>
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="/" class="site-brand" title="Home">
+        <Mushroom size={40} />
+        <span class="site-brand__text">{siteTitle}</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">~/posts</a>
+        <a href="/tags">~/tags</a>
+        <a href="/rss.xml">~/rss</a>
+      </nav>
+    </header>
+
+    <main>
+      <Terminal>
+        <slot />
+      </Terminal>
+    </main>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    max-width: 720px;
+    margin: 0 auto var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+  }
+
+  .site-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    transition: opacity 0.15s;
+  }
+
+  .site-brand:hover {
+    opacity: 0.8;
+  }
+
+  .site-brand__text {
+    font-size: var(--text-base);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+  }
+
+  .site-nav {
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  .site-nav a {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .site-nav a:hover {
+    color: var(--color-accent);
+  }
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 640px) {
+    .site-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

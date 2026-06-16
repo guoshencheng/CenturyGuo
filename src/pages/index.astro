@@ -1,0 +1,59 @@
+---
+import Base from "../layouts/Base.astro";
+import PostCard from "../components/PostCard.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog"))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<Base description="guoshencheng's personal blog — Retro Terminal style">
+  <div class="home-intro">
+    <p>
+      <span class="home-prompt">century@blog:~$</span>
+      <span class="home-cmd"> ls -lt ~/posts/</span>
+    </p>
+    <p class="home-count">total {posts.length} posts</p>
+  </div>
+
+  <div class="post-list">
+    {posts.length === 0 ? (
+      <p class="home-empty">No posts yet. <span class="home-cursor">█</span></p>
+    ) : (
+      posts.map((post) => <PostCard post={post} />)
+    )}
+  </div>
+</Base>
+
+<style>
+  .home-intro {
+    margin-bottom: var(--space-lg);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .home-prompt {
+    color: var(--color-accent);
+  }
+
+  .home-cmd {
+    color: var(--color-link);
+  }
+
+  .home-count {
+    color: var(--color-text-muted);
+  }
+
+  .home-empty {
+    color: var(--color-text-muted);
+  }
+
+  .home-cursor {
+    color: var(--color-link);
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+</style>

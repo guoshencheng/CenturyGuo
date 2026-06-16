@@ -1,0 +1,47 @@
+---
+export interface Props {
+  size?: number;
+}
+const { size = 64 } = Astro.props;
+const accentDeep = "rgba(233, 69, 96, 0.8)";
+const accentLight = "rgba(233, 69, 96, 0.65)";
+const cell = size / 8;
+const viewBox = `0 0 ${size} ${size}`;
+const rects = [
+  [1,2],[2,2],[3,2],[4,2],
+  [0,3],[1,3],[2,3],[3,3],[4,3],[5,3],
+  [1,4],[2,4],[3,4],[4,4],
+  [2,5],[3,5],[4,5],[5,5],
+  [2,6],[3,6],[4,6],[5,6],
+  [2,7],[3,7],[4,7],[5,7],
+];
+---
+
+<svg
+  viewBox={viewBox}
+  width={size}
+  height={size}
+  class="mushroom"
+  aria-label="Century's Blog Logo"
+>
+  {rects.map(([x, y]) => (
+    <rect
+      x={x * cell}
+      y={y * cell}
+      width={cell}
+      height={cell}
+      rx={cell * 0.15}
+      ry={cell * 0.15}
+      fill={y % 2 === 0
+        ? (x % 2 === 0 ? accentDeep : accentLight)
+        : (x % 2 === 0 ? accentLight : accentDeep)}
+    />
+  ))}
+</svg>
+
+<style>
+  .mushroom {
+    display: block;
+    image-rendering: pixelated;
+  }
+</style>
