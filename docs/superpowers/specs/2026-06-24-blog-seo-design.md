@@ -56,7 +56,7 @@
 | 文件 | 改动 |
 |------|------|
 | `src/layouts/Base.astro` | props 接收 `seo` 对象；接入 `<SeoHead>`；加跳过链接、`tabindex`、`<nav aria-label>` |
-| `src/styles/base.css` | 加 `:focus-visible` 样式、`.skip-link` 样式 |
+| `src/styles/base.css` | 加 `:focus-visible` 样式、`.skip-link` 样式、`img { max-width: 100%; height: auto; }` 兜底 |
 | `src/pages/posts/[slug].astro` | 传递 `seo` props（封面图、发布时间、tags） |
 | `src/pages/index.astro` | 传递 `seo` props（website 类型） |
 | `src/pages/tags.astro` | 传递 `seo` props |
@@ -270,8 +270,8 @@ Astro 构建时自动复制到 `dist/robots.txt`，无需路由配置。
   - 蘑菇 Logo（站点已有 SVG）
   - 主标题 "Century's World"
   - 副标题 "guoshencheng's personal blog"
-- 实施时若用户没有现成图：使用博客已有 Mushroom 组件渲染 + 终端文字生成临时 PNG 占位（spec 不强制视觉细节，可后续替换）
-- 文件大小控制在 200KB 以内
+- **生成方式**：实施阶段使用任何可用工具（screenshot、figma、ImageMagick）合成一次性 PNG，文件大小控制在 200KB 以内。如实施时无现成图，使用博客已有 Mushroom 组件 + 终端文字生成临时占位 PNG，明确标注为"v1 占位，可后续替换"。
+- 提交后用户可自行替换为更高质量版本
 
 ## 13. 图片优化与懒加载
 
@@ -288,18 +288,22 @@ Astro 构建时自动复制到 `dist/robots.txt`，无需路由配置。
 
 ### 注册插件
 
-`astro.config.ts` 改动：
+`astro.config.ts` 改动（**用 import 方式注册**，避免路径解析问题）：
 
 ```ts
+import { rehypeImgLazy } from "./src/utils/rehype-img-lazy";
+
 export default defineConfig({
   site: "https://blog.shemu.top",
   integrations: [sitemap()],
   markdown: {
     shikiConfig: { theme: "github-dark" },
-    rehypePlugins: ["./src/utils/rehype-img-lazy.ts"],
+    rehypePlugins: [rehypeImgLazy],
   },
 });
 ```
+
+插件 `src/utils/rehype-img-lazy.ts` 命名导出 `rehypeImgLazy`（标准 unified 插件签名 `(tree: Root) => void`）。
 
 ### 防 CLS（Cumulative Layout Shift）
 
