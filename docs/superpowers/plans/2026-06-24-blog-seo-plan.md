@@ -340,7 +340,7 @@ export function buildWebSiteJsonLd(input: {
 npm test
 ```
 
-Expected: PASS — 所有 13 个测试通过
+Expected: PASS — 所有 14 个测试通过
 
 - [ ] **Step 3: Commit**
 
@@ -461,6 +461,7 @@ import {
   buildBlogPostingJsonLd,
   buildOgImage,
   buildWebSiteJsonLd,
+  truncateDescription,
 } from "../utils/seo";
 
 export interface Props {
@@ -498,6 +499,8 @@ const og = buildOgImage({ image, site });
 
 const ogImageAlt = imageAlt ?? og.alt;
 
+const safeDescription = truncateDescription(description);
+
 const jsonLd =
   type === "article"
     ? buildBlogPostingJsonLd({
@@ -519,7 +522,7 @@ const jsonLd =
 ---
 
 <title>{fullTitle}</title>
-<meta name="description" content={description} />
+<meta name="description" content={safeDescription} />
 <meta
   name="robots"
   content={noindex
@@ -529,7 +532,7 @@ const jsonLd =
 <link rel="canonical" href={canonicalUrl} />
 
 <meta property="og:title" content={fullTitle} />
-<meta property="og:description" content={description} />
+<meta property="og:description" content={safeDescription} />
 <meta property="og:type" content={type} />
 <meta property="og:url" content={canonicalUrl} />
 <meta property="og:site_name" content={siteTitle} />
@@ -541,7 +544,7 @@ const jsonLd =
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={fullTitle} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:description" content={safeDescription} />
 <meta name="twitter:image" content={og.url} />
 <meta name="twitter:image:alt" content={ogImageAlt} />
 
