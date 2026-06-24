@@ -1,4 +1,5 @@
 const DEFAULT_AUTHOR = "Guo Shencheng";
+const SITE_URL = "https://blog.shemu.top";
 
 export function absoluteUrl(path: string, site: URL): string {
   if (path.includes(" ")) {
@@ -66,13 +67,13 @@ export function buildBlogPostingJsonLd(input: {
     "@type": "BlogPosting",
     headline: input.title,
     description: input.description,
-    author: { "@type": "Person", name: author, url: "https://blog.shemu.top" },
-    publisher: { "@type": "Person", name: author, url: "https://blog.shemu.top" },
+    author: { "@type": "Person", name: author, url: SITE_URL },
+    publisher: { "@type": "Person", name: author, url: SITE_URL },
     mainEntityOfPage: { "@type": "WebPage", "@id": input.url },
   };
   if (published) obj.datePublished = published;
   if (modified) obj.dateModified = modified;
-  if (input.tags && input.tags.length > 0) obj.keywords = input.tags.join(",");
+  if (input.tags?.length) obj.keywords = input.tags.join(",");
   if (input.imageUrl) obj.image = input.imageUrl;
 
   return JSON.stringify(obj);
@@ -99,7 +100,7 @@ export function buildWebSiteJsonLd(input: {
     author: {
       "@type": "Person",
       name: author,
-      url: input.authorUrl ?? "https://blog.shemu.top",
+      url: input.authorUrl ?? SITE_URL,
     },
   };
   return JSON.stringify(obj);
