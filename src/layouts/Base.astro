@@ -1,24 +1,27 @@
 ---
 import Terminal from "../components/Terminal.astro";
 import Mushroom from "../components/Mushroom.astro";
+import SeoHead from "../components/SeoHead.astro";
 import "../styles/base.css";
 
 export interface Props {
-  pageTitle?: string;
-  description?: string;
   terminalTitle?: string;
   isHome?: boolean;
+  seo: {
+    title: string;
+    description: string;
+    type?: "website" | "article";
+    image?: string;
+    imageAlt?: string;
+    publishedTime?: Date;
+    modifiedTime?: Date;
+    author?: string;
+    tags?: string[];
+    noindex?: boolean;
+  };
 }
 
-const {
-  pageTitle,
-  description = "guoshencheng's personal blog",
-  terminalTitle,
-  isHome = false,
-} = Astro.props;
-
-const siteTitle = "Century's World";
-const fullTitle = pageTitle ? `${pageTitle} — ${siteTitle}` : siteTitle;
+const { terminalTitle, isHome = false, seo } = Astro.props;
 ---
 
 <!doctype html>
@@ -26,9 +29,7 @@ const fullTitle = pageTitle ? `${pageTitle} — ${siteTitle}` : siteTitle;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <title>{fullTitle}</title>
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <SeoHead {...seo} />
     {import.meta.env.PROD && (
       <script
         is:inline
@@ -40,13 +41,14 @@ const fullTitle = pageTitle ? `${pageTitle} — ${siteTitle}` : siteTitle;
     )}
   </head>
   <body>
+    <a href="#main-content" class="skip-link">跳到主要内容</a>
     {!isHome && (
       <header class="site-header">
         <a href="/" class="site-brand" title="Home">
           <Mushroom size={40} />
-          <span class="site-brand__text">{siteTitle}</span>
+          <span class="site-brand__text">Century's World</span>
         </a>
-        <nav class="site-nav">
+        <nav class="site-nav" aria-label="主导航">
           <a href="/">~/posts</a>
           <a href="/tags">~/tags</a>
           <a href="/rss.xml">~/rss</a>
@@ -54,7 +56,7 @@ const fullTitle = pageTitle ? `${pageTitle} — ${siteTitle}` : siteTitle;
       </header>
     )}
 
-    <main>
+    <main id="main-content" tabindex="-1">
       <Terminal title={terminalTitle}>
         <slot />
       </Terminal>
