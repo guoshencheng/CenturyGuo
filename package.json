@@ -15,7 +15,7 @@
   "dependencies": {
     "@astrojs/rss": "^4.0.0",
     "@astrojs/sitemap": "^3.0.0",
-    "astro": "^5.0.0"
+    "astro": "^7.0.2"
   },
   "devDependencies": {
     "marked": "^15.0.0",
