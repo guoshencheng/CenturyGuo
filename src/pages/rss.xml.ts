@@ -9,13 +9,16 @@ export async function GET(context: APIContext) {
   return rss({
     title: "Century's World",
     description: "guoshencheng's personal blog",
-    site: context.site ?? "https://guoshencheng.com",
+    site: context.site ?? "https://blog.shemu.top",
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.date,
       link: `/posts/${post.slug}`,
+      author: "guoshencheng@shemu.top (Guo Shencheng)",
     })),
-    customData: `<language>zh-CN</language>`,
+    customData: `<language>zh-CN</language>
+<managingEditor>guoshencheng@shemu.top (Guo Shencheng)</managingEditor>
+<webMaster>guoshencheng@shemu.top (Guo Shencheng)</webMaster>`,
   });
 }
