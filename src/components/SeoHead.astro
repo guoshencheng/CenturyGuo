@@ -1,0 +1,108 @@
+---
+import {
+  buildBlogPostingJsonLd,
+  buildOgImage,
+  buildWebSiteJsonLd,
+  truncateDescription,
+} from "../utils/seo";
+
+export interface Props {
+  title: string;
+  description: string;
+  type?: "website" | "article";
+  publishedTime?: Date;
+  modifiedTime?: Date;
+  author?: string;
+  tags?: string[];
+  image?: string;
+  imageAlt?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  type = "website",
+  publishedTime,
+  modifiedTime,
+  author = "Guo Shencheng",
+  tags = [],
+  image,
+  imageAlt,
+  noindex = false,
+} = Astro.props;
+
+const site = Astro.site ?? new URL("https://blog.shemu.top");
+const siteTitle = "Century's World";
+const fullTitle = `${title} — ${siteTitle}`;
+const canonicalUrl = Astro.url.href;
+
+const og = buildOgImage({ image, site });
+
+const ogImageAlt = imageAlt ?? og.alt;
+
+const safeDescription = truncateDescription(description);
+
+const jsonLd =
+  type === "article"
+    ? buildBlogPostingJsonLd({
+        title,
+        description,
+        url: canonicalUrl,
+        publishedTime,
+        modifiedTime,
+        author,
+        tags,
+        imageUrl: og.url,
+      })
+    : buildWebSiteJsonLd({
+        siteName: siteTitle,
+        description,
+        siteUrl: site.href,
+        authorName: author,
+      });
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={safeDescription} />
+<meta
+  name="robots"
+  content={noindex
+    ? "noindex, nofollow"
+    : "index, follow, max-snippet:-1, max-image-preview:large"}
+/>
+<link rel="canonical" href={canonicalUrl} />
+
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={safeDescription} />
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:site_name" content={siteTitle} />
+<meta property="og:locale" content="zh_CN" />
+<meta property="og:image" content={og.url} />
+<meta property="og:image:width" content={String(og.width)} />
+<meta property="og:image:height" content={String(og.height)} />
+<meta property="og:image:alt" content={ogImageAlt} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={safeDescription} />
+<meta name="twitter:image" content={og.url} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
+
+{type === "article" && publishedTime && (
+  <meta property="article:published_time" content={publishedTime.toISOString()} />
+)}
+{type === "article" && modifiedTime && (
+  <meta property="article:modified_time" content={modifiedTime.toISOString()} />
+)}
+{type === "article" && (
+  <meta property="article:author" content={author} />
+)}
+{type === "article" && tags.map((tag) => (
+  <meta property="article:tag" content={tag} />
+))}
+
+<link rel="sitemap" href="/sitemap-index.xml" />
+
+<script type="application/ld+json" set:html={jsonLd} />
