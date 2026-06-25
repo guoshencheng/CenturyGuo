@@ -4,6 +4,7 @@ import Base from "../../layouts/Base.astro";
 import Card from "../../components/Card.astro";
 import { formatDate } from "../../utils/formatDate";
 import "../../styles/markdown.css";
+import { extractFirstImage } from "../../utils/seo";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -19,9 +20,15 @@ const { Content } = await post.render();
 ---
 
 <Base
-  pageTitle={title}
-  description={description}
   terminalTitle={`century@blog:~/posts/${post.slug}.md`}
+  seo={{
+    title,
+    description,
+    type: "article",
+    publishedTime: date,
+    tags,
+    image: extractFirstImage(post.body),
+  }}
 >
   <Card prompt={`> CENTURY_GUO:/posts/${post.slug}`}>
     <article class="article">

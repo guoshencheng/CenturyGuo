@@ -12,7 +12,11 @@ const posts = (await getCollection("blog"))
 <Base
   isHome
   terminalTitle="century@blog:~/posts"
-  description="guoshencheng's personal blog — Retro Terminal style"
+  seo={{
+    title: "Posts",
+    description: "guoshencheng's personal blog — Retro Terminal style",
+    type: "website",
+  }}
 >
   <Hero />
 

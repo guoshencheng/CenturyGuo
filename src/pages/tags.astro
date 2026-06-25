@@ -13,7 +13,14 @@ posts.forEach((post) => {
 const allTags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
-<Base pageTitle="Tags" description="标签列表" terminalTitle="century@blog:~/tags">
+<Base
+  terminalTitle="century@blog:~/tags"
+  seo={{
+    title: "Tags",
+    description: "所有文章标签 — 按文章数量排序",
+    type: "website",
+  }}
+>
   <Card prompt="> CENTURY_GUO:/tags">
     {allTags.length === 0 ? (
       <p class="tags-empty">No tags yet.</p>

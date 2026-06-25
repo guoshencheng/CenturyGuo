@@ -22,9 +22,12 @@ const posts = allPosts
 ---
 
 <Base
-  pageTitle={`#${tag}`}
-  description={`${tag} 标签下的文章`}
   terminalTitle={`century@blog:~/tags/${tag}`}
+  seo={{
+    title: `#${tag}`,
+    description: `标签 ${tag} 下的所有文章`,
+    type: "website",
+  }}
 >
   <Card prompt={`> CENTURY_GUO:/tags/${tag}`}>
     <p class="tag-page-count">found {posts.length} post(s)</p>
