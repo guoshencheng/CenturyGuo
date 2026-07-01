@@ -43,21 +43,26 @@ OpenCode 的前端是 SolidJS，状态管理上很死板，但值得一看。
 
 事件从 SSE 流到屏幕，分三段：
 
-```mermaid
-flowchart LR
-  subgraph 1["① 唯一网络入口"]
-    A["for await event.stream<br/>(server-sdk.tsx)"]
-  end
-  subgraph 2["② 内存批处理"]
-    B["queue<br/>16ms 一帧"]
-    C["coalesce<br/>(同 part.delta 合并)"]
-    D["heartbeat 15s<br/>看门狗 abort"]
-  end
-  subgraph 3["③ 派发"]
-    E["emitter.emit<br/>(directory, payload)"]
-  end
-  A --> B --> C --> E
-  C -.超 15s 无事件.-> D -.abort.-> A
+```
+   ┌────────────────────────┐
+   │  ① 唯一网络入口         │
+   │  for-await event.stream│
+   └──────────────┬─────────┘
+                  │
+                  ▼
+   ┌────────────────────────┐    超 15s 无事件
+   │  ② 内存批处理          │◀──────────────────┐
+   │  queue (16ms/帧)       │                   │
+   │  coalesce 同 part      │                   │
+   └──────────────┬─────────┘                   │
+                  │                              │
+                  ▼                              │
+   ┌────────────────────────┐                   │
+   │  ③ 派发                │────── abort+reconn │
+   │  emitter.emit(dir, ev) │                   │
+   └────────────────────────┘                   │
+                  │                              │
+                  └──────────────────────────────┘
 ```
 
 1. **唯一入口**：`for await` 循环，把流切成 chunk 推进一个 `queue`；
@@ -79,17 +84,28 @@ reducer 收到 `session.status` 事件就更新这个 map。`session_working(id)
 
 侧边栏的项目级 spinner 也是一样：把所有 directory 下的 `session_status[id]` 拉个并集，转一圈找 `busy`。
 
-```mermaid
-flowchart TB
-  SSE["SSE /global/event"]
-  RED["reducer<br/>(applyDirectoryEvent)"]
-  MAP["session_status map<br/>{id → busy/idle}"]
-  SIDEBAR["sidebar spinner<br/>reactive memo"]
-  CHAT["Chat 页<br/>(挂/不挂都行)"]
-
-  SSE --> RED --> MAP
-  MAP --> SIDEBAR
-  MAP -. Chat 即使关闭<br/>也持续更新 .-> MAP
+```
+   SSE /global/event
+          │
+          ▼
+   ┌─────────────────────┐
+   │  reducer            │
+   │  applyDirectoryEvent│
+   └──────────┬──────────┘
+              ▼
+   ┌──────────────────────────────────┐
+   │  session_status map              │
+   │  { id: 'busy' | 'idle' | 'retry'}│
+   └──┬──────────────────────────┬────┘
+      ▼                          ▼
+   sidebar spinner          Chat 页
+   reactive memo           (挂 / 不挂都行)
+                    ▲
+                    │  update
+                    │
+              ─────┘
+   注: Chat 即使关闭,
+       map 仍在被 update
 ```
 
 所以 OpenCode 的根本答案是：
@@ -102,25 +118,32 @@ flowchart TB
 
 调研完回来盘自己的代码。结构大致是三层：
 
-```mermaid
-flowchart TB
-  subgraph Runtime["Runtime 层（bridge 服务进程）"]
-    CORE["Agent 运行时<br/>(core 循环 + Provider)"]
-    BUS["Bus<br/>(进程内 EventEmitter)"]
-    EP["Stream Endpoint<br/>(GET /agent/stream)"]
-  end
-  subgraph Persist["持久化层"]
-    FS["FileSessionProvider<br/>(本地 JSON 文件)"]
-  end
-  subgraph Client["前端 (React/Solid)"]
-    REM["Remote Client<br/>(fetch stream)"]
-    HOOK["Stream Hook<br/>(订阅 + 重连退避)"]
-    REDUCER["Session Reducer<br/>(bus 事件 → UIMessage)"]
-  end
-
-  CORE --> BUS --> EP
-  CORE --> FS
-  EP -- SSE --> REM --> HOOK --> REDUCER
+```
+   ┌─────────────────────────────────────────────────────────┐
+   │  Runtime 层 (bridge 服务进程)                              │
+   │  ┌──────────────────────────────────────────────────────┐│
+   │  │ Agent 运行时 (core 循环 + Provider)                  ││
+   │  └──────┬───────────────────────────────────────────────┘│
+   │         ▼                                                  │
+   │  ┌──────────┐    ┌──────────────────────────────────────┐ │
+   │  │   Bus    │───▶│ Stream Endpoint (GET /agent/stream) │ │
+   │  └──────────┘    └────────────────┬─────────────────────┘ │
+   └────────────────────────────────────┼───────────────────────┘
+                                        │
+   ┌────────────────────────────────────┼───────────────────────┐
+   │ 持久化层                          │                       │
+   │ ┌──────────┐                      │                       │
+   │ │FileProvider│←────────────────────┘ (save 每个 chunk)     │
+   │ └──────────┘                                              │
+   └───────────────────────────────────────────────────────────┘
+                                        │
+                                        │ SSE
+                                        ▼
+   ┌─────────────────────────────────────────────────────────┐
+   │ 前端 (React/Solid)                                       │
+   │  Remote  ──▶  Stream Hook  ──▶  Session Reducer         │
+   │  Client      (订阅+重连)       (bus ev → UIMessage)      │
+   └─────────────────────────────────────────────────────────┘
 ```
 
 接到 OpenCode 的启发其实并不大——**结构上已经是一根 SSE 总管了**。Bus 全局单点，endpoint 只发订阅者的事件，session 列表在前端 store 里有。但有几个模糊地带没想清：
@@ -204,31 +227,24 @@ sequenceDiagram
 
 把上面所有规则串到一起，就是最终的数据流：
 
-```mermaid
-flowchart TB
-  subgraph 写入路径
-    R["REST /sessions/:id<br/>(全量快照)"]
-    S["SSE /agent/stream<br/>(增量 delta)"]
-    O["用户输入<br/>(乐观插入)"]
-  end
+```
+   写入路径                          前端 Store              渲染
+   ┌──────────────────┐
+   │  REST /sessions/:id│── reconcile(key:id) ──┐
+   │  (全量快照)        │                       │
+   └──────────────────┘                       ▼
+                                       ┌────────────────┐
+   ┌──────────────────┐                │  messages[id]  │
+   │  SSE /agent/stream│── append delta ─▶│  part.id 索引  │──┐
+   │  (增量 delta)     │                └────────────────┘  │
+   └──────────────────┘                       ▲             │
+                                             │             ▼
+   ┌──────────────────┐   mergeOptimisticPage │      ┌────────────┐
+   │  用户输入         │─────────────────────┘       │ Chat / Side│
+   │  (乐观插入)       │                              │ bar 渲染   │
+   └──────────────────┘                              └────────────┘
 
-  subgraph Store["前端 Store (Reactive)"]
-    M["messages[id]<br/>part.id 索引"]
-    P["parts[messageID]
-     [{partId: 'p1',
-       text: '你好'}"]
-  end
-
-  subgraph 渲染
-    UI["Chat 页 / Sidebar"]
-  end
-
-  R -- "reconcile(key:id)" --> M
-  S -- "append delta" --> P
-  O -- "mergeOptimisticPage" --> M
-
-  M --> UI
-  P --> UI
+   三条写入路径都汇入同一份 store，靠 part.id 自然去重
 ```
 
 三条写入路径都收敛到同一个 store，靠 `reconcile({key:"id"})` 和 `part.id` 自然合并。Chat 页和 Sidebar 都是这个 store 的纯订阅者，谁也不会因为别人没挂、没渲染而漏写。
