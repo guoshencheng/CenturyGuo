@@ -43,27 +43,7 @@ OpenCode 的前端是 SolidJS，状态管理上很死板，但值得一看。
 
 事件从 SSE 流到屏幕，分三段：
 
-```
-   ┌────────────────────────┐
-   │  ① 唯一网络入口         │
-   │  for-await event.stream│
-   └──────────────┬─────────┘
-                  │
-                  ▼
-   ┌────────────────────────┐    超 15s 无事件
-   │  ② 内存批处理          │◀──────────────────┐
-   │  queue (16ms/帧)       │                   │
-   │  coalesce 同 part      │                   │
-   └──────────────┬─────────┘                   │
-                  │                              │
-                  ▼                              │
-   ┌────────────────────────┐                   │
-   │  ③ 派发                │────── abort+reconn │
-   │  emitter.emit(dir, ev) │                   │
-   └────────────────────────┘                   │
-                  │                              │
-                  └──────────────────────────────┘
-```
+![一根总管分流到 N 个 Session](/images/blog/one-sse-stream-multiple-agents/01-single-pipe.webp)
 
 1. **唯一入口**：`for await` 循环，把流切成 chunk 推进一个 `queue`；
 2. **合并 + 批量**：16ms 一帧，同 `(messageID, partID, field)` 的 delta 合并成一个 emit；过 heartbeat 15s 没动静就 abort 重连；
@@ -178,30 +158,7 @@ SSE /global/event             → 只发增量 delta，从"现在起"
 
 把上面这条线展开就是续接的完整时序：
 
-```mermaid
-sequenceDiagram
-  participant U as 用户
-  participant H as Stream Hook (前端)
-  participant R as REST Endpoint
-  participant S as SSE Endpoint
-  participant Red as Reducer
-
-  U->>H: 进入 Session A
-  H->>R: GET /session/A/message?limit=80
-  R-->>H: 200 { 80 条消息 + 当前 text }
-  H->>Red: reconcile(messages, {key:"id"})
-  Note over Red: T0 时刻快照写入
-
-  par 实时增量
-    S->>H: SSE push part.delta (msgX.partY, "+token1")
-    H->>Red: prev + delta = "你"+"好" = "你好"
-  and 持续推送
-    S->>H: SSE push part.delta (msgX.partY, "+token2")
-    H->>Red: prev + delta = "你好"+"世界" = "你好世界"
-  end
-
-  Note over Red: 任何一种写入路径都不破坏 store<br/>靠 reconcile(key:"id") 兜底幂等
-```
+![REST 水表读数 + SSE 增量拼接](/images/blog/one-sse-stream-multiple-agents/02-rest-snapshot.webp)
 
 前端 `message.part.delta` 进来时，reducer 找对应的 part，找不到就丢。**丢的不是内容，是状态机里还不存在的 part**——这部分内容在 REST 快照的 `text` 字段里已经凝固好了。
 
@@ -227,25 +184,7 @@ sequenceDiagram
 
 把上面所有规则串到一起，就是最终的数据流：
 
-```
-   写入路径                          前端 Store              渲染
-   ┌──────────────────┐
-   │  REST /sessions/:id│── reconcile(key:id) ──┐
-   │  (全量快照)        │                       │
-   └──────────────────┘                       ▼
-                                       ┌────────────────┐
-   ┌──────────────────┐                │  messages[id]  │
-   │  SSE /agent/stream│── append delta ─▶│  part.id 索引  │──┐
-   │  (增量 delta)     │                └────────────────┘  │
-   └──────────────────┘                       ▲             │
-                                             │             ▼
-   ┌──────────────────┐   mergeOptimisticPage │      ┌────────────┐
-   │  用户输入         │─────────────────────┘       │ Chat / Side│
-   │  (乐观插入)       │                              │ bar 渲染   │
-   └──────────────────┘                              └────────────┘
-
-   三条写入路径都汇入同一份 store，靠 part.id 自然去重
-```
+![三条写入路径汇入 store](/images/blog/one-sse-stream-multiple-agents/03-three-streams-store.webp)
 
 三条写入路径都收敛到同一个 store，靠 `reconcile({key:"id"})` 和 `part.id` 自然合并。Chat 页和 Sidebar 都是这个 store 的纯订阅者，谁也不会因为别人没挂、没渲染而漏写。
 
