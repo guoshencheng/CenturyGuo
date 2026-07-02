@@ -7,7 +7,7 @@
 - **类型**：个人静态博客
 - **线上地址**：[blog.shemu.top](https://blog.shemu.top)
 - **栈**：Astro 5 SSG · TypeScript strict · 自写 CSS Design System · GitHub Pages + Actions · Shiki
-- **作者署名**：Guo Shencheng (`guoshencheng@shemu.top`)
+- **作者署名**：Century Guo (`guoshencheng@shemu.top`)
 - **不在栈内**：UI 框架（React/Vue）、Tailwind、CSS-in-JS、测试框架（jest/vitest）。需要测试用 Node 22+ 原生 `node --test`。
 
 ## 红线（违反会破坏构建或线上行为）

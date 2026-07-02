@@ -1,4 +1,4 @@
-const DEFAULT_AUTHOR = "Guo Shencheng";
+const DEFAULT_AUTHOR = "Century Guo";
 const SITE_URL = "https://blog.shemu.top";
 
 export function absoluteUrl(path: string, site: URL): string {

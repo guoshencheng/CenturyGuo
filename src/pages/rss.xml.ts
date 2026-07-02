@@ -8,17 +8,17 @@ export async function GET(context: APIContext) {
 
   return rss({
     title: "Century's World",
-    description: "guoshencheng's personal blog",
+    description: "Century Guo's personal blog",
     site: context.site ?? "https://blog.shemu.top",
     items: posts.map((post) => ({
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.date,
       link: `/posts/${post.slug}`,
-      author: "guoshencheng@shemu.top (Guo Shencheng)",
+      author: "guoshencheng@shemu.top (Century Guo)",
     })),
     customData: `<language>zh-CN</language>
-<managingEditor>guoshencheng@shemu.top (Guo Shencheng)</managingEditor>
-<webMaster>guoshencheng@shemu.top (Guo Shencheng)</webMaster>`,
+<managingEditor>guoshencheng@shemu.top (Century Guo)</managingEditor>
+<webMaster>guoshencheng@shemu.top (Century Guo)</webMaster>`,
   });
 }
