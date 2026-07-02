@@ -10,13 +10,28 @@ export async function getStaticPaths() {
   const posts = await getCollection("blog");
   return posts.map((post) => ({
     params: { slug: post.slug },
-    props: { post },
+    props: { post, all: posts },
   }));
 }
 
-const { post } = Astro.props;
-const { title, date, tags, description } = post.data;
+const { post, all } = Astro.props;
+const { title, date, tags, description, faq } = post.data;
 const { Content } = await post.render();
+
+const tagSet = new Set(tags);
+const related = all
+  .filter((p) => p.slug !== post.slug)
+  .map((p) => ({
+    post: p,
+    overlap: p.data.tags.filter((t) => tagSet.has(t)).length,
+  }))
+  .filter((entry) => entry.overlap > 0)
+  .sort((a, b) => {
+    if (b.overlap !== a.overlap) return b.overlap - a.overlap;
+    return b.post.data.date.getTime() - a.post.data.date.getTime();
+  })
+  .slice(0, 3)
+  .map((entry) => entry.post);
 ---
 
 <Base
@@ -28,6 +43,15 @@ const { Content } = await post.render();
     publishedTime: date,
     tags,
     image: extractFirstImage(post.body),
+    body: post.body,
+    faqs: post.data.faq,
+    person: {
+      name: "郭申成",
+      alternateName: "Guo Shencheng",
+      jobTitle: "全栈工程师",
+      knowsAbout: ["LLM Agent", "Node", "React", "架构设计"],
+      sameAs: ["https://github.com/guoshencheng"],
+    },
   }}
 >
   <Card prompt={`> CENTURY_GUO:/posts/${post.slug}`}>
@@ -58,6 +82,36 @@ const { Content } = await post.render();
       <div class="article-body">
         <Content />
       </div>
+
+      {faq && faq.length > 0 && (
+        <section class="article-faq">
+          <h2 class="article-faq__title">常见问题</h2>
+          {faq.map((item) => (
+            <details class="article-faq__item" open>
+              <summary class="article-faq__q">{item.q}</summary>
+              <p class="article-faq__a">{item.a}</p>
+            </details>
+          ))}
+        </section>
+      )}
+
+      {related.length > 0 && (
+        <aside class="article-related">
+          <h2 class="article-related__title">延伸阅读</h2>
+          <ul class="article-related__list">
+            {related.map((p) => (
+              <li class="article-related__item">
+                <a href={`/posts/${p.slug}`} class="article-related__link">
+                  {p.data.title}
+                </a>
+                <span class="article-related__date">
+                  {formatDate(p.data.date)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
 
       <footer class="article-footer">
         <a href="/" class="article-back">cd ~/posts/</a>
@@ -134,6 +188,112 @@ const { Content } = await post.render();
 
   .article-body {
     margin-top: var(--space-xl);
+  }
+
+  .article-faq {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: var(--border);
+  }
+
+  .article-faq__title {
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-md);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+  }
+
+  .article-faq__item {
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: var(--space-sm) var(--space-md);
+    margin-bottom: var(--space-sm);
+    background: var(--color-bg);
+  }
+
+  .article-faq__item[open] {
+    border-color: var(--color-link);
+  }
+
+  .article-faq__q {
+    cursor: pointer;
+    color: var(--color-link);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    font-weight: 600;
+    list-style: none;
+    padding: var(--space-xs) 0;
+  }
+
+  .article-faq__q::-webkit-details-marker {
+    display: none;
+  }
+
+  .article-faq__q::before {
+    content: "▸ ";
+    color: var(--color-accent);
+    display: inline-block;
+    transition: transform 0.15s;
+  }
+
+  .article-faq__item[open] .article-faq__q::before {
+    content: "▾ ";
+  }
+
+  .article-faq__a {
+    margin: var(--space-sm) 0 0;
+    padding-left: var(--space-md);
+    color: var(--color-text);
+    line-height: 1.7;
+    border-left: 2px solid var(--color-border);
+  }
+
+  .article-related {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: var(--border);
+  }
+
+  .article-related__title {
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-md);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+  }
+
+  .article-related__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .article-related__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .article-related__link {
+    color: var(--color-link);
+    text-decoration: none;
+    font-size: var(--text-base);
+  }
+
+  .article-related__link:hover {
+    color: var(--color-link-hover);
+    text-decoration: underline;
+  }
+
+  .article-related__date {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    flex-shrink: 0;
   }
 
   .article-footer {

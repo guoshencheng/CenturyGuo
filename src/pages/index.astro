@@ -13,21 +13,40 @@ const posts = (await getCollection("blog"))
   isHome
   terminalTitle="century@blog:~/posts"
   seo={{
-    title: "Posts",
-    description: "guoshencheng's personal blog — Retro Terminal style",
+    title: "Agent、流式与架构笔记",
+    description: "郭申成的个人博客 — 记录 Agent、流式、架构与代码取舍",
     type: "website",
+    person: {
+      name: "郭申成",
+      alternateName: "Guo Shencheng",
+      jobTitle: "全栈工程师",
+      knowsAbout: ["LLM Agent", "Node", "React", "架构设计"],
+      sameAs: ["https://github.com/guoshencheng"],
+    },
   }}
 >
   <Hero />
 
   <Card>
-    {posts.length === 0 ? (
-      <p class="home-empty">
-        No posts yet. <span class="home-cursor">█</span>
+    <section class="about">
+      <h2 class="about__title">关于这个博客</h2>
+      <p class="about__body">
+        我是郭申成，全栈工程师。这里记录我读源码、做项目时的取舍——不是教程，是思考过程。
       </p>
-    ) : (
-      posts.map((post) => <PostCard post={post} />)
-    )}
+      <p class="about__body">
+        关注领域：LLM Agent 架构、SSE/流式协议、桌面应用性能。
+      </p>
+    </section>
+
+    <div class="home-list">
+      {posts.length === 0 ? (
+        <p class="home-empty">
+          No posts yet. <span class="home-cursor">█</span>
+        </p>
+      ) : (
+        posts.map((post) => <PostCard post={post} />)
+      )}
+    </div>
   </Card>
 </Base>
 
@@ -41,6 +60,31 @@ const posts = (await getCollection("blog"))
   .home-cursor {
     color: var(--color-link);
     animation: blink 1s step-end infinite;
+  }
+
+  .about {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: var(--border);
+  }
+
+  .about__title {
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-sm);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+  }
+
+  .about__body {
+    margin: var(--space-sm) 0 0;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    line-height: 1.7;
+  }
+
+  .home-list {
+    display: flex;
+    flex-direction: column;
   }
 
   @keyframes blink {

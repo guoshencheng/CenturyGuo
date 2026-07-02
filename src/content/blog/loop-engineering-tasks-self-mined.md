@@ -3,6 +3,15 @@ title: "当 Agent 不再等你拍板"
 date: "2026-06-22"
 tags: [loop-engineering, agent, llm]
 description: 'Loop Engineering 真正改的不是 Agent,是把"该做什么"也交给了系统。'
+faq:
+  - q: Loop Engineering 是什么？跟"加个 cron 定时跑 Agent"有什么区别？
+    a: Loop Engineering 不是"加 cron"。它真正翻转的是 Agent 时代的 5 个默认前提：任务不再由人选、Prompt 不再由人写、启动不再靠按键、完成度不再由人判、记忆不止于会话。一个孤零零的 cron 只是个闹钟，闹钟加发现规则、加生成器、加执行器、加验证器、加状态文件，才是一个 Loop。Addy Osmani 给的定义里，Loop 由 trigger / discovery / generation / execution / verification / memory 六步闭环组成。
+  - q: Karpathy 700 次超参实验和 Shopify 37 次实验是 Loop Engineering 吗？
+    a: 不是。Karpathy 用 Python 写了个 `for` 循环跑超参数，参数范围手写的，跑完没跑完看一眼就懂。Shopify CEO Tobi Lütke 的 37 次实验也是同一范式，所有参数、所有 prompt、所有终止条件都是人硬编码。它们是脚本自动化，不是 Loop。脚本不会自己发现"下一个该跑什么实验"，不会读上一次的失败日志调整策略，不会跨 session 记忆你是谁。Loop 和脚本循环的最大差别：脚本的每一行都是人写的，Loop 的"每一行任务"是系统自己识别并生成的。
+  - q: 完成度判定为什么不能让 Agent 自己判？
+    a: 因为 Agent 太擅长给自己打分了。Loop 的做法是拆出独立的"判官"——Addy Osmani 在 `/goal` 命令定义里强调，每轮跑完后会有一个独立的小模型去检查终止条件是否满足，写代码的那个 Agent 自己不参与判定。Maker 和 Checker 必须分开。Claude Code 团队 Boris Cherny 的原话："I don't prompt Claude anymore. I have loops running. They're the ones that are prompting Claude and figuring out what to do. My job is to write loops."
+  - q: Loop Engineering 的代价是什么？
+    a: 两条代价：(1) comprehension debt 理解债务——代码库在涨，工程师的认知在掉；(2) cognitive surrender 认知缴械——循环太舒服，干脆不思考，按"通过"就行。Osmani 结尾："Two people can build the exact same loop and get completely opposite results. One uses it to move faster on work they understand deeply. The other uses it to avoid understanding the work at all. The loop doesn't know the difference. You do." 即使拆 Maker/Checker 两个子 Agent，"做完了"也是系统声明的，不是证明的——验证最终还是得人来完成。
 ---
 
 # 当 Agent 不再等你拍板

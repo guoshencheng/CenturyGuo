@@ -3,6 +3,13 @@ title: "Egg中的错误处理"
 date: "2019-01-09"
 tags: ["node", "egg"]
 description: "在文档中，明确的指出统一的错误处理是依靠一个onerror的插件来完成的，这个插件也是egg官方的一个默认开启的插件，官方提到会根据content-negotiation来判断具体的返回会使用JSON数据或者是一个html页面。我们可以自己启动一个server来验证一下，当..."
+faq:
+  - q: Egg 框架默认怎么统一处理错误？
+    a: Egg 官方通过 onerror 插件做统一错误处理，默认开启。根据 content-negotiation 判断返回 JSON 还是 HTML：如果 Accept 头是 application/json，或者 URL 以 .json 结尾，返回 JSON 数据；否则返回 HTML 错误页。底层是 koa-onerror 重写 app.context.onerror，执行 accepts('html', 'text', 'json') 判断请求期望返回什么类型。
+  - q: 为什么设 Content-Type 设成 application/json 没拿到 JSON？
+    a: 因为是 Accept 头决定返回类型，不是 Content-Type。Content-Type 是请求体的格式声明，跟服务端返回什么无关——egg/koa-onerror 的判定逻辑是读 ctx.accepts()。很多人误以为设 Content-Type 就能拿到 JSON，最终得到的还是 HTML 错误页，这个坑文档里没明确写。
+  - q: Egg onerror 自定义怎么处理 all 回调？
+    a: 如果定义了 all 处理函数，content-negotiation 的所有分支都走它。但有个坑：只有返回 type 为 json 时才会在最后执行 this.body = JSON.stringify(this.body)，所以 all 中的返回需要自行处理成字符串或流。其余情况（html / text）从 options[type] 对应的处理函数调用，除了 json 能返回对象外，其他都应该返回字符串或流，否则会序列化失败。
 ---
 
 > 在实现WebServer的过程中，错误处理是一个必不可少的过程，提供优雅的兜底处理是所有Web框架需要解决的事情，Egg在[官方文档中](https://eggjs.org/zh-cn/core/error-handling.html)提到错误处理，除了自行`try catch`之外还会有统一的错误处理。

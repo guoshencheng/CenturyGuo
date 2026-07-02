@@ -3,6 +3,15 @@ title: "流式，Agent 的神经系统"
 date: "2026-06-16"
 tags: [agent, streaming, llm]
 description: "最近做的一个 Agent 项目里，流式输出能力补全的实现总结。"
+faq:
+  - q: Agent 流式输出为什么要拆成 3 层？
+    a: Provider 层把 OpenAI、Anthropic 等 SDK 的原始流解析成统一的 StreamChunk；Engine 层在 infer 里归一化并处理 reasoning 标签分区；Agent Stream 层把 chunk 加工成带边界的 OutputChunk。不同 SDK 协议差异（OpenAI 的 delta.content/delta.tool_calls/chunk.usage vs Anthropic 的 text_delta/thinking_delta/tool_use）被压在 Provider 层，UI 不感知。统一 chunk 类型涵盖 text / reasoning / tool-call / usage / finish 五类。
+  - q: 多步 ReAct 循环应该产生多个 assistant message 还是一个？
+    a: 应该是一个。一次用户输入只产生一个 assistant message，多步 loop 的所有内容累加到同一个 message 里。早期多 message 方案有三个问题：流式体验断裂（用户看到 assistant 回答一半停了又出现第二条回答）；语义不对（一次用户输入对应一次 assistant 回复是对话基本单元）；下游渲染复杂（同一轮多个 assistant bubble，状态管理、打字机、思考块折叠都乱）。
+  - q: 单 message 怎么容纳"输出文字 → 调用工具 → 拿到结果 → 再输出文字"这种交错结构？
+    a: 用 parts 抽象。一次模型响应由多个 part 组成：text / reasoning / tool-call / tool-result。流控制器 append 在切换内容类型时自动补全 start / finish 边界，UI 拿到带边界的 chunk 后按 part 渲染：文本打字机、reasoning 折叠、tool-call 卡片。一次用户请求对应的会话结构：user → assistant（多 parts）→ tool → tool。
+  - q: 多轮会话中 parts 怎么还原成 Provider 需要的 message 格式？
+    a: provider 适配层做一次性还原。OpenAI 的 assistant message 是 content + tool_calls 数组，工具结果是 role 为 'tool' 且带 tool_call_id；Anthropic 的 assistant message 是 content blocks 含 text 和 tool_use，工具结果是 user message 里的 tool_result block。内部状态永远用 parts；调用模型前通过 provider 做还原；还原失败的问题被限制在 provider 层，不污染 core 循环逻辑。OpenAI 要求 tool_calls 和后面 tool 消息一一对应，Anthropic 要求 tool_use 的 id 和 tool_result 的 tool_use_id 对齐。
 ---
 
 # 流式，Agent 的神经系统

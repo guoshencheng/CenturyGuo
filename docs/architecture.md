@@ -66,7 +66,8 @@
 │   │   ├── posts/[slug].astro   # /posts/<slug>
 │   │   ├── tags.astro           # /tags
 │   │   ├── tags/[tag].astro     # /tags/<tag>
-│   │   └── rss.xml.ts           # /rss.xml（动态生成）
+│   │   ├── rss.xml.ts           # /rss.xml（动态生成）
+│   │   └── llms.txt.ts          # /llms.txt（LLM 友好的站点摘要，Jeremy Howard 协议）
 │   ├── styles/
 │   │   ├── tokens.css           # 设计 token（颜色 / 字体 / 间距 / 圆角）
 │   │   ├── base.css             # 全局 reset + a11y（focus-visible / skip-link / img 兜底）
@@ -94,6 +95,7 @@
 | `/tags/<tag>` | `src/pages/tags/[tag].astro` | website | `website` |
 | `/rss.xml` | `src/pages/rss.xml.ts` | — | — |
 | `/sitemap-index.xml` | `@astrojs/sitemap` 自动生成 | — | — |
+| `/llms.txt` | `src/pages/llms.txt.ts` | — | — |
 | `/robots.txt` | `public/robots.txt` 静态复制 | — | — |
 
 所有页面**必须**经 `<Base seo={...}>` 布局。`Base.astro` 是唯一 HTML 外壳——`<head>`、`<body>`、Umami 脚本、a11y 跳过链接、导航、Terminal 容器全部在这里。**不要绕开它。**
@@ -109,6 +111,7 @@ const blogCollection = defineCollection({
     date: z.coerce.date(),
     tags: z.array(z.string()).default([]),
     description: z.string(),   // ← 必填，缺了直接构建失败
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
   }),
 });
 ```
@@ -120,12 +123,15 @@ const blogCollection = defineCollection({
 - RSS item `<description>`
 - 文章详情页 article-desc
 
+`faq` 字段（可选）：文章页 frontmatter 里加 `faq: [{ q, a }, ...]`，会自动注入 `FAQPage` JSON-LD，提升 AI 答案引用率（GEO 优化点）。
+
 ## 6. SEO 流水线
 
 ```
 页面（index.astro / posts/[slug].astro / …）
   │
-  │  seo={{ title, description, type, publishedTime, tags, image }}
+  │  seo={{ title, description, type, publishedTime, tags, image,
+  │         body, faqs, person }}
   ▼
 Base.astro 接收 seo prop
   │
@@ -138,14 +144,20 @@ SeoHead.astro 渲染：
   ├─ article:* (published_time / modified_time / author / tag) ← 仅 type==="article"
   ├─ <link rel="sitemap" href="/sitemap-index.xml">
   └─ <script type="application/ld+json">
-        └─ BlogPosting（文章页）/ WebSite（首页、标签页）
+        ├─ BlogPosting（文章页）/ WebSite（首页、标签页）
+        ├─ Person（可选：跨平台身份聚合，sameAs 数组）← 文章页与首页都传
+        └─ FAQPage（可选：frontmatter faq 字段非空时）← 仅文章页
 ```
 
 OG 图片优先级：`seo.image` → 首张 `![](path)`（通过 `extractFirstImage(post.body)`）→ `public/og-default.png` 兜底。
 
 JSON-LD 由 `src/utils/seo.ts` 里的纯函数生成：
-- `buildBlogPostingJsonLd({...})` — 文章页
+- `buildBlogPostingJsonLd({...})` — 文章页，含 `inLanguage: 'zh-CN'` 和 `articleBody`（从 markdown 提取前 280 字符纯文本）
 - `buildWebSiteJsonLd({...})` — 首页与标签页
+- `buildPersonJsonLd({...})` — 跨平台身份，可传 `sameAs: [GitHub, ...]`、`knowsAbout: [...]`、`jobTitle`
+- `buildFaqJsonLd([{q, a}, ...])` — 文章页 FAQ，frontmatter 有 `faq` 字段才注入
+
+`/llms.txt`（LLM 友好的站点摘要）由 `src/pages/llms.txt.ts` 动态生成，遵循 [Jeremy Howard llms.txt 规范](https://llmstxt.org/)：H1 + blockquote 简介 + `## Posts` 列出全部文章（带 140 字摘要）+ `## Tags` + `## Optional`（RSS / sitemap 链接）。Perplexity、Answer.AI 等已部分支持。
 
 RSS 在 `src/pages/rss.xml.ts` 增强：每个 item 带 `<author>`，channel 带 `<managingEditor>` 和 `<webMaster>`。
 

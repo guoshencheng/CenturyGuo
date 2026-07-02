@@ -15,9 +15,10 @@
 1. **不要改 `astro.config.ts` 里的 `site`** — 现为 `https://blog.shemu.top`，与 `public/CNAME`、`robots.txt`、SEO 工具中的 `SITE_URL` 三处硬绑定。改了会导致 sitemap/RSS/OG/canonical 全部指错域。
 2. **不要删 `public/CNAME`** — 没有它 GitHub Pages 不知道绑哪个自定义域名。
 3. **不要给博文 frontmatter 漏 `description`** — schema 必填。`src/content/config.ts` 用 `z.string()` 校验，缺了直接构建失败。这字段同时驱动卡片副标题、列表摘要、`og:description`、Twitter Card、RSS description。
-4. **新页面必须经 `Base.astro` 布局 + 传 `seo` prop** — 不要绕开 `Base` 自己写 `<head>`，否则会绕过 skip-link、Umami 统计、SEO meta 一致性。
+4. **新页面必须经 `Base.astro` 布局 + 传 `seo` prop** — 不要绕开 `Base` 自己写 `<head>`，否则会绕过 skip-link、Umami 统计、SEO meta 一致性。`seo` prop 透传给 `SeoHead`，`person` 字段含 `sameAs`（跨平台 profile 链接列表）必须跟 `src/pages/index.astro` 保持一致；`body` / `faqs` 字段直接来自 `post.data` / `post.body`。
 5. **图片 `alt` 不能为空** — `rehype-img-lazy` 插件会在 build 时 `console.warn` 缺 alt 的 `<img>`。首张 `![](path)` 会自动作为 OG 图。
 6. **不要加 npm 依赖除非真的必要** — 当前依赖固定在 `package.json`。新依赖必须 review 体积、维护状态、与 Astro 5 兼容性。
+7. **不要删 `/llms.txt` 端点** — `src/pages/llms.txt.ts` 动态生成 LLM 友好的站点摘要（Jeremy Howard 协议）。`BlogPosting` JSON-LD、OG、Twitter Card 是给 Google / 社交平台看的，`/llms.txt` 是给 AI 答案检索用的——GSC 不收录，但 Perplexity / Answer.AI / 未来更多 LLM 会读。
 
 ## 命令速查
 
@@ -46,7 +47,7 @@
 ## 写新博文时
 
 1. 在 `src/content/blog/<slug>.md` 建文件（slug 与文件名对应）
-2. frontmatter 必填：`title`、`date`、`tags`、`description`
+2. frontmatter 必填：`title`、`date`、`tags`、`description`；**推荐加 `faq`**（`[{q, a}, ...]`）会自动注入 FAQPage JSON-LD，提升 AI 答案引用率
 3. 正文首张 `![](path)` 会自动作 OG 图（如需单独 OG，传入 `seo.image` 覆盖）
 4. 本地跑 `npm run dev` 看效果，`npm run build` 验证 SSG 完整通过
 5. push 到 `master` 触发自动部署

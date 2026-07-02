@@ -3,6 +3,15 @@ title: "一根 SSE 总管，撑起整个 Agent 流式"
 date: "2026-07-01"
 tags: [agent, streaming, sse, architecture]
 description: "调研 OpenCode 源码后对自己项目流式设计的反思——多 Agent 同时跑不需要 N 条连接，一条共享广播 + REST 快照兜底，是更简洁也更诚实的选择。"
+faq:
+  - q: 多 Agent 同时跑，需要开几条 SSE 长连接？
+    a: 一条就够。后端用一个进程级 EventEmitter（如 OpenCode 的 GlobalBus）全量广播所有 session 事件，前端在内存里按 sessionID demux。N 个 Agent 同时跑对应 N 份虚拟 channel，但连接数始终是 1。
+  - q: 为什么浏览器同 origin 只能开 6 条并发？
+    a: 这是 HTTP/1.1 规范的历史遗留限制（见 RFC 7230 §6.4），Chrome、Firefox、Safari 等主流浏览器对同一 origin 的 HTTP/1 并发上限默认是 6。HTTP/2 多路复用可以缓解，但 SSE 这类长连接仍会各占一格名额，移动端更紧。
+  - q: SSE 断线后怎么续传？为什么不用 Last-Event-ID？
+    a: 续接点不是事件序号，是字符串拼接。HTTP 规范里的 Last-Event-ID 看起来很美，但 OpenCode 没实现——它选择 REST 快照拿完整状态、SSE 只发增量 delta，前端用 reconcile({key:"id"}) 合并两者。幂等靠 part.id，不靠事件序。重连后从 REST 重拉快照、SSE delta 当增量往上 append。
+  - q: OpenCode 的前端怎么消费一条共享 SSE？
+    a: 分三段：第一步 for await 循环把流切 chunk 推进 queue；第二步 16ms 一帧按 (messageID, partID, field) 合并 delta，15s 没心跳就 abort 重连；第三步 reducer listener 按 directory 路由到对应 child-store，再细分到 per-event-type 分发给各 UI Provider。整个管线只有第一步开网络流，其他都在内存里派发。
 ---
 
 # 一根 SSE 总管，撑起整个 Agent 流式

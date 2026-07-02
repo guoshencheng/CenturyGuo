@@ -1,8 +1,11 @@
 ---
 import {
   buildBlogPostingJsonLd,
+  buildFaqJsonLd,
   buildOgImage,
+  buildPersonJsonLd,
   buildWebSiteJsonLd,
+  extractArticleBody,
   truncateDescription,
 } from "../utils/seo";
 
@@ -17,6 +20,15 @@ export interface Props {
   image?: string;
   imageAlt?: string;
   noindex?: boolean;
+  body?: string;
+  faqs?: Array<{ q: string; a: string }>;
+  person?: {
+    name: string;
+    alternateName?: string;
+    jobTitle?: string;
+    knowsAbout?: string[];
+    sameAs?: string[];
+  };
 }
 
 const {
@@ -30,6 +42,9 @@ const {
   image,
   imageAlt,
   noindex = false,
+  body,
+  faqs,
+  person,
 } = Astro.props;
 
 const site = Astro.site ?? new URL("https://blog.shemu.top");
@@ -43,7 +58,9 @@ const ogImageAlt = imageAlt ?? og.alt;
 
 const safeDescription = truncateDescription(description);
 
-const jsonLd =
+const articleBody = type === "article" && body ? extractArticleBody(body) : undefined;
+
+const mainJsonLd =
   type === "article"
     ? buildBlogPostingJsonLd({
         title,
@@ -54,6 +71,8 @@ const jsonLd =
         author,
         tags,
         imageUrl: og.url,
+        inLanguage: "zh-CN",
+        articleBody,
       })
     : buildWebSiteJsonLd({
         siteName: siteTitle,
@@ -61,6 +80,22 @@ const jsonLd =
         siteUrl: site.href,
         authorName: author,
       });
+
+const personJsonLd = person
+  ? buildPersonJsonLd({
+      name: person.name,
+      url: site.href,
+      alternateName: person.alternateName,
+      jobTitle: person.jobTitle,
+      knowsAbout: person.knowsAbout,
+      sameAs: person.sameAs,
+    })
+  : undefined;
+
+const faqJsonLd =
+  type === "article" && faqs && faqs.length > 0
+    ? buildFaqJsonLd(faqs)
+    : undefined;
 ---
 
 <title>{fullTitle}</title>
@@ -105,4 +140,10 @@ const jsonLd =
 
 <link rel="sitemap" href="/sitemap-index.xml" />
 
-<script type="application/ld+json" set:html={jsonLd} />
+<script type="application/ld+json" set:html={mainJsonLd} />
+{personJsonLd && (
+  <script type="application/ld+json" set:html={personJsonLd} />
+)}
+{faqJsonLd && (
+  <script type="application/ld+json" set:html={faqJsonLd} />
+)}

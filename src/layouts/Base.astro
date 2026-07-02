@@ -18,6 +18,15 @@ export interface Props {
     author?: string;
     tags?: string[];
     noindex?: boolean;
+    body?: string;
+    faqs?: Array<{ q: string; a: string }>;
+    person?: {
+      name: string;
+      alternateName?: string;
+      jobTitle?: string;
+      knowsAbout?: string[];
+      sameAs?: string[];
+    };
   };
 }
 

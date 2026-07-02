@@ -3,6 +3,15 @@ title: "Token 烧得太快，是因为 Agent 没吃上缓存"
 date: "2026-06-24"
 tags: [llm, agent, cache, 排查]
 description: "平时用各种模型工具跑任务，感觉 token 消耗挺快。社交媒体上有人提到，可能是 token 的缓存机制没用上。联想到自己也在做 Agent，就把这件事系统查了一遍——原理、各家厂商机制、和 Agent 场景里常见的几个反模式。"
+faq:
+  - q: LLM 缓存读取价是原价的多少？各厂商机制一样吗？
+    a: 不一样。Anthropic 缓存读取是原价 10%；DeepSeek 命中价最低，是未命中的 1/120。但触发方式分两类：Anthropic、Gemini、Kimi 需要手动加 cache_control 字段（显式）；OpenAI、DeepSeek、Qwen、GLM 隐式自动检测 prefix，零配置。Anthropic 还提供 5min（写入费 1.25x）和 1h（写入费 2x）两种 TTL。
+  - q: LLM 缓存的 prefix 必须完全一样吗？差一个空格会怎样？
+    a: 必须字节级完全一样。`{"a":1,"b":2}` 和 `{"b":2,"a":1}` 字段顺序换了、换行符 `\n` 变 `\r\n`、多一个空格、工具数组换个顺序——这些都会让命中率从 90% 直接归零。修法是 `json.dumps(..., ensure_ascii=False, sort_keys=True, separators=(",", ":"))` 锁序列化，文本入库前 `unicodedata.normalize("NFC", text)` 归一化。
+  - q: Claude Code 缓存命中率从 97% 跌到多少？什么原因？
+    a: 2026 年 3 月 Claude Code 团队出过 Bug，工具定义列表顺序因非确定性算法变动，缓存读取率从 97% 跌到 4-17%，有开发者一晚上烧掉 43% 的周配额。根因是工具数组根据用户权限动态过滤、字段顺序取决于字典迭代，两种写法都会让整个 tools 段失效。修法是工具定义用 sort_keys 序列化，权限差异挪到 system prompt 说明，不再靠删 tool 体现。
+  - q: Agent 场景为什么特别容易破坏 LLM 缓存？
+    a: 三个高频反模式：(1) 动态内容进 system prompt（session_id、current_time、UUID）；(2) 工具定义顺序不固定；(3) RAG 检索结果塞 system——检索结果每次 query 都不同，破坏 prefix 稳定性。修法分别是：动态信息挪到 user message 末尾、工具用 sort_keys 序列化、检索结果放 user message 或在 Anthropic 模式下用 cache_control 做独立断点缓存。Agent 调用频率是"人点一下"的成千上万倍，这些小 Bug 的代价会被放大到无法忽视。
 ---
 
 # Token 烧得太快，是因为 Agent 没吃上缓存
