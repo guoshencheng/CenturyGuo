@@ -1,4 +1,4 @@
-# Century's World
+# Duluu's World
 
 > Personal blog source for [blog.shemu.top](https://blog.shemu.top) (legacy mirror at [guoshencheng.com](https://guoshencheng.com)).
 

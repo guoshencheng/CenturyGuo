@@ -28,9 +28,9 @@ export async function GET(context: APIContext) {
   }
 
   const lines: string[] = [
-    "# Century's World",
+    "# Duluu's World",
     "",
-    "> Century Guo 的个人博客 — 记录 Agent、流式、架构与代码取舍",
+    "> Duluu Guo 的个人博客 — 记录 Agent、流式、架构与代码取舍",
     "> 关注领域：LLM Agent 架构、SSE/流式协议、桌面应用性能",
     "",
     "## Posts",

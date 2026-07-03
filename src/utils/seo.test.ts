@@ -99,14 +99,14 @@ test("buildBlogPostingJsonLd: 必需字段都输出", () => {
     description: "World",
     url: "https://blog.shemu.top/posts/hello",
     publishedTime: new Date("2026-01-01T00:00:00Z"),
-    author: "Century Guo",
+    author: "Duluu Guo",
     tags: ["a", "b"],
     imageUrl: "https://blog.shemu.top/og-default.png",
   });
   const parsed = JSON.parse(json);
   assert.equal(parsed["@type"], "BlogPosting");
   assert.equal(parsed.headline, "Hello");
-  assert.equal(parsed.author.name, "Century Guo");
+  assert.equal(parsed.author.name, "Duluu Guo");
   assert.equal(parsed.keywords, "a,b");
   assert.equal(parsed.datePublished, "2026-01-01T00:00:00.000Z");
 });
@@ -127,15 +127,15 @@ test("buildBlogPostingJsonLd: 缺 title 抛 Error", () => {
 
 test("buildWebSiteJsonLd: 输出 WebSite schema", () => {
   const json = buildWebSiteJsonLd({
-    siteName: "Century's World",
+    siteName: "Duluu's World",
     description: "personal blog",
     siteUrl: "https://blog.shemu.top",
-    authorName: "Century Guo",
+    authorName: "Duluu Guo",
     authorUrl: "https://blog.shemu.top",
   });
   const parsed = JSON.parse(json);
   assert.equal(parsed["@type"], "WebSite");
-  assert.equal(parsed.name, "Century's World");
+  assert.equal(parsed.name, "Duluu's World");
   assert.equal(parsed.inLanguage, "zh-CN");
   assert.equal(parsed.author["@type"], "Person");
 });
@@ -202,7 +202,7 @@ test("buildBlogPostingJsonLd: 传入 inLanguage 和 articleBody", () => {
     description: "World",
     url: "https://blog.shemu.top/posts/hello",
     publishedTime: new Date("2026-01-01T00:00:00Z"),
-    author: "Century Guo",
+    author: "Duluu Guo",
     tags: ["a"],
     imageUrl: "https://blog.shemu.top/og-default.png",
     inLanguage: "zh-CN",
@@ -226,18 +226,18 @@ test("buildBlogPostingJsonLd: 不传 inLanguage 时不输出字段", () => {
 
 test("buildPersonJsonLd: 必填字段输出", () => {
   const json = buildPersonJsonLd({
-    name: "Century Guo",
+    name: "Duluu Guo",
     url: "https://blog.shemu.top",
   });
   const parsed = JSON.parse(json);
   assert.equal(parsed["@type"], "Person");
-  assert.equal(parsed.name, "Century Guo");
+  assert.equal(parsed.name, "Duluu Guo");
   assert.equal(parsed.url, "https://blog.shemu.top");
 });
 
 test("buildPersonJsonLd: 可选字段缺省时不输出", () => {
   const json = buildPersonJsonLd({
-    name: "Century Guo",
+    name: "Duluu Guo",
     url: "https://blog.shemu.top",
   });
   const parsed = JSON.parse(json);
@@ -249,7 +249,7 @@ test("buildPersonJsonLd: 可选字段缺省时不输出", () => {
 
 test("buildPersonJsonLd: knowsAbout 和 sameAs 数组正确传递", () => {
   const json = buildPersonJsonLd({
-    name: "Century Guo",
+    name: "Duluu Guo",
     url: "https://blog.shemu.top",
     jobTitle: "全栈工程师",
     knowsAbout: ["LLM Agent", "Node", "React", "架构设计"],

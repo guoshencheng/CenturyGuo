@@ -1,4 +1,4 @@
-const DEFAULT_AUTHOR = "Century Guo";
+const DEFAULT_AUTHOR = "Duluu Guo";
 const SITE_URL = "https://blog.shemu.top";
 
 export function absoluteUrl(path: string, site: URL): string {
@@ -77,7 +77,7 @@ export function buildOgImage(props: {
     url,
     width: 1200,
     height: 630,
-    alt: "Century's World — Agent、流式与架构笔记",
+    alt: "Duluu's World — Agent、流式与架构笔记",
   };
 }
 
