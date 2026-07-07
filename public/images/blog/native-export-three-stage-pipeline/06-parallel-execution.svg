@@ -1,0 +1,99 @@
+<svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <text x="450" y="30" text-anchor="middle" font-size="17" font-weight="600" fill="#1e293b">并行执行：3 帧在 3 段同时处理</text>
+  <text x="450" y="52" text-anchor="middle" font-size="12" fill="#64748b">每帧解码 0.1s · GPU 2.3s · 编码 0.6s（示意；实际是 ms 量级，这里按 1:10 放大）</text>
+
+  <!-- Time axis -->
+  <line x1="100" y1="380" x2="860" y2="380" stroke="#cbd5e1" stroke-width="1"/>
+  <g font-size="10" fill="#94a3b8">
+    <text x="100" y="398" text-anchor="middle">0s</text>
+    <text x="180" y="398" text-anchor="middle">1s</text>
+    <text x="260" y="398" text-anchor="middle">2s</text>
+    <text x="340" y="398" text-anchor="middle">3s</text>
+    <text x="420" y="398" text-anchor="middle">4s</text>
+    <text x="500" y="398" text-anchor="middle">5s</text>
+    <text x="580" y="398" text-anchor="middle">6s</text>
+    <text x="660" y="398" text-anchor="middle">7s</text>
+    <text x="740" y="398" text-anchor="middle">8s</text>
+    <text x="820" y="398" text-anchor="middle">9s</text>
+  </g>
+  <g font-size="9" fill="#94a3b8">
+    <line x1="100" y1="380" x2="100" y2="385" stroke="#cbd5e1"/>
+    <line x1="180" y1="380" x2="180" y2="385" stroke="#cbd5e1"/>
+    <line x1="260" y1="380" x2="260" y2="385" stroke="#cbd5e1"/>
+    <line x1="340" y1="380" x2="340" y2="385" stroke="#cbd5e1"/>
+    <line x1="420" y1="380" x2="420" y2="385" stroke="#cbd5e1"/>
+    <line x1="500" y1="380" x2="500" y2="385" stroke="#cbd5e1"/>
+    <line x1="580" y1="380" x2="580" y2="385" stroke="#cbd5e1"/>
+    <line x1="660" y1="380" x2="660" y2="385" stroke="#cbd5e1"/>
+    <line x1="740" y1="380" x2="740" y2="385" stroke="#cbd5e1"/>
+    <line x1="820" y1="380" x2="820" y2="385" stroke="#cbd5e1"/>
+  </g>
+
+  <!-- 解码 lane -->
+  <g>
+    <text x="90" y="125" text-anchor="end" font-size="13" font-weight="600" fill="#1e293b">解码</text>
+    <text x="90" y="142" text-anchor="end" font-size="10" fill="#64748b">ASIC</text>
+
+    <!-- Frame 1 decode: 0-0.1s (very short, mark as 100-115) -->
+    <rect x="100" y="105" width="15" height="30" fill="#059669" opacity="0.7" rx="2"/>
+    <text x="107" y="158" text-anchor="middle" font-size="9" fill="#64748b">帧1</text>
+
+    <!-- Frame 2 decode: 0.1-0.2s -->
+    <rect x="115" y="105" width="15" height="30" fill="#059669" opacity="0.7" rx="2"/>
+    <text x="122" y="158" text-anchor="middle" font-size="9" fill="#64748b">帧2</text>
+
+    <!-- Frame 3 decode: 0.2-0.3s -->
+    <rect x="130" y="105" width="15" height="30" fill="#059669" opacity="0.7" rx="2"/>
+    <text x="137" y="158" text-anchor="middle" font-size="9" fill="#64748b">帧3</text>
+
+    <!-- Continue showing more frames compressed -->
+    <rect x="145" y="105" width="60" height="30" fill="#059669" opacity="0.4" rx="2"/>
+    <text x="175" y="125" text-anchor="middle" font-size="10" fill="white" font-weight="600">...</text>
+  </g>
+
+  <!-- GPU lane -->
+  <g>
+    <text x="90" y="220" text-anchor="end" font-size="13" font-weight="600" fill="#1e293b">GPU</text>
+    <text x="90" y="237" text-anchor="end" font-size="10" fill="#64748b">瓶颈</text>
+
+    <!-- Frame 1 GPU: 0.1-2.4s (x=115 to 330) -->
+    <rect x="115" y="200" width="215" height="30" fill="#d97706" opacity="0.7" rx="2"/>
+    <text x="222" y="220" text-anchor="middle" font-size="10" fill="white" font-weight="600">帧1 GPU（2.3s）</text>
+
+    <!-- Frame 2 GPU: 0.2-2.5s -->
+    <rect x="130" y="235" width="215" height="30" fill="#d97706" opacity="0.7" rx="2"/>
+    <text x="237" y="255" text-anchor="middle" font-size="10" fill="white" font-weight="600">帧2 GPU（2.3s）</text>
+
+    <!-- Frame 3 GPU: 0.3-2.6s -->
+    <rect x="145" y="270" width="215" height="30" fill="#d97706" opacity="0.7" rx="2"/>
+    <text x="252" y="290" text-anchor="middle" font-size="10" fill="white" font-weight="600">帧3 GPU（2.3s）</text>
+  </g>
+
+  <!-- 编码 lane -->
+  <g>
+    <text x="90" y="345" text-anchor="end" font-size="13" font-weight="600" fill="#1e293b">编码</text>
+    <text x="90" y="362" text-anchor="end" font-size="10" fill="#64748b">ASIC</text>
+
+    <!-- Frame 1 encode: 2.4-3.0s (x=330 to 410) -->
+    <rect x="330" y="325" width="65" height="30" fill="#059669" opacity="0.7" rx="2"/>
+    <text x="362" y="345" text-anchor="middle" font-size="10" fill="white" font-weight="600">帧1</text>
+
+    <!-- Frame 2 encode: 2.5-3.1s -->
+    <rect x="345" y="358" width="65" height="30" fill="#059669" opacity="0.4" rx="2"/>
+  </g>
+
+  <!-- Annotations -->
+  <g>
+    <text x="500" y="125" font-size="12" fill="#059669" font-weight="700">↑ 解码 ASIC 几乎瞬间（0.8s / 26912 帧）</text>
+    <text x="500" y="250" font-size="12" fill="#d97706" font-weight="700">↑ GPU 是瓶颈，3 帧在 GPU 队列里紧挨着</text>
+    <text x="500" y="345" font-size="12" fill="#059669" font-weight="700">↑ 编码 ASIC 等 GPU 喂，但能接住节奏</text>
+  </g>
+
+  <!-- Bottom summary -->
+  <g>
+    <line x1="100" y1="100" x2="100" y2="375" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="330" y1="100" x2="330" y2="375" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="3,3"/>
+    <text x="100" y="92" text-anchor="middle" font-size="10" fill="#64748b">t=0</text>
+    <text x="330" y="92" text-anchor="middle" font-size="10" fill="#64748b">t≈2.4s 帧1 出 GPU</text>
+  </g>
+</svg>

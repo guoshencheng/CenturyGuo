@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync, readdirSync } from "node:fs";
-import { join, basename, dirname, resolve } from "node:path";
+import { join, basename, dirname, resolve, extname } from "node:path";
 import { marked } from "marked";
+import sharp from "sharp";
 
 /**
  * Convert Astro blog markdown to WeChat-compatible HTML.
@@ -108,11 +109,11 @@ function findProjectRoot(startDir: string): string {
   return startDir;
 }
 
-function collectAndCopyImages(
+async function collectAndCopyImages(
   md: string,
   mdFileDir: string,
   outputImagesDir: string
-): ImageRef[] {
+): Promise<ImageRef[]> {
   const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
   const images: ImageRef[] = [];
   let match;
@@ -136,26 +137,41 @@ function collectAndCopyImages(
       continue;
     }
 
-    const filename = basename(src);
-    const copiedPath = join(outputImagesDir, filename);
+    const isSvg = extname(resolvedPath).toLowerCase() === ".svg";
+    // WeChat editor doesn't render SVG → rasterize to 2x PNG (retina).
+    const originalFilename = basename(src);
+    const baseForOutput = isSvg
+      ? originalFilename.replace(/\.svg$/i, ".png")
+      : originalFilename;
+    const copiedPath = join(outputImagesDir, baseForOutput);
 
     // Avoid name collisions by appending index if needed
     let uniqueCopiedPath = copiedPath;
-    let uniqueFilename = filename;
+    let uniqueFilename = baseForOutput;
     let counter = 1;
     while (
       images.some((img) => img.copiedPath === uniqueCopiedPath) ||
       existsSync(uniqueCopiedPath)
     ) {
-      const extIndex = filename.lastIndexOf(".");
-      const name = extIndex > 0 ? filename.slice(0, extIndex) : filename;
-      const ext = extIndex > 0 ? filename.slice(extIndex) : "";
+      const extIndex = baseForOutput.lastIndexOf(".");
+      const name = extIndex > 0 ? baseForOutput.slice(0, extIndex) : baseForOutput;
+      const ext = extIndex > 0 ? baseForOutput.slice(extIndex) : "";
       uniqueFilename = `${name}-${counter}${ext}`;
       uniqueCopiedPath = join(outputImagesDir, uniqueFilename);
       counter++;
     }
 
-    copyFileSync(resolvedPath, uniqueCopiedPath);
+    if (isSvg) {
+      // Convert SVG → 2x PNG via sharp (already a transitive dep of Astro).
+      // WeChat displays at ≤680px; 1360px gives crisp retina.
+      const svg = readFileSync(resolvedPath);
+      await sharp(svg, { density: 200 })
+        .resize({ width: 1360, withoutEnlargement: false })
+        .png()
+        .toFile(uniqueCopiedPath);
+    } else {
+      copyFileSync(resolvedPath, uniqueCopiedPath);
+    }
 
     images.push({
       originalPath: src,
@@ -191,7 +207,7 @@ if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
   process.exit(args.length === 0 ? 1 : 0);
 }
 
-function processMarkdownFile(inputPath: string): void {
+async function processMarkdownFile(inputPath: string): Promise<void> {
   const raw = readFileSync(inputPath, "utf-8");
   const { frontmatter, body } = parseFrontmatter(raw);
   const title = String(frontmatter.title ?? basename(inputPath, ".md"));
@@ -205,7 +221,7 @@ function processMarkdownFile(inputPath: string): void {
   }
 
   // Collect local images, copy them to output/images/, and rewrite markdown paths
-  const images = collectAndCopyImages(body, mdFileDir, outputImagesDir);
+  const images = await collectAndCopyImages(body, mdFileDir, outputImagesDir);
   const bodyWithLocalImages = rewriteImagePaths(body, images);
 
   const contentHtml = convertMarkdownToWechat(bodyWithLocalImages);
@@ -355,9 +371,9 @@ if (args[0] === "--all") {
   console.log(`📚 Found ${files.length} markdown file(s) in ${BLOG_DIR}\n`);
   for (const file of files) {
     console.log(`\n--- Processing: ${basename(file)} ---`);
-    processMarkdownFile(file);
+    await processMarkdownFile(file);
   }
   console.log(`\n✨ All done. Output in scripts/output/`);
 } else {
-  processMarkdownFile(args[0]);
+  await processMarkdownFile(args[0]);
 }

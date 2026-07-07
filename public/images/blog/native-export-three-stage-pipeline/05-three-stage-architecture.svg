@@ -1,0 +1,76 @@
+<svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <text x="450" y="30" text-anchor="middle" font-size="17" font-weight="600" fill="#1e293b">三段生产者-消费者管线架构</text>
+  <text x="450" y="52" text-anchor="middle" font-size="12" fill="#64748b">三线程 + 两段有界 FIFO 队列（深度 2）+ 跨线程引用计数管理</text>
+
+  <!-- 解码线程 -->
+  <g>
+    <rect x="15" y="100" width="175" height="180" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+    <text x="102" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">解码线程</text>
+    <text x="102" y="146" text-anchor="middle" font-size="10" fill="#64748b">VideoToolbox ASIC</text>
+    <line x1="30" y1="158" x2="175" y2="158" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="102" y="178" text-anchor="middle" font-size="11" fill="#1e293b">stage 1: 解码</text>
+    <text x="102" y="196" text-anchor="middle" font-size="11" fill="#1e293b">stage 2: 引用帧</text>
+    <text x="102" y="213" text-anchor="middle" font-size="9" fill="#64748b">(Retain)</text>
+    <text x="102" y="240" text-anchor="middle" font-size="10" fill="#64748b">↓ 帧入队</text>
+    <text x="102" y="265" text-anchor="middle" font-size="10" fill="#64748b">1 帧在解码</text>
+  </g>
+
+  <!-- Queue 1 -->
+  <g>
+    <rect x="215" y="160" width="100" height="60" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="2" stroke-dasharray="5,3"/>
+    <text x="265" y="183" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">有界队列</text>
+    <text x="265" y="200" text-anchor="middle" font-size="10" fill="#64748b">深度 2</text>
+    <text x="265" y="213" text-anchor="middle" font-size="9" fill="#64748b">自带背压</text>
+  </g>
+  <line x1="190" y1="190" x2="213" y2="190" stroke="#475569" stroke-width="2" marker-end="url(#arr2)"/>
+  <line x1="315" y1="190" x2="338" y2="190" stroke="#475569" stroke-width="2" marker-end="url(#arr2)"/>
+
+  <!-- GPU 线程 -->
+  <g>
+    <rect x="340" y="100" width="220" height="180" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="450" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">GPU 线程</text>
+    <text x="450" y="146" text-anchor="middle" font-size="10" fill="#64748b">单线程 · Metal 队列 · Skia 上下文</text>
+    <line x1="355" y1="158" x2="545" y2="158" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="450" y="178" text-anchor="middle" font-size="11" fill="#1e293b">stage 3: 渲染 HUD</text>
+    <text x="450" y="195" text-anchor="middle" font-size="11" fill="#1e293b">stage 4: 降采样</text>
+    <text x="450" y="212" text-anchor="middle" font-size="11" fill="#1e293b">stage 5: 分配 + 合成</text>
+    <text x="450" y="229" text-anchor="middle" font-size="11" fill="#1e293b">stage 6: 释放帧</text>
+    <text x="450" y="248" text-anchor="middle" font-size="9" fill="#dc2626">⚠ 段内不并发</text>
+    <text x="450" y="265" text-anchor="middle" font-size="10" fill="#64748b">1 帧在 GPU</text>
+  </g>
+
+  <!-- Queue 2 -->
+  <g>
+    <rect x="585" y="160" width="100" height="60" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="2" stroke-dasharray="5,3"/>
+    <text x="635" y="183" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">有界队列</text>
+    <text x="635" y="200" text-anchor="middle" font-size="10" fill="#64748b">深度 2</text>
+    <text x="635" y="213" text-anchor="middle" font-size="9" fill="#64748b">自带背压</text>
+  </g>
+  <line x1="560" y1="190" x2="583" y2="190" stroke="#475569" stroke-width="2" marker-end="url(#arr2)"/>
+  <line x1="685" y1="190" x2="708" y2="190" stroke="#475569" stroke-width="2" marker-end="url(#arr2)"/>
+
+  <!-- 编码线程 -->
+  <g>
+    <rect x="710" y="100" width="175" height="180" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+    <text x="797" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#1e293b">编码线程</text>
+    <text x="797" y="146" text-anchor="middle" font-size="10" fill="#64748b">AVAssetWriter 硬件编码</text>
+    <line x1="725" y1="158" x2="870" y2="158" stroke="#cbd5e1" stroke-width="1"/>
+    <text x="797" y="178" text-anchor="middle" font-size="11" fill="#1e293b">stage 7: 编码</text>
+    <text x="797" y="196" text-anchor="middle" font-size="9" fill="#64748b">(AcquireOutputBuffer)</text>
+    <text x="797" y="222" text-anchor="middle" font-size="10" fill="#64748b">↓ 帧入文件</text>
+    <text x="797" y="248" text-anchor="middle" font-size="10" fill="#64748b">1 帧在编码</text>
+    <text x="797" y="265" text-anchor="middle" font-size="10" fill="#64748b">报进度</text>
+  </g>
+
+  <!-- Bottom annotations -->
+  <g>
+    <text x="450" y="320" text-anchor="middle" font-size="12" fill="#059669" font-weight="700">三种硬件同时有活干</text>
+    <text x="450" y="340" text-anchor="middle" font-size="11" fill="#1e293b">解码 N+1 帧  ‖  GPU 处理 N 帧  ‖  编码 N-1 帧</text>
+  </g>
+</svg>

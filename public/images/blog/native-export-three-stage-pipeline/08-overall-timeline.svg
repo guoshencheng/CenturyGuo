@@ -1,0 +1,67 @@
+<svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <pattern id="saved" patternUnits="userSpaceOnUse" width="8" height="8">
+      <path d="M 0 8 L 8 0" stroke="#059669" stroke-width="1" opacity="0.15"/>
+    </pattern>
+  </defs>
+
+  <text x="450" y="30" text-anchor="middle" font-size="17" font-weight="600" fill="#1e293b">端到端：7 分 40 秒 → 约 4 分钟</text>
+  <text x="450" y="52" text-anchor="middle" font-size="12" fill="#64748b">18 分钟 2688×1512 源视频 · macOS 14 + Apple Silicon M3</text>
+
+  <!-- BEFORE row -->
+  <g>
+    <text x="30" y="100" font-size="14" font-weight="700" fill="#dc2626">BEFORE</text>
+    <text x="30" y="118" font-size="11" fill="#64748b">原生架构 + 串行管线 + 重编码</text>
+
+    <rect x="180" y="85" width="650" height="60" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" rx="4"/>
+
+    <!-- 视频帧 4:00 = 240s × 1.413 = 339px -->
+    <rect x="180" y="85" width="339" height="60" fill="#3b82f6" opacity="0.75" rx="4"/>
+    <text x="349" y="118" text-anchor="middle" font-size="13" fill="white" font-weight="700">视频帧导出 4:00</text>
+
+    <!-- 音频合并 3:44 = 224s × 1.413 = 317px (180+339+317 = 836, a bit over 830) -->
+    <rect x="519" y="85" width="311" height="60" fill="#dc2626" opacity="0.75" rx="4"/>
+    <text x="674" y="118" text-anchor="middle" font-size="13" fill="white" font-weight="700">音频合并 3:44 (重编码!)</text>
+
+    <text x="845" y="120" text-anchor="end" font-size="13" font-weight="700" fill="#dc2626">7:40</text>
+  </g>
+
+  <!-- Arrow down -->
+  <g>
+    <line x1="450" y1="170" x2="450" y2="200" stroke="#475569" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arr3)"/>
+    <text x="480" y="190" font-size="11" fill="#64748b" font-style="italic">B2 + A + Passthrough</text>
+  </g>
+
+  <!-- AFTER row -->
+  <g>
+    <text x="30" y="225" font-size="14" font-weight="700" fill="#059669">AFTER</text>
+    <text x="30" y="243" font-size="11" fill="#64748b">B2 GPU 去等待 + A 三段并行 + Passthrough</text>
+
+    <rect x="180" y="210" width="650" height="60" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" rx="4"/>
+
+    <!-- 视频帧 3:56 = 236s × 1.413 = 333px -->
+    <rect x="180" y="210" width="333" height="60" fill="#3b82f6" opacity="0.75" rx="4"/>
+    <text x="346" y="243" text-anchor="middle" font-size="13" fill="white" font-weight="700">视频帧导出 3:56</text>
+
+    <!-- 音频合并 ≈ 几秒 -->
+    <rect x="513" y="210" width="7" height="60" fill="#059669" opacity="0.85" rx="2"/>
+    <text x="540" y="243" font-size="13" fill="#059669" font-weight="700">音频合并 ≈ 几秒</text>
+
+    <!-- Saved (hatched) area -->
+    <rect x="520" y="210" width="310" height="60" fill="url(#saved)"/>
+
+    <text x="845" y="245" text-anchor="end" font-size="13" font-weight="700" fill="#059669">~4:00</text>
+  </g>
+
+  <!-- Bottom summary -->
+  <g>
+    <rect x="180" y="320" width="650" height="60" fill="#ecfdf5" stroke="#059669" stroke-width="1" rx="4"/>
+    <text x="350" y="345" text-anchor="middle" font-size="13" font-weight="600" fill="#059669">省下的 224s 几乎全部来自 Passthrough</text>
+    <text x="350" y="368" text-anchor="middle" font-size="11" fill="#64748b">视频帧阶段本身只省了 4s（295s → 236s），但消除"无意义重编码"是更大的胜利</text>
+  </g>
+
+  <text x="450" y="405" text-anchor="middle" font-size="11" fill="#94a3b8" font-style="italic">关键收获：架构重构改天花板（8-15min → 5min），装完计时告诉你离天花板还差多少（再榨 20%）</text>
+</svg>

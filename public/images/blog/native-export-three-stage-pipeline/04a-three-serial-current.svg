@@ -1,0 +1,44 @@
+<svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <marker id="arr4a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <text x="450" y="30" text-anchor="middle" font-size="17" font-weight="600" fill="#1e293b">当前：单线程串行，3 段没有重叠</text>
+  <text x="450" y="52" text-anchor="middle" font-size="12" fill="#64748b">帧 N 必须走完 decode → GPU → encode，才能开始帧 N+1</text>
+
+  <!-- Three big boxes -->
+  <g>
+    <rect x="40" y="90" width="220" height="80" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+    <text x="150" y="120" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">解码</text>
+    <text x="150" y="142" text-anchor="middle" font-size="11" fill="#64748b">VideoToolbox ASIC</text>
+    <text x="150" y="158" text-anchor="middle" font-size="10" fill="#64748b">~0.8s / 全部帧</text>
+  </g>
+
+  <g>
+    <rect x="340" y="90" width="220" height="80" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="450" y="120" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">GPU 处理</text>
+    <text x="450" y="142" text-anchor="middle" font-size="11" fill="#64748b">渲染 + 降采样 + 合成</text>
+    <text x="450" y="158" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">~230s（瓶颈）</text>
+  </g>
+
+  <g>
+    <rect x="640" y="90" width="220" height="80" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="2"/>
+    <text x="750" y="120" text-anchor="middle" font-size="15" font-weight="700" fill="#1e293b">编码</text>
+    <text x="750" y="142" text-anchor="middle" font-size="11" fill="#64748b">AVAssetWriter 硬件编码</text>
+    <text x="750" y="158" text-anchor="middle" font-size="10" fill="#64748b">~62s</text>
+  </g>
+
+  <line x1="260" y1="130" x2="338" y2="130" stroke="#475569" stroke-width="2" marker-end="url(#arr4a)"/>
+  <line x1="560" y1="130" x2="638" y2="130" stroke="#475569" stroke-width="2" marker-end="url(#arr4a)"/>
+
+  <!-- Time-line underneath showing 帧 N+1 waits -->
+  <g>
+    <text x="150" y="200" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="600">↓ 解码完等 GPU</text>
+    <text x="450" y="200" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="600">↓ GPU 在画，编码空等</text>
+    <text x="750" y="200" text-anchor="middle" font-size="11" fill="#dc2626" font-weight="600">↓ 编码完才能开始下一帧</text>
+  </g>
+
+  <text x="450" y="225" text-anchor="middle" font-size="11" fill="#64748b" font-style="italic">三段串行 ≈ 295s（CPU/GPU/编码 ASIC 大量空转）</text>
+</svg>
