@@ -1,0 +1,83 @@
+---
+import { portfolio } from "../data/portfolio";
+import PortfolioCard from "./PortfolioCard.astro";
+
+export interface Props {
+  limit?: number;
+  showMore?: boolean;
+}
+
+const { limit, showMore = false } = Astro.props;
+const items = portfolio.slice(0, limit ?? portfolio.length);
+---
+
+<section class="portfolio-overview">
+  <header class="portfolio-overview__header">
+    <h2 class="portfolio-overview__title">~/works</h2>
+    {showMore && (
+      <a href="/portfolio" class="portfolio-overview__more">more →</a>
+    )}
+  </header>
+  <ul class="portfolio-overview__grid">
+    {items.map((item) => (
+      <li><PortfolioCard item={item} /></li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .portfolio-overview {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-lg);
+    border-bottom: var(--border);
+  }
+
+  .portfolio-overview__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+  }
+
+  .portfolio-overview__title {
+    font-size: var(--text-lg);
+    margin: 0;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+  }
+
+  .portfolio-overview__more {
+    color: var(--color-link);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    transition: color 0.15s;
+  }
+
+  .portfolio-overview__more:hover {
+    color: var(--color-link-hover);
+  }
+
+  .portfolio-overview__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .portfolio-overview__grid > li {
+    display: flex;
+  }
+
+  .portfolio-overview__grid > li > :global(*) {
+    width: 100%;
+  }
+
+  @media (max-width: 640px) {
+    .portfolio-overview__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
