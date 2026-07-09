@@ -25,39 +25,45 @@ const posts = (await getCollection("blog"))
     },
   }}
 >
-  <Hero />
+  <div class="home-blocks">
+    <Hero />
 
-  <Card prompt="> DULUU_GUO:~/works">
-    <PortfolioOverview limit={4} showMore />
-  </Card>
+    <Card prompt="> DULUU_GUO:~/works">
+      <PortfolioOverview limit={4} showMore />
+    </Card>
 
-  <Card prompt="> DULUU_GUO:/">
-    <section class="about">
-      <h2 class="about__title">关于这个博客</h2>
-      <p class="about__body">
-        我是 Duluu Guo，全栈工程师。这里记录我读源码、做项目时的取舍——不是教程，是思考过程。
-      </p>
-      <p class="about__body">
-        关注领域：LLM Agent 架构、SSE/流式协议、桌面应用性能。
-      </p>
-    </section>
-  </Card>
+    <Card prompt="> DULUU_GUO:/">
+      <section class="about">
+        <h2 class="about__title">关于这个博客</h2>
+        <p class="about__body">
+          我是 Duluu Guo，全栈工程师。这里记录我读源码、做项目时的取舍——不是教程，是思考过程。
+        </p>
+        <p class="about__body">
+          关注领域：LLM Agent 架构、SSE/流式协议、桌面应用性能。
+        </p>
+      </section>
+    </Card>
 
-  <Card prompt="> DULUU_GUO:~/posts">
-    <h2 class="posts__title">~/posts</h2>
-    {posts.length === 0 ? (
-      <p class="home-empty">
-        No posts yet. <span class="home-cursor">█</span>
-      </p>
-    ) : (
-      <div class="home-list">
-        {posts.map((post) => <PostCard post={post} />)}
-      </div>
-    )}
-  </Card>
+    <Card prompt="> DULUU_GUO:~/posts">
+      <h2 class="posts__title">~/posts</h2>
+      {posts.length === 0 ? (
+        <p class="home-empty">
+          No posts yet. <span class="home-cursor">█</span>
+        </p>
+      ) : (
+        <div class="home-list">
+          {posts.map((post) => <PostCard post={post} />)}
+        </div>
+      )}
+    </Card>
+  </div>
 </Base>
 
 <style>
+  .home-blocks > :global(*) + :global(*) {
+    margin-top: var(--space-xl);
+  }
+
   .home-empty {
     color: var(--color-text-muted);
     font-family: var(--font-mono);
