@@ -1,0 +1,62 @@
+---
+import Base from "../layouts/Base.astro";
+import Card from "../components/Card.astro";
+import PortfolioCard from "../components/PortfolioCard.astro";
+import { portfolio } from "../data/portfolio";
+---
+
+<Base
+  terminalTitle="century@blog:~/works"
+  seo={{
+    title: "作品集 | Duluu's World",
+    description: "Duluu Guo 的作品集 — DuluuClip、Rem Agent 等产品与开源项目",
+    type: "website",
+    person: {
+      name: "Duluu Guo",
+      jobTitle: "全栈工程师",
+      knowsAbout: ["LLM Agent", "Node", "React", "架构设计"],
+      sameAs: ["https://github.com/guoshencheng"],
+    },
+  }}
+>
+  <Card prompt="> DULUU_GUO:~/works">
+    <p class="portfolio-intro">我做过的产品 / 项目，点卡片直达。</p>
+    <ul class="portfolio-grid">
+      {portfolio.map((item) => (
+        <li><PortfolioCard item={item} /></li>
+      ))}
+    </ul>
+  </Card>
+</Base>
+
+<style>
+  .portfolio-intro {
+    margin: 0 0 var(--space-md);
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  .portfolio-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+  }
+
+  .portfolio-grid > li {
+    display: flex;
+  }
+
+  .portfolio-grid > li > :global(*) {
+    width: 100%;
+  }
+
+  @media (max-width: 640px) {
+    .portfolio-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
