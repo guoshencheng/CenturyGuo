@@ -1,0 +1,67 @@
+---
+import type { PortfolioItem } from "../data/portfolio";
+
+export interface Props {
+  item: PortfolioItem;
+}
+
+const { item } = Astro.props;
+---
+
+<article class="portfolio-card">
+  <h3 class="portfolio-card__title">{item.name}</h3>
+  <p class="portfolio-card__desc">{item.description}</p>
+  <a
+    class="portfolio-card__cta"
+    href={item.url}
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    {item.ctaLabel} →
+  </a>
+</article>
+
+<style>
+  .portfolio-card {
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    background: var(--color-surface);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .portfolio-card__title {
+    display: inline-block;
+    align-self: flex-start;
+    background: var(--color-accent);
+    color: var(--color-card-bg);
+    padding: 4px 14px;
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin: 0;
+    font-family: var(--font-mono);
+    line-height: 1.4;
+  }
+
+  .portfolio-card__desc {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .portfolio-card__cta {
+    color: var(--color-link);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    transition: color 0.15s;
+  }
+
+  .portfolio-card__cta:hover {
+    color: var(--color-link-hover);
+  }
+</style>
