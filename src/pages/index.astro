@@ -28,10 +28,6 @@ const posts = (await getCollection("blog"))
   <div class="home-blocks">
     <Hero />
 
-    <Card prompt="> DULUU_GUO:~/works">
-      <PortfolioOverview limit={4} showMore />
-    </Card>
-
     <Card prompt="> DULUU_GUO:/">
       <section class="about">
         <h2 class="about__title">关于这个博客</h2>
@@ -42,6 +38,10 @@ const posts = (await getCollection("blog"))
           关注领域：LLM Agent 架构、SSE/流式协议、桌面应用性能。
         </p>
       </section>
+    </Card>
+
+    <Card prompt="> DULUU_GUO:~/works">
+      <PortfolioOverview limit={4} showMore />
     </Card>
 
     <Card prompt="> DULUU_GUO:~/posts">
