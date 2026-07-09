@@ -36,7 +36,7 @@ export const portfolio = [
     name: "DuluuClip",
     slug: "duluuclip",
     description: "运动相机视频 + GPS HUD 叠加工具",
-    url: "https://duluuclip.app",
+    url: "https://duluuclip.icerock.top/",
     ctaLabel: "Visit Site",
     type: "product",
   },
