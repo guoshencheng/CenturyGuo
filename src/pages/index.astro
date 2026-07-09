@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import Hero from "../components/Hero.astro";
 import Card from "../components/Card.astro";
 import PostCard from "../components/PostCard.astro";
+import PortfolioOverview from "../components/PortfolioOverview.astro";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("blog"))
@@ -36,6 +37,8 @@ const posts = (await getCollection("blog"))
         关注领域：LLM Agent 架构、SSE/流式协议、桌面应用性能。
       </p>
     </section>
+
+    <PortfolioOverview limit={4} showMore />
 
     <div class="home-list">
       {posts.length === 0 ? (
