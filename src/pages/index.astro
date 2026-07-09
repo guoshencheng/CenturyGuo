@@ -27,7 +27,11 @@ const posts = (await getCollection("blog"))
 >
   <Hero />
 
-  <Card>
+  <Card prompt="> DULUU_GUO:~/works">
+    <PortfolioOverview limit={4} showMore />
+  </Card>
+
+  <Card prompt="> DULUU_GUO:/">
     <section class="about">
       <h2 class="about__title">关于这个博客</h2>
       <p class="about__body">
@@ -37,18 +41,19 @@ const posts = (await getCollection("blog"))
         关注领域：LLM Agent 架构、SSE/流式协议、桌面应用性能。
       </p>
     </section>
+  </Card>
 
-    <PortfolioOverview limit={4} showMore />
-
-    <div class="home-list">
-      {posts.length === 0 ? (
-        <p class="home-empty">
-          No posts yet. <span class="home-cursor">█</span>
-        </p>
-      ) : (
-        posts.map((post) => <PostCard post={post} />)
-      )}
-    </div>
+  <Card prompt="> DULUU_GUO:~/posts">
+    <h2 class="posts__title">~/posts</h2>
+    {posts.length === 0 ? (
+      <p class="home-empty">
+        No posts yet. <span class="home-cursor">█</span>
+      </p>
+    ) : (
+      <div class="home-list">
+        {posts.map((post) => <PostCard post={post} />)}
+      </div>
+    )}
   </Card>
 </Base>
 
@@ -65,9 +70,7 @@ const posts = (await getCollection("blog"))
   }
 
   .about {
-    margin-bottom: var(--space-xl);
-    padding-bottom: var(--space-lg);
-    border-bottom: var(--border);
+    margin: 0;
   }
 
   .about__title {
@@ -82,6 +85,13 @@ const posts = (await getCollection("blog"))
     font-size: var(--text-base);
     color: var(--color-text);
     line-height: 1.7;
+  }
+
+  .posts__title {
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-md);
+    color: var(--color-text);
+    font-family: var(--font-mono);
   }
 
   .home-list {
