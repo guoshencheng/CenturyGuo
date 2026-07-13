@@ -1,6 +1,6 @@
 ---
 name: blog-illustration
-description: 为博客文章生成 AI 插画提示词、规划图片存放与命名、插入 Markdown 引用、并将生成的 PNG 压缩为 WebP。固定采用「彩色手绘插画」风格（watercolor + crayon + 可见纸张纹理）。当用户说「给文章配图」「生成配图」「生成插画」「compress blog images」或类似请求时触发此 skill。专注于 CenturyGuo 博客（`src/content/blog/*.md` + `public/images/blog/<slug>/`）的工作流，但也适用于任何 Astro 风格的博客。
+description: 为博客文章生成 AI 插画提示词、规划图片存放与命名、插入 Markdown 引用、并将生成的 PNG 压缩为 WebP。固定采用「赛博朋克」风格（neon noir, cyberpunk, 深色背景 + 霓虹色彩）。当用户说「给文章配图」「生成配图」「生成插画」「compress blog images」或类似请求时触发此 skill。专注于 CenturyGuo 博客（`src/content/blog/*.md` + `public/images/blog/<slug>/`）的工作流，但也适用于任何 Astro 风格的博客。
 ---
 
 # 博客配图助手
@@ -27,7 +27,7 @@ description: 为博客文章生成 AI 插画提示词、规划图片存放与命
 ```
 1. 读文章 + 识别可视觉化点
 2. 与用户确认配图数量和插入位置
-3. 生成 AI 绘图提示词（彩色手绘风格）
+3. 生成 AI 绘图提示词（赛博朋克风格）
 4. 给出图片存放目录与命名方案
 5. 在 Markdown 中插入 ![alt](path) 引用
 6. （图片生成完毕后）压缩 PNG → WebP，并更新引用
@@ -54,7 +54,7 @@ description: 为博客文章生成 AI 插画提示词、规划图片存放与命
 一次问一个关键问题。建议问的顺序：
 
 1. **配图数量**：每节一张 / 核心 N 张 / 1 张总览
-2. **风格是否调整**：默认彩色手绘，是否需要改
+2. **风格是否调整**：默认赛博朋克，是否需要改
 3. **是否包含中文/英文标签**：影响提示词中关于 `hand-lettered labels` 的描述
 
 ## 步骤 3：生成提示词
@@ -64,12 +64,13 @@ description: 为博客文章生成 AI 插画提示词、规划图片存放与命
 所有提示词必须包含下列关键词以保证风格统一：
 
 ```
-colorful hand-drawn illustration, watercolor washes, crayon textures,
-ink outlines, hand-lettered labels, visible paper grain,
-white background, playful editorial style
+cyberpunk, neon noir, dark futuristic aesthetic,
+glowing holographic UI elements, volumetric fog,
+deep blue and black background, cyan and magenta neon accents,
+lens flare, reflective wet surfaces, cinematic lighting
 ```
 
-**为什么固定这个风格**：本博客整体是手绘/水彩科技感，配图需要与站点视觉一致；彩色手绘在 AI 绘图里参数稳定，可复现。
+**为什么固定这个风格**：赛博朋克视觉冲击力强，AI 绘图中参数稳定、可复现；深色背景 + 霓虹色彩的组合适配科技类博客，浓烈的风格对比让图片在信息流中辨识度极高。
 
 ### 提示词结构
 
@@ -82,11 +83,11 @@ white background, playful editorial style
 
 例如：
 ```
-A colorful hand-drawn illustration of a three-layer streaming
-protocol architecture, sketched with loose ink outlines and
-watercolor washes. Three stacked horizontal platforms drawn with
-slight wobble. Soft purple and teal palette, hand-lettered labels,
-visible paper texture, white background.
+A cyberpunk illustration of a three-layer software architecture,
+visualized as glowing holographic platforms stacked in a dark server
+room. Neon cyan and magenta data streams connect the layers through
+ethereal light beams. Volumetric fog at the base, reflective floor
+with wet surfaces, cinematic lens flare, blue-black background.
 ```
 
 ### 中文版本
@@ -194,7 +195,7 @@ public/images/blog/<slug>/
 
 - **不直接调 AI 绘图 API**：本 skill 只生成提示词 + 管理文件，不替你调 OpenAI/SD/Midjourney。生成图片由用户在外部完成后再回到本 skill 归档压缩。
 - **不修改文章正文**：只在 Markdown 中插入 `![alt](path)` 引用，不重写段落。
-- **风格不轻易改**：彩色手绘是基线。如果用户明确说"换风格"，才改。
+- **风格不轻易改**：赛博朋克是基线。如果用户明确说"换风格"，才改。
 
 ---
 
