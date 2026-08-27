@@ -4,17 +4,19 @@
 
 ## 1. 总览
 
-一个纯 SSG 个人博客。`npm run build` 把 `src/` + `src/content/blog/*.md` 编译成静态 `dist/`，再由 GitHub Actions 发到 GitHub Pages，绑定自定义域 `blog.shemu.top`。
+一个纯 SSG 个人博客。`npm run build` 把 `src/` 和内容编译成静态 `dist/`，GitHub Actions 确定性打包后，通过受限 SSH `publish` 交给共享静态发布平台。公网域 `blog.shemu.top` 的路由与 HTTPS 由 OpenResty 管理。此处描述仓库配置的目标架构；修改 workflow 不会自动切换线上 DNS 或服务器。
 
 ```
-┌─────────────────┐      ┌──────────────────┐      ┌─────────────────────┐
-│  src/content/   │      │  Astro build     │      │  GitHub Pages       │
-│  blog/*.md      │ ───> │  (npm run build) │ ───> │  blog.shemu.top     │
-│  (markdown)     │      │  → dist/         │      │  (CNAME 绑定)       │
-└─────────────────┘      └──────────────────┘      └─────────────────────┘
-        │                        │
-        │                        ├── public/  原样复制（含 CNAME / robots.txt / og-default.png）
-        │                        └── scripts/  不参与 build（仅 wechat-sync 离线工具）
+src/content/ → GitHub Actions: test + Astro build → dist/ → tar.gz
+                                        │                  │
+                                        │           SSH publish
+                                        │                  ▼
+                                        │      current → releases/<full-sha> 原子切换
+                                        │                  ▲
+                                        │      共享 Nginx（127.0.0.1:19080）
+                                        │                  ▲
+                                        │      OpenResty（blog.shemu.top / HTTPS）
+                                        └── public/ 原样复制（保留 CNAME / robots.txt / 图片）
 ```
 
 ## 2. 技术栈
@@ -30,8 +32,8 @@
 | RSS | `@astrojs/rss` | `/rss.xml` |
 | Sitemap | `@astrojs/sitemap` | `/sitemap-index.xml` |
 | 统计 | Umami（自建 `https://umami.shemu.top`） | 仅生产环境（`import.meta.env.PROD`）注入 |
-| 部署 | GitHub Actions | `.github/workflows/deploy.yml` |
-| 测试 | Node 22+ 原生 `node --test` | 仅 `src/utils/*.test.ts` |
+| 部署 | GitHub Actions → SSH `publish` → 共享 Nginx | OpenResty 提供公网 HTTPS；`.github/workflows/deploy.yml` |
+| 测试 | Node 22+ 原生 `node --test` | `src/**/*.test.ts`、`scripts/*.test.ts`，含发布适配器行为测试 |
 
 ## 3. 目录结构
 
@@ -40,13 +42,15 @@
 ├── astro.config.ts              # site URL + shiki + rehype 插件
 ├── package.json                 # 依赖与 scripts
 ├── tsconfig.json                # extends astro/tsconfigs/strictest
-├── .github/workflows/deploy.yml # GitHub Pages 自动部署
+├── .github/workflows/
+│   └── deploy.yml               # 构建、测试、内联打包和单次 SSH publish
 ├── public/                      # 构建时原样复制到 dist/
-│   ├── CNAME                    # blog.shemu.top（删掉则自定义域失效）
+│   ├── CNAME                    # blog.shemu.top（保留域名约定和 Pages 回退兼容）
 │   ├── robots.txt               # 指向 sitemap-index.xml
 │   ├── og-default.png           # 兜底 OG 图（1200×630）
 │   └── images/blog/<slug>/      # 文章封面图
 ├── scripts/
+│   ├── static-deployment.test.ts # 执行 workflow 内联 Bash，模拟 SSH，不连接服务器
 │   └── wechat-sync.ts           # 公众号转换工具（不参与 build）
 ├── src/
 │   ├── components/
@@ -79,7 +83,8 @@
 │       └── rehype-img-lazy.ts   # rehype 插件：补 loading/decoding/alt
 └── docs/
     ├── architecture.md          # 本文件
-    ├── custom-domain-setup.md   # blog.shemu.top 绑定教程
+    ├── custom-domain-setup.md   # blog.shemu.top DNS / OpenResty / HTTPS
+    ├── static-deployment.md     # 发布配置、运维协议、迁移验收与回滚
     └── superpowers/
         ├── specs/               # 已完成 feature 的设计 spec
         └── plans/               # 已完成 feature 的实施计划（含 commit 步骤）
@@ -166,27 +171,43 @@ RSS 在 `src/pages/rss.xml.ts` 增强：每个 item 带 `<author>`，channel 带
 ## 7. 部署
 
 ```
-push to master
+push to master / workflow_dispatch on master
     │
     ▼
 .github/workflows/deploy.yml 触发
     │
-    ├─ npm ci
+    ├─ Node 22 + npm ci
+    ├─ npm test
     ├─ npm run build
-    └─ actions/upload-pages-artifact@v3 (./dist)
+    ├─ 检查 dist/index.html，拒绝链接和特殊文件
+    ├─ GNU tar + gzip -n 确定性打包，计算 SHA-256
+    └─ SSH staticdeploy: publish <site> <full-sha> <archive-sha256>
             │
             ▼
-       actions/deploy-pages@v4 → GitHub Pages
+       服务端持有站点锁：upload → activate → health → status
+       必要时回滚并验证恢复版本；失败始终返回非零
             │
             ▼
-       GitHub 读 public/CNAME → blog.shemu.top
-       DNS: blog.shemu.top CNAME → guoshencheng.github.io
+       /srv/static-deploy/sites/<site>/current → releases/<full-sha>
+       共享非 root Nginx，仅绑定 127.0.0.1:19080
             │
             ▼
-       用户访问 https://blog.shemu.top
+       OpenResty 固定注入 X-Static-Site → 用户访问 https://blog.shemu.top
 ```
 
-DNS / HTTPS / 常见坑见 `docs/custom-domain-setup.md`。
+CI 仅保留 `contents: read` 权限，仓库级并发组 `static-deploy-${{ github.repository }}` 不取消进行中的发布，手动运行非 `master` 分支会跳过 job。没有 Pages 上传/部署 action，也不依赖 `github-pages` environment。安装、测试、构建均在 runner 完成，服务器不安装依赖、不构建；本仓库不维护平台源码或独立发布客户端。
+
+| 配置 | 位置 | 含义 |
+|------|------|------|
+| `STATIC_DEPLOY_HOST` | Actions Variable | 受限 SSH 主机名/IP，不含用户、协议或路径 |
+| `STATIC_DEPLOY_SITE` | Actions Variable | 与 OpenResty 固定 header 一致的站点 slug |
+| `STATIC_DEPLOY_SSH_KEY` | Actions Secret | 完整多行 Ed25519 私钥，仅在 publish 步骤注入 |
+| `STATIC_DEPLOY_KNOWN_HOSTS` | Actions Secret | 经可信控制台核验的 SSH host key 完整行 |
+| `GIT_COMMIT_SHA` / `DIST_DIR` | workflow | `github.sha` 的完整小写 SHA / `dist` |
+
+临时身份文件 `STATIC_DEPLOY_IDENTITY_FILE`、`STATIC_DEPLOY_KNOWN_HOSTS_FILE` 由 `mktemp -d` 分配并以 `0600` 写入，`trap` 清理；SSH 强制 host key 校验、非交互及指定身份。服务器聚合 JSON 和原始退出码保留在日志中。没有客户端盲目重试或回滚，也无需 `SITE_PUBLIC_URL` / `SITE_SMOKE_PATH`。SSH 中断后先查询 `status` / `health`，不能凭本地连接结果判断是否已激活。
+
+接入、状态查询、回滚和验收见 [static-deployment.md](static-deployment.md)；DNS / HTTPS 见 [custom-domain-setup.md](custom-domain-setup.md)。本博客为 SSG，迁移时必须额外检查深链、真实 404 和 Astro 指纹资源缓存，不能默认共享平台的 SPA fallback 已满足这些要求。
 
 ## 8. 跨切关注点
 

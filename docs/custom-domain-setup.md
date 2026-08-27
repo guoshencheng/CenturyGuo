@@ -1,4 +1,35 @@
-# GitHub Pages 自定义域名设置教程
+# 自定义域名与 HTTPS
+
+站点地址保持 `https://blog.shemu.top`。当前仓库发布方案改为受限 SSH 静态构件发布，DNS 与 OpenResty 负责公网入口；修改 workflow 本身不会修改 DNS、证书或线上站点。平台接入及发布验收见 [static-deployment.md](static-deployment.md)。
+
+## 当前方案：DNS → OpenResty → 共享 Nginx
+
+1. 先完成共享平台安装、站点首次发布和内部验收，保留旧 Pages 服务与 DNS 作为切换前的线上入口。
+2. 管理员为 `blog.shemu.top` 配置 OpenResty vhost，保留原有日志、超时与 HTTPS 设置。将下面示例的 `example-site` 替换为 CI 的 `STATIC_DEPLOY_SITE`：
+
+```nginx
+location / {
+    proxy_set_header X-Static-Site example-site;
+    proxy_pass http://127.0.0.1:19080;
+}
+```
+
+必须固定覆盖客户端 header，不能传 `$http_x_static_site`。如果 vhost 另有资源或精确路径 location，也要检查它们不会绕过固定映射。19080 仅绑定回环，不开放公网端口，不新增站点容器。若 OpenResty 在容器中运行，先确认它所在网络能访问宿主机回环入口；不能为了连通直接把 19080 改成公网监听。
+
+3. 按平台运维流程校验完整 OpenResty 配置后再 reload；失败时修正或恢复该 vhost，不停止其他站点。证书由现有 OpenResty/证书管理流程签发与续期，不再依赖 GitHub Pages 的 Enforce HTTPS。
+4. 在切 DNS 前验证新入口的 SSG 深链、404、资源缓存、固定 header 与证书，详见运维文档第 4 节。
+5. 验收后，将 `blog` 的 DNS 指向管理员确认的新入口：使用 A/AAAA 或入口主机名的 CNAME。移除冲突或陈旧记录，尤其不要留下仍指向旧服务的 AAAA。实际服务器地址不写入本仓库。
+6. DNS 生效后检查公网首页、文章深链、RSS、sitemap、llms.txt、HTTPS 证书和重定向；未完成时不要宣布迁移成功。
+
+`astro.config.ts` 的 `site`、`public/CNAME`、`public/robots.txt` 和 SEO `SITE_URL` 均保持原值。`CNAME` 保留域名约定与 Pages 回退兼容，不会配置 OpenResty，也不能代替 DNS。
+
+## 回退到 GitHub Pages
+
+下文仅保留旧 Pages 方案作为回退参考，不是新发布流程的前置条件。回退需显式恢复 Pages workflow / 设置并确认旧站点和证书可用，再切回 DNS；仅保留 `public/CNAME` 不会自动恢复 Pages 部署。不要因部署迁移更改本站的 `site` 或添加 `base`。
+
+---
+
+## 旧方案参考：GitHub Pages 自定义域名
 
 以 `blog.shemu.top` 为例，讲解如何把 GitHub Pages 项目绑定到子域名。
 

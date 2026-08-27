@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy static site
 
 on:
   push:
@@ -7,44 +7,105 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: static-deploy-${{ github.repository }}
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
+    # Manual runs from feature branches must not publish to production.
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Test
+        run: npm test
+
       - name: Build
         run: npm run build
 
-      - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./dist
+      - name: Publish static artifact
+        shell: bash
+        env:
+          STATIC_DEPLOY_HOST: ${{ vars.STATIC_DEPLOY_HOST }}
+          STATIC_DEPLOY_SITE: ${{ vars.STATIC_DEPLOY_SITE }}
+          STATIC_DEPLOY_SSH_KEY: ${{ secrets.STATIC_DEPLOY_SSH_KEY }}
+          STATIC_DEPLOY_KNOWN_HOSTS: ${{ secrets.STATIC_DEPLOY_KNOWN_HOSTS }}
+          GIT_COMMIT_SHA: ${{ github.sha }}
+          DIST_DIR: dist
+        run: |
+          set +x
+          set -Eeuo pipefail
+          umask 077
+          export LC_ALL=C
+          unset TAR_OPTIONS GZIP
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          die() {
+            echo "static publish: $*" >&2
+            exit 2
+          }
+          for name in STATIC_DEPLOY_HOST STATIC_DEPLOY_SITE GIT_COMMIT_SHA DIST_DIR \
+            STATIC_DEPLOY_SSH_KEY STATIC_DEPLOY_KNOWN_HOSTS RUNNER_TEMP; do
+            [[ -n ${!name:-} ]] || die "${name} is required"
+          done
+          [[ ${STATIC_DEPLOY_HOST} =~ ^[A-Za-z0-9][A-Za-z0-9._:-]*$ ]] || die "host is invalid"
+          [[ ${STATIC_DEPLOY_SITE} =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]] || die "site is invalid"
+          [[ ${GIT_COMMIT_SHA} =~ ^([0-9a-f]{40}|[0-9a-f]{64})$ ]] || die "full lowercase commit SHA is required"
+          [[ ${RUNNER_TEMP} = /* && -d ${RUNNER_TEMP} ]] || die "RUNNER_TEMP must be an existing absolute directory"
+          [[ -d ${DIST_DIR} && ! -L ${DIST_DIR} ]] || die "DIST_DIR must be a directory, not a symlink"
+          [[ -f ${DIST_DIR}/index.html && ! -L ${DIST_DIR}/index.html ]] || die "regular root index.html is required"
+          # Never dereference links or send hard links / special files.
+          unsupported=$(find "${DIST_DIR}" \( ! -type f ! -type d -o -type f -links +1 \) -print -quit)
+          [[ -z ${unsupported} ]] || die "DIST_DIR contains links or special files"
+
+          work_dir=$(mktemp -d "${RUNNER_TEMP}/static-publish.XXXXXX")
+          STATIC_DEPLOY_IDENTITY_FILE="${work_dir}/identity"
+          STATIC_DEPLOY_KNOWN_HOSTS_FILE="${work_dir}/known_hosts"
+          archive_path="${work_dir}/dist.tar.gz"
+          cleanup() {
+            rm -f -- "${STATIC_DEPLOY_IDENTITY_FILE}" "${STATIC_DEPLOY_KNOWN_HOSTS_FILE}" "${archive_path}"
+            rmdir -- "${work_dir}"
+          }
+          trap cleanup EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+          printf '%s\n' "${STATIC_DEPLOY_SSH_KEY}" > "${STATIC_DEPLOY_IDENTITY_FILE}"
+          printf '%s\n' "${STATIC_DEPLOY_KNOWN_HOSTS}" > "${STATIC_DEPLOY_KNOWN_HOSTS_FILE}"
+          chmod 600 "${STATIC_DEPLOY_IDENTITY_FILE}" "${STATIC_DEPLOY_KNOWN_HOSTS_FILE}"
+
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 \
+            --numeric-owner --format=ustar --mode='u=rwX,go=rX' \
+            -C "${DIST_DIR}" -cf - . | gzip -n > "${archive_path}"
+          archive_sha256=$(sha256sum "${archive_path}" | awk '{print $1}')
+          [[ ${archive_sha256} =~ ^[0-9a-f]{64}$ ]] || die "invalid archive SHA256"
+
+          SSH_OPTS=(
+            -T -F /dev/null
+            -i "${STATIC_DEPLOY_IDENTITY_FILE}"
+            -o BatchMode=yes
+            -o IdentitiesOnly=yes
+            -o StrictHostKeyChecking=yes
+            -o "UserKnownHostsFile=${STATIC_DEPLOY_KNOWN_HOSTS_FILE}"
+            -o PasswordAuthentication=no
+            -o KbdInteractiveAuthentication=no
+            -o ClearAllForwardings=yes
+            -o ConnectTimeout=15
+          )
+          echo "static publish: ${STATIC_DEPLOY_SITE} ${GIT_COMMIT_SHA} ${archive_sha256}"
+          # Preserve the server JSON and exit status; rollback belongs to publish.
+          ssh "${SSH_OPTS[@]}" "staticdeploy@${STATIC_DEPLOY_HOST}" \
+            "publish ${STATIC_DEPLOY_SITE} ${GIT_COMMIT_SHA} ${archive_sha256}" < "${archive_path}"

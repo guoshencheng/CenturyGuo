@@ -6,19 +6,20 @@
 
 - **类型**：个人静态博客
 - **线上地址**：[blog.shemu.top](https://blog.shemu.top)
-- **栈**：Astro 5 SSG · TypeScript strict · 自写 CSS Design System · GitHub Pages + Actions · Shiki
+- **栈**：Astro 5 SSG · TypeScript strict · 自写 CSS Design System · GitHub Actions + 受限 SSH 静态构件发布 · OpenResty + 共享 Nginx · Shiki
 - **作者署名**：Duluu Guo (`guoshencheng@shemu.top`)
 - **不在栈内**：UI 框架（React/Vue）、Tailwind、CSS-in-JS、测试框架（jest/vitest）。需要测试用 Node 22+ 原生 `node --test`。
 
 ## 红线（违反会破坏构建或线上行为）
 
 1. **不要改 `astro.config.ts` 里的 `site`** — 现为 `https://blog.shemu.top`，与 `public/CNAME`、`robots.txt`、SEO 工具中的 `SITE_URL` 三处硬绑定。改了会导致 sitemap/RSS/OG/canonical 全部指错域。
-2. **不要删 `public/CNAME`** — 没有它 GitHub Pages 不知道绑哪个自定义域名。
+2. **不要删 `public/CNAME`** — 保留 `blog.shemu.top` 域名约定和 GitHub Pages 回退兼容；当前发布方案的域名与 HTTPS 由 DNS / OpenResty 管理，不依赖该文件配置代理。
 3. **不要给博文 frontmatter 漏 `description`** — schema 必填。`src/content/config.ts` 用 `z.string()` 校验，缺了直接构建失败。这字段同时驱动卡片副标题、列表摘要、`og:description`、Twitter Card、RSS description。
 4. **新页面必须经 `Base.astro` 布局 + 传 `seo` prop** — 不要绕开 `Base` 自己写 `<head>`，否则会绕过 skip-link、Umami 统计、SEO meta 一致性。`seo` prop 透传给 `SeoHead`，`person` 字段含 `sameAs`（跨平台 profile 链接列表）必须跟 `src/pages/index.astro` 保持一致；`body` / `faqs` 字段直接来自 `post.data` / `post.body`。
 5. **图片 `alt` 不能为空** — `rehype-img-lazy` 插件会在 build 时 `console.warn` 缺 alt 的 `<img>`。首张 `![](path)` 会自动作为 OG 图。
 6. **不要加 npm 依赖除非真的必要** — 当前依赖固定在 `package.json`。新依赖必须 review 体积、维护状态、与 Astro 5 兼容性。
 7. **不要删 `/llms.txt` 端点** — `src/pages/llms.txt.ts` 动态生成 LLM 友好的站点摘要（Jeremy Howard 协议）。`BlogPosting` JSON-LD、OG、Twitter Card 是给 Google / 社交平台看的，`/llms.txt` 是给 AI 答案检索用的——GSC 不收录，但 Perplexity / Answer.AI / 未来更多 LLM 会读。
+8. **发布只走受限 SSH `publish` 协议** — CI 用 Node 22、`npm ci`、`npm test`、`npm run build`，确定性打包 `dist/` 后以 `staticdeploy` 发布完整 commit SHA；严格校验 host key，不用 root / SCP / SFTP / rsync，不复制平台源码或发布客户端到本仓库。回滚由服务器处理，失败保持非零；发布并发不得自动取消。服务器地址、私钥及 host key 不入库。
 
 ## 命令速查
 
@@ -28,7 +29,7 @@
 | `npm run dev` | 本地开发 (`localhost:4321`) |
 | `npm run build` | SSG 构建到 `dist/` |
 | `npm run preview` | 本地预览构建产物 |
-| `npm test` | 跑 `node --test` (扫 `src/utils/*.test.ts`) |
+| `npm test` | 跑 `node --test`（含 `src/**/*.test.ts`、`scripts/*.test.ts` 和发布适配器测试） |
 | `npm run wechat <file>` | 单篇 markdown → 公众号 HTML（输出到 `scripts/output/`，gitignored） |
 | `npm run wechat:all` | 批量转换 `src/content/blog/*.md` |
 | `npm run wechat:open` | macOS 打开 `scripts/output/` 目录 |
@@ -38,6 +39,7 @@
 | 我想知道… | 看这里 |
 |-----------|--------|
 | 路由清单、SEO 流水线、deploy 流程、数据流 | [`docs/architecture.md`](docs/architecture.md) |
+| 发布凭据、服务器接入、迁移验收与回滚 | [`docs/static-deployment.md`](docs/static-deployment.md) |
 | `blog.shemu.top` 怎么绑的、DNS 怎么配、HTTPS 怎么签 | [`docs/custom-domain-setup.md`](docs/custom-domain-setup.md) |
 | 之前某个 feature 怎么设计的 | `docs/superpowers/specs/2026-06-*.md` |
 | 之前某个 feature 怎么实现的（含 commit 步骤） | `docs/superpowers/plans/2026-06-*.md` |
@@ -50,7 +52,11 @@
 2. frontmatter 必填：`title`、`date`、`tags`、`description`；**推荐加 `faq`**（`[{q, a}, ...]`）会自动注入 FAQPage JSON-LD，提升 AI 答案引用率
 3. 正文首张 `![](path)` 会自动作 OG 图（如需单独 OG，传入 `seo.image` 覆盖）
 4. 本地跑 `npm run dev` 看效果，`npm run build` 验证 SSG 完整通过
-5. push 到 `master` 触发自动部署
+5. 配置好发布平台与 CI 凭据后，push 到 `master` 触发自动部署；手动 workflow 也只允许 `master`
+
+## 发布配置
+
+仓库 Actions Variables：`STATIC_DEPLOY_HOST`（受限 SSH 主机）、`STATIC_DEPLOY_SITE`（与 OpenResty 固定 header 一致的 slug）。Actions Secrets：`STATIC_DEPLOY_SSH_KEY`（完整多行私钥）、`STATIC_DEPLOY_KNOWN_HOSTS`（经可信渠道核验的完整 host key 行）。`GIT_COMMIT_SHA` 来自 `github.sha`，`DIST_DIR=dist`；私钥与 known_hosts 文件只在 runner 临时目录存在，由 trap 清理。无需 `SITE_PUBLIC_URL` / `SITE_SMOKE_PATH`。不要仅凭构建成功或本地测试就报告线上部署完成；迁移还需验收博客深链、真实 404 和 Astro 指纹资源缓存，见运维文档。
 
 ## 写新功能时
 
